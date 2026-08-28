@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" width="1600" height="480">
-  <rect width="1600" height="480" fill="#242B34"/>
-  <g fill="#FFFCF7" opacity="0.5" font-family="sans-serif">
-    <text x="800" y="230" font-size="28" text-anchor="middle">PHOTO PLACEHOLDER</text>
-    <text x="800" y="270" font-size="16" text-anchor="middle">Replace assets/donation-photo-placeholder.svg with a real photo</text>
-    <text x="800" y="296" font-size="16" text-anchor="middle">from a blood donation camp (recommended width: 1600px+)</text>
-  </g>
-</svg>
