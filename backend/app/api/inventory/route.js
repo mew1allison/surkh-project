@@ -1,0 +1,233 @@
+import { createSupabaseServerClient } from '@/lib/supabase-server'
+
+const VALID_BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+const VALID_STATUSES = ['available', 'low', 'not available']
+const VALID_COMPONENT_TYPES = ['Whole Blood', 'Red Blood Cells', 'Platelets', 'Fresh Frozen Plasma']
+
+export async function GET() {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('Inventory')
+    .select('*')
+
+  if (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 500 }
+    )
+  }
+
+  return Response.json(data)
+}
+
+export async function POST(request) {
+  const supabase = await createSupabaseServerClient()
+
+  // Step 1: authenticate
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Step 2: get facility_id from server-side Profile
+  const { data: profile, error: profileError } = await supabase
+    .from('Profile')
+    .select('facility_id')
+    .eq('id', user.id)
+    .single()
+
+  if (profileError || !profile) {
+    return Response.json({ error: 'Profile not found' }, { status: 404 })
+  }
+
+  if (!profile.facility_id) {
+    return Response.json(
+      { error: 'No facility associated with this account' },
+      { status: 403 }
+    )
+  }
+
+  // Step 3: validate client-supplied fields
+  const body = await request.json()
+
+  if (body.facility_id !== undefined) {
+    return Response.json(
+      { error: 'You are not authorized to specify a facility' },
+      { status: 403 }
+    )
+  }
+
+  const { blood_group, quantity, expiry_date, status, component_type } = body
+
+  if (!blood_group || !VALID_BLOOD_GROUPS.includes(blood_group)) {
+    return Response.json(
+      { error: `blood_group must be one of: ${VALID_BLOOD_GROUPS.join(', ')}` },
+      { status: 400 }
+    )
+  }
+
+  const parsedQuantity = Number(quantity)
+  if (!Number.isInteger(parsedQuantity) || parsedQuantity < 0) {
+    return Response.json({ error: 'quantity must be a non-negative integer' }, { status: 400 })
+  }
+
+  if (!expiry_date || isNaN(Date.parse(expiry_date))) {
+    return Response.json({ error: 'expiry_date must be a valid date' }, { status: 400 })
+  }
+
+  if (!status || !VALID_STATUSES.includes(status)) {
+    return Response.json(
+      { error: `status must be one of: ${VALID_STATUSES.join(', ')}` },
+      { status: 400 }
+    )
+  }
+
+  if (!component_type || !VALID_COMPONENT_TYPES.includes(component_type)) {
+    return Response.json(
+      { error: `component_type must be one of: ${VALID_COMPONENT_TYPES.join(', ')}` },
+      { status: 400 }
+    )
+  }
+
+  // Step 4: insert — facility_id always from server-side Profile
+  const { data, error } = await supabase
+    .from('Inventory')
+    .insert({
+      facility_id: profile.facility_id,
+      blood_group,
+      quantity: parsedQuantity,
+      expiry_date,
+      status,
+      component_type,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 })
+  }
+
+  // Step 5: return created record
+  return Response.json(data, { status: 201 })
+}
+
+export async function PATCH(request) {
+  const supabase = await createSupabaseServerClient()
+
+  // Step 1: authenticate
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Step 2: get facility_id from server-side Profile
+  const { data: profile, error: profileError } = await supabase
+    .from('Profile')
+    .select('facility_id')
+    .eq('id', user.id)
+    .single()
+
+  if (profileError || !profile) {
+    return Response.json({ error: 'Profile not found' }, { status: 404 })
+  }
+
+  if (!profile.facility_id) {
+    return Response.json(
+      { error: 'No facility associated with this account' },
+      { status: 403 }
+    )
+  }
+
+  // Step 3: extract and validate id + fields to update
+  const body = await request.json()
+  const { id, blood_group, quantity, expiry_date, status, component_type } = body
+
+  const parsedId = Number(id)
+  if (!Number.isInteger(parsedId) || parsedId < 1) {
+    return Response.json({ error: 'id must be a positive integer' }, { status: 400 })
+  }
+
+  const updates = {}
+
+  if (blood_group !== undefined) {
+    if (!VALID_BLOOD_GROUPS.includes(blood_group)) {
+      return Response.json(
+        { error: `blood_group must be one of: ${VALID_BLOOD_GROUPS.join(', ')}` },
+        { status: 400 }
+      )
+    }
+    updates.blood_group = blood_group
+  }
+
+  if (quantity !== undefined) {
+    const parsedQuantity = Number(quantity)
+    if (!Number.isInteger(parsedQuantity) || parsedQuantity < 0) {
+      return Response.json({ error: 'quantity must be a non-negative integer' }, { status: 400 })
+    }
+    updates.quantity = parsedQuantity
+  }
+
+  if (expiry_date !== undefined) {
+    if (isNaN(Date.parse(expiry_date))) {
+      return Response.json({ error: 'expiry_date must be a valid date' }, { status: 400 })
+    }
+    updates.expiry_date = expiry_date
+  }
+
+  if (status !== undefined) {
+    if (!VALID_STATUSES.includes(status)) {
+      return Response.json(
+        { error: `status must be one of: ${VALID_STATUSES.join(', ')}` },
+        { status: 400 }
+      )
+    }
+    updates.status = status
+  }
+
+  if (component_type !== undefined) {
+    if (!VALID_COMPONENT_TYPES.includes(component_type)) {
+      return Response.json(
+        { error: `component_type must be one of: ${VALID_COMPONENT_TYPES.join(', ')}` },
+        { status: 400 }
+      )
+    }
+    updates.component_type = component_type
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return Response.json({ error: 'No valid fields provided to update' }, { status: 400 })
+  }
+
+  // Step 4: update — RLS enforces facility ownership, facility_id never touched
+  const { data, error } = await supabase
+    .from('Inventory')
+    .update(updates)
+    .eq('id', parsedId)
+    .select()
+    .single()
+
+  if (error) {
+    // When RLS blocks the update, .single() fails because no row is returned
+    if (
+      error.message.includes('Cannot coerce the result to a single JSON object') ||
+      error.code === 'PGRST116'
+    ) {
+      return Response.json(
+        { error: 'You are not authorized to modify this inventory' },
+        { status: 403 }
+      )
+    }
+    return Response.json({ error: error.message }, { status: 500 })
+  }
+
+  if (!data) {
+    return Response.json(
+      { error: 'You are not authorized to modify this inventory' },
+      { status: 403 }
+    )
+  }
+
+  // Step 5: return updated record
+  return Response.json(data, { status: 200 })
+}
