@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In — SURKH</title>
+  <link rel="icon" type=""image/x-icon" href="assets/icon-drop-of-blood.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top announcement bar -->
+  <div class="top-bar">
+    <a href="#" class="top-bar__link">Download Our App <span aria-hidden="true">→</span></a>
+  </div>
+
+  <!-- Header — no "Get Connected" CTA here, this page is for returning facilities, not new sign-ups -->
+  <header class="site-header">
+    <a href="index.html" class="brand">
+      <img src="assets/logo.jpg" alt="SURKH logo" class="brand__logo">
+      <span class="brand__text">
+        <span class="brand__name">SURKH</span>
+        <span class="brand__tagline">CENTRALISED BLOOD INVENTORY</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <a href="index.html#hero" class="main-nav__link">Home</a>
+      <a href="index.html#why" class="main-nav__link">About</a>
+    </nav>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <!-- ---- Short intro — no full pitch/chips here, just a welcome line ---- -->
+  <section class="partner-hero">
+    <div class="partner-hero__inner">
+      <p class="partner-hero__label">Facility Login</p>
+      <h1 class="partner-hero__heading js-float-in">Welcome Back to the Grid</h1>
+      <p class="partner-hero__desc js-float-in">
+        Log in to update your inventory, view incoming requests, and keep
+        your facility visible across the network.
+      </p>
+    </div>
+  </section>
+
+  <!-- ---- Login: photo panel + form ---- -->
+  <section class="partner-signup" id="facility-login">
+    <div class="partner-signup__inner">
+
+      <!-- Photo panel — same image as the sign-up page for visual continuity -->
+      <div class="partner-photo">
+        <img src="assets/hospital-login.jpg" class="partner-photo__img">
+        <div class="partner-photo__content">
+        </div>
+      </div>
+
+      <!-- Form card — just the two fields a returning user actually needs -->
+      <form class="partner-form" id="login-form" novalidate>
+        <h2 class="partner-form__heading js-float-in">Log In</h2>
+        <p class="partner-form__subtext js-float-in">Enter the details you signed up with.</p>
+
+        <!-- profile.email -->
+        <div class="partner-form__field">
+          <label class="partner-form__label" for="login-email">Work Email</label>
+          <input type="email" id="login-email" name="login-email" class="partner-form__input" placeholder="you@hospital.org" required>
+        </div>
+
+        <!-- Auth-only — Supabase Auth verifies this, not a Profile column -->
+        <div class="partner-form__field">
+          <label class="partner-form__label" for="login-password">Password</label>
+          <input type="password" id="login-password" name="login-password" class="partner-form__input" placeholder="Your password" required minlength="8">
+        </div>
+
+        <p class="partner-form__error" id="login-form-error"></p>
+
+        <button type="submit" class="btn btn--primary partner-form__submit" id="login-submit-btn">
+          <span id="login-submit-btn-text">Log In</span>
+        </button>
+
+        <p class="partner-form__login">
+          <a href="#">Forgot password?</a>
+        </p>
+        <p class="partner-form__login">Don't have an account? <a href="signup.html">Sign up</a></p>
+      </form>
+
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__brand">Surkh</p>
+      <nav class="site-footer__links">
+        <a href="index.html#why">Impact</a>
+        <a href="index.html#join-grid">Technology</a>
+        <a href="partner.html">Partner Hospitals</a>
+        <a href="#">Privacy Policy</a>
+      </nav>
+      <p class="site-footer__copy">&copy; <span id="footer-year"></span> Surkh Blood Management Grid. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
