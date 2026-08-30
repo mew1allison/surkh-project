@@ -1,0 +1,4461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facility Dashboard — SURKH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+/* ---- Design tokens ---- */
+:root {
+  --color-primary: #D8323A;   /* red */
+  --color-secondary: #F0B856; /* gold */
+  --color-accent: #111415;    /* near-black */
+  --color-text: #1C0204;
+  --color-bg: #FFFCF7;
+  --color-hero-navy: #242B34; /* derived hero overlay */
+
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+}
+
+/* ---- Top announcement bar ---- */
+.top-bar {
+  background: var(--color-primary);
+  padding: 0.75rem 1.5rem;
+}
+
+.top-bar__link {
+  color: var(--color-bg);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* ---- Header ---- */
+.site-header {
+  position: relative;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.brand:hover {
+  opacity: 0.8;
+}
+
+.brand__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand__name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-primary);
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+}
+
+.brand__tagline {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-accent);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+/* Nav — hidden on mobile until the hamburger opens it as a dropdown */
+.main-nav {
+  display: none;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  padding: 1.5rem;
+  box-shadow: 0 8px 16px rgba(28, 2, 4, 0.1);
+  z-index: 20;
+}
+
+.main-nav.is-open {
+  display: flex;
+}
+
+.main-nav__link {
+  position: relative;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.main-nav__link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width 0.25s ease;
+}
+
+.main-nav__link:hover {
+  color: var(--color-primary);
+}
+
+.main-nav__link:hover::after {
+  width: 100%;
+}
+
+.main-nav__cta {
+  width: auto;
+  align-self: flex-start;
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.nav-toggle {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 26px;
+  height: 3px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Hamburger animates into an X when the nav is open */
+.nav-toggle.is-active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.nav-toggle.is-active span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle.is-active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ---- Hero ---- */
+.hero {
+  position: relative;
+  background: var(--color-hero-navy) url('assets/hero-map-bg.png') center / cover no-repeat;
+  padding: 3rem 1.5rem 3.5rem;
+  text-align: center;
+}
+
+/* Dark overlay so hero text stays legible over the map image */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(36, 43, 52, 0.55);
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hero__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.05;
+  font-size: clamp(2.2rem, 9vw, 3.2rem);
+}
+
+.hero__heading-line {
+  display: block;
+}
+
+.hero__heading-line--red {
+  color: var(--color-primary);
+}
+
+.hero__heading-line--white {
+  color: var(--color-bg);
+}
+
+.hero__drop-icon {
+  font-size: 0.75em;
+}
+
+.hero__swoosh {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 1rem auto 1.5rem;
+  display: block;
+}
+
+.hero__desc {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--color-bg);
+  font-size: clamp(1.05rem, 4vw, 1.3rem);
+  line-height: 1.5;
+  max-width: 560px;
+  margin: 0 auto 2rem;
+}
+
+.hero__desc-accent {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Small icon sitting inline with button/heading text (replaces emoji placeholders) */
+.icon-inline {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* Shake feedback for a blocked form submit, so it never reads as unresponsive */
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+.shake {
+  animation: shake 0.5s ease;
+}
+
+/* ---- Buttons ---- */
+/* Kept exactly as shown in design: sharp corners, block-level, not pill-shaped or centered */
+.btn {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  border: none;
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(28, 2, 4, 0.18);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.btn--secondary {
+  background: var(--color-secondary);
+  color: var(--color-accent);
+}
+
+/* ---- Why SURKH ---- */
+.why {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg);
+  padding: 3rem 1.5rem 3.5rem;
+  text-align: center;
+}
+
+.why__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.why__icon-top {
+  width: 32px;
+  margin-bottom: 1rem;
+}
+
+.why__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  margin-bottom: 1.5rem;
+}
+
+.why__stats {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin-bottom: 2.5rem;
+}
+
+.why__stats strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.why__stats-accent {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Scroll-in animation target: starts hidden/offset, .is-visible triggers the transition */
+.js-float-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.js-float-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.why__icon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 420px;
+  margin: 0 auto 3rem;
+}
+
+.why__icon-side {
+  width: 64px;
+  height: 64px;
+}
+
+.why__subheading {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.why__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Card border color is set per-card via inline style / --card-accent (see script.js) */
+.why-card {
+  --card-accent: var(--color-accent);
+  background: var(--color-bg);
+  border-left: 6px solid var(--card-accent);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.why-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(28, 2, 4, 0.14);
+}
+
+.why-card__icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.75rem;
+}
+
+.why-card__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.why-card__title span {
+  color: var(--color-primary);
+}
+
+.why-card__desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  opacity: 0.85;
+}
+
+.why__resolves {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.why__learn-more {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  margin-bottom: 2.5rem;
+}
+
+.why__photo {
+  width: calc(100% + 3rem);
+  margin: 0 -1.5rem -3.5rem;
+  display: block;
+  max-width: none;
+}
+
+/* ---- Find Blood Now ---- */
+.find-blood {
+  background: #FBE3E4; /* light pink derived from primary, matches mockup */
+  padding: 3rem 1.5rem 3.5rem;
+}
+
+.find-blood__intro {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.find-blood__icon-top {
+  width: 32px;
+  margin-bottom: 1rem;
+}
+
+.find-blood__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  margin-bottom: 1rem;
+}
+
+.find-blood__subtext {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.find-blood__subtext-accent {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.find-blood__location-btn {
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.find-blood__location-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.find-blood__location-status {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  min-height: 1.2em;
+  margin-bottom: 1.25rem;
+}
+
+.find-blood__location-status--success {
+  color: #1a7a3c;
+}
+
+.find-blood__location-status--error {
+  color: var(--color-primary);
+}
+
+.find-blood__location-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.find-blood__quick-label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.find-blood__quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.chip {
+  font-family: var(--font-body);
+  font-weight: 500;
+  background: var(--color-secondary);
+  color: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(28, 2, 4, 0.12);
+}
+
+.chip.is-active {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+/* Search form card */
+.find-blood__form {
+  background: var(--color-bg);
+  border-left: 6px solid var(--color-primary);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  max-width: 640px;
+  margin: 0 auto 3rem;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.find-blood__field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.find-blood__field-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.find-blood__field-icon--pin {
+  width: auto;
+  height: auto;
+  font-size: 1.3rem;
+}
+
+.find-blood__group-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.group-btn {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  transition: transform 0.15s ease;
+}
+
+.group-btn:hover {
+  transform: scale(1.1);
+}
+
+.group-btn.is-active {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border-radius: 4px;
+}
+
+.find-blood__qty-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.qty-btn {
+  font-family: var(--font-body);
+  font-weight: 500;
+  background: var(--color-secondary);
+  opacity: 0.55;
+  border: none;
+  border-radius: 4px;
+  min-width: 56px;
+  padding: 0.7rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.qty-btn:hover {
+  transform: translateY(-2px);
+}
+
+.qty-btn.is-active {
+  opacity: 1;
+}
+
+.find-blood__qty-custom {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 160px;
+  background: var(--color-secondary);
+  opacity: 0.55;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.find-blood__qty-custom.is-active {
+  opacity: 1;
+}
+
+.find-blood__qty-custom-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-accent);
+  padding: 0.7rem 0.9rem;
+  min-width: 0;
+}
+
+.find-blood__qty-custom-input::placeholder {
+  color: var(--color-accent);
+  opacity: 0.7;
+}
+
+.find-blood__qty-step {
+  border: none;
+  background: rgba(17, 20, 21, 0.08);
+  font-family: var(--font-body);
+  font-weight: 600;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+}
+
+.find-blood__city-select {
+  width: 100%;
+  background: var(--color-secondary);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-accent);
+  padding: 0.9rem 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111415'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.find-blood__submit {
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.find-blood__submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.find-blood__form-error {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  text-align: center;
+  min-height: 1.2em;
+}
+
+/* Results */
+.find-blood__results {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.find-blood__results-heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.find-blood__results-subtext {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  opacity: 0.75;
+  margin-bottom: 2rem;
+}
+
+.find-blood__results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.result-card {
+  background: var(--color-bg);
+  border-left: 6px solid var(--color-secondary);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  overflow: hidden;
+  text-align: left;
+}
+
+.result-card__photo-wrap {
+  position: relative;
+}
+
+.result-card__photo {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+.result-card__badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-secondary);
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+}
+
+.result-card__body {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.result-card__top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-card__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.result-card__name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text);
+  margin-bottom: 0.2rem;
+}
+
+.result-card__address {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.75;
+}
+
+.result-card__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.result-card__eta {
+  font-family: var(--font-body);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.result-card__reserve {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.result-card__reserve:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(28, 2, 4, 0.2);
+}
+
+.find-blood__see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  text-decoration: none;
+  padding: 0.9rem 1.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.find-blood__empty {
+  display: none;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  opacity: 0.75;
+  margin-bottom: 1.5rem;
+}
+
+.find-blood__empty.is-visible {
+  display: block;
+}
+
+.result-card__reserve:disabled {
+  background: var(--color-accent);
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---- Reserve Blood dialog ---- */
+.reserve-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.reserve-modal[hidden] {
+  display: none;
+}
+
+.reserve-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 20, 21, 0.55);
+}
+
+.reserve-modal__box {
+  position: relative;
+  background: var(--color-bg);
+  border-radius: 8px;
+  max-width: 380px;
+  width: 100%;
+  padding: 2rem 1.75rem;
+  text-align: center;
+}
+
+.reserve-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.reserve-modal__title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.reserve-modal__group {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.reserve-modal__facility {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+.reserve-modal__contact {
+  background: rgba(17, 20, 21, 0.05);
+  border-radius: 4px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reserve-modal__contact-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+
+.reserve-modal__cta {
+  width: 100%;
+  justify-content: center;
+  background: #25D366; /* WhatsApp brand green */
+}
+
+/* ---- Desktop ---- */
+/* Design was provided mobile-first; on wider screens we simply give the
+   same stacked layout more breathing room rather than re-composing it. */
+@media (min-width: 768px) {
+  .top-bar,
+  .site-header,
+  .hero__inner {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  .site-header {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  /* Desktop nav sits inline in the header; hamburger is mobile-only */
+  .nav-toggle {
+    display: none;
+  }
+
+  .main-nav {
+    display: flex;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .main-nav__cta {
+    align-self: center;
+  }
+
+  .hero {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .hero__actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .btn {
+    flex: 0 0 auto;
+    min-width: 220px;
+  }
+
+  .why__cards {
+    flex-direction: row;
+    gap: 2.5rem;
+  }
+
+  .why-card {
+    flex: 1;
+    padding: 2.25rem 2rem;
+  }
+
+  .why__resolves {
+    max-width: 1100px;
+  }
+
+  .why__photo {
+    width: calc(100% + 8rem);
+    margin: 0 -4rem -3.5rem;
+  }
+
+  /* Find Blood: becomes a full-width filter toolbar, results grid below it */
+  .find-blood {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  .find-blood__location-btn {
+    width: auto;
+    display: inline-flex;
+  }
+
+  .find-blood__form {
+    max-width: none;
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    border-left: none;
+    border-top: 6px solid var(--color-primary);
+    padding: 1.75rem 2rem;
+    gap: 2rem;
+  }
+
+  .find-blood__field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .find-blood__field--group {
+    flex: 1.6;
+  }
+
+  .find-blood__field-label {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .find-blood__submit {
+    width: auto;
+    align-self: flex-end;
+    padding: 0.9rem 2rem;
+  }
+
+  .find-blood__results {
+    max-width: none;
+  }
+
+  /* Fixed-width grid tracks keep cards uniform in size, never stretched,
+     and simply centered as a group when fewer than 3 results are shown. */
+  .find-blood__results-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 300px));
+    justify-content: center;
+    gap: 1.75rem;
+  }
+
+  .result-card {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ---- Join the Grid: how it works, AI ledger brief, CTA cards ---- */
+.join-grid {
+  background: var(--color-bg);
+  padding: 3rem 1.5rem 3.5rem;
+}
+
+.how-works {
+  background: var(--color-bg);
+  border: 1px solid rgba(28, 2, 4, 0.08);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  max-width: 1100px;
+  margin: 0 auto 2.5rem;
+}
+
+.how-works__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text);
+  font-size: clamp(1.6rem, 6vw, 2rem);
+  margin-bottom: 2rem;
+}
+
+.how-works__steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem 1rem;
+}
+
+.how-works__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin: 0 auto 0.85rem;
+}
+
+.how-works__icon img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Tints derived from existing brand tokens (no new hex values introduced) */
+.how-works__icon--tint1 { background: rgba(216, 50, 58, 0.14); }
+.how-works__icon--tint2 { background: rgba(36, 43, 52, 0.12); }
+.how-works__icon--tint3 { background: rgba(240, 184, 86, 0.3); }
+.how-works__icon--tint4 { background: rgba(216, 50, 58, 0.14); }
+
+.how-works__step-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.how-works__step-desc {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+/* ---- AI Ledger Reader brief ---- */
+/* No screenshot supplied yet for this block — placeholder copy, kept in the
+   same visual language as the rest of the page until the real one arrives. */
+.ledger-brief {
+  max-width: 640px;
+  margin: 0 auto 3.5rem;
+  padding: 1rem 0 1.5rem;
+  text-align: center;
+}
+
+.ledger-brief__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--color-primary);
+  border-radius: 4px;
+}
+
+.ledger-brief__icon img {
+  width: 28px;
+  height: 28px;
+}
+
+.ledger-brief__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: clamp(1.5rem, 5vw, 1.9rem);
+  margin-bottom: 0.75rem;
+}
+
+.ledger-brief__desc {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  opacity: 0.85;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.ledger-brief__features {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+  margin: 0 auto;
+}
+
+.ledger-brief__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.ledger-brief__feature-check {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+/* ---- For Donors / For Hospitals CTA cards ---- */
+.cta-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cta-card {
+  border-radius: 4px;
+  padding: 2rem 1.75rem;
+  color: var(--color-bg);
+}
+
+.cta-card--donor {
+  /* Derived from --color-primary rather than a hand-picked new hex */
+  background: color-mix(in srgb, var(--color-primary) 65%, black);
+}
+
+.cta-card--hospital {
+  background: var(--color-hero-navy);
+}
+
+.cta-card__title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cta-card__desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+  max-width: 420px;
+}
+
+/* Buttons size to their own text instead of stretching full-width, so labels
+   like "Partner with Surkh" never wrap under the card edge */
+.cta-card__btn {
+  display: inline-flex;
+  width: auto;
+  white-space: nowrap;
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--color-bg);
+  border: 2px solid var(--color-bg);
+}
+
+/* ---- Footer ---- */
+.site-footer {
+  background: var(--color-hero-navy);
+  color: var(--color-bg);
+  padding: 2rem 1.5rem;
+}
+
+.site-footer__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.site-footer__brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.site-footer__links a {
+  color: var(--color-bg);
+  opacity: 0.8;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.site-footer__links a:hover {
+  opacity: 1;
+}
+
+.site-footer__copy {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+@media (min-width: 768px) {
+  .how-works {
+    padding: 3rem;
+  }
+
+  .how-works__steps {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .how-works__icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .cta-cards {
+    flex-direction: row;
+  }
+
+  .cta-card {
+    flex: 1;
+    padding: 2.5rem;
+  }
+
+  .site-footer__inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .site-footer__links {
+    justify-content: flex-start;
+  }
+}
+
+
+/* ================================================================
+   Partner with Surkh — hospital sign-up page (partner.html)
+   ================================================================ */
+
+/* ---- Section 1: why hospitals ---- */
+.partner-hero {
+  background: var(--color-bg);
+  padding: 3.5rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.partner-hero__inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.partner-hero__label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.partner-hero__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text);
+  font-size: clamp(1.9rem, 7vw, 2.6rem);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.partner-hero__desc {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--color-text);
+  opacity: 0.85;
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+.partner-hero__chips {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.partner-chip {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--color-bg);
+  border: 1px solid rgba(28, 2, 4, 0.08);
+  border-radius: 4px;
+  padding: 1.25rem;
+}
+
+.partner-chip__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partner-chip__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.partner-chip__desc {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.5;
+}
+
+/* ---- Section 2: photo + form ---- */
+.partner-signup {
+  background: var(--color-bg);
+  padding: 1rem 1.5rem 4rem;
+}
+
+.partner-signup__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(28, 2, 4, 0.1);
+}
+
+/* Photo panel — placeholder hospital image with a primary-to-accent gradient,
+   same overlay technique as the hero section's dark map overlay */
+.partner-photo {
+  position: relative;
+  min-height: 220px;
+  background: var(--color-hero-navy);
+}
+
+.partner-photo__placeholder {
+  position: absolute;
+  z-index: 1;
+  inset: 1rem;
+  border: 1.5px dashed rgba(255, 252, 247, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 1rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(255, 252, 247, 0.7);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.partner-photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(216, 50, 58, 0.85), rgba(17, 20, 21, 0.85));
+}
+
+.partner-photo__content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: var(--color-bg);
+}
+
+.partner-photo__quote {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.partner-photo__count {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Form card */
+.partner-form {
+  background: var(--color-bg);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.partner-form__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text);
+  font-size: 1.5rem;
+}
+
+.partner-form__subtext {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.7;
+  margin-top: -1rem;
+}
+
+.partner-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.partner-form__label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.partner-form__input {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1.5px solid rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  padding: 0.85rem 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.partner-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.partner-form__select {
+  width: 100%;
+  background: var(--color-secondary);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-accent);
+  padding: 0.9rem 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111415'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.partner-form__location-btn {
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.partner-form__location-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.partner-form__location-status {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.partner-form__location-status--success {
+  color: #1a7a3c;
+}
+
+.partner-form__location-status--error {
+  color: var(--color-primary);
+}
+
+.partner-form__toggle {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.toggle-btn {
+  flex: 1;
+  font-family: var(--font-body);
+  font-weight: 600;
+  background: var(--color-secondary);
+  opacity: 0.55;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-btn.is-active {
+  opacity: 1;
+}
+
+.partner-form__divider {
+  border: none;
+  border-top: 1px solid rgba(28, 2, 4, 0.1);
+  margin: 0.5rem 0;
+}
+
+.partner-form__section-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: -1rem;
+}
+
+.partner-form__error {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  min-height: 1.2em;
+}
+
+.partner-form__submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.partner-form__login {
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.partner-form__login a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .partner-hero__chips {
+    flex-direction: row;
+  }
+
+  .partner-chip {
+    flex: 1;
+  }
+
+  .partner-signup__inner {
+    flex-direction: row;
+  }
+
+  .partner-photo,
+  .partner-form {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .partner-photo {
+    min-height: 100%;
+  }
+
+  .partner-form {
+    padding: 3rem 3rem;
+  }
+}
+
+
+/* ============================================================
+   Dashboard shell — Step 1
+   Extends style.css tokens. Loaded after style.css, never before.
+   ============================================================ */
+
+:root {
+  --color-healthy: #2E7D6B; /* muted teal-green — "sufficient stock" state, new for the dashboard */
+}
+
+/* ---- Body context ---- */
+.dashboard-body {
+  background: #FAF6EE; /* a hair darker than --color-bg so white cards lift off the page */
+  min-height: 100vh;
+}
+
+/* ---- Header ---- */
+.dash-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--color-bg);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(17, 20, 21, 0.08);
+}
+
+.dash-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.dash-header__logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.dash-header__brand-name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Facility switcher ---- */
+.facility-switcher-wrap {
+  position: relative;
+  margin-right: auto;
+  display: none;
+}
+
+.facility-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: 1px solid rgba(17, 20, 21, 0.12);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.facility-switcher:hover,
+.facility-switcher[aria-expanded="true"] {
+  border-color: rgba(17, 20, 21, 0.3);
+  background: rgba(17, 20, 21, 0.03);
+}
+
+.facility-switcher__label {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.facility-switcher__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.facility-switcher__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.55);
+}
+
+.facility-switcher__meta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-healthy);
+  flex-shrink: 0;
+}
+
+.facility-switcher__chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.facility-switcher[aria-expanded="true"] .facility-switcher__chevron {
+  transform: rotate(180deg);
+}
+
+.facility-switcher__menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  min-width: 240px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  box-shadow: 0 8px 22px rgba(28, 2, 4, 0.14);
+  padding: 0.5rem;
+  z-index: 30;
+}
+
+.facility-switcher__menu.is-open {
+  display: block;
+}
+
+.facility-switcher__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.facility-switcher__item:hover {
+  background: rgba(17, 20, 21, 0.05);
+}
+
+.facility-switcher__item.is-active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.facility-switcher__divider {
+  height: 1px;
+  background: rgba(17, 20, 21, 0.08);
+  margin: 0.4rem 0.25rem;
+}
+
+/* ---- Header actions (bell + profile) ---- */
+.dash-header__actions {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.notif-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.notif-bell:hover {
+  background: rgba(17, 20, 21, 0.05);
+}
+
+.notif-bell__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.dash-profile-wrap {
+  position: relative;
+}
+
+.dash-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.dash-profile:hover,
+.dash-profile[aria-expanded="true"] {
+  background: rgba(17, 20, 21, 0.05);
+}
+
+.dash-profile__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dash-profile__info {
+  display: none;
+  flex-direction: column;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.dash-profile__name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.dash-profile__role {
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.55);
+}
+
+.dash-profile__menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  box-shadow: 0 8px 22px rgba(28, 2, 4, 0.14);
+  padding: 0.5rem;
+  z-index: 30;
+}
+
+.dash-profile__menu.is-open {
+  display: block;
+}
+
+.dash-profile__menu-item {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dash-profile__menu-item:hover {
+  background: rgba(17, 20, 21, 0.05);
+}
+
+.dash-profile__menu-item--danger {
+  color: var(--color-primary);
+}
+
+/* ---- Mobile menu toggle + panel ---- */
+.dash-nav-toggle {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: auto;
+}
+
+.dash-nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 3px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.dash-nav-toggle.is-active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.dash-nav-toggle.is-active span:nth-child(2) {
+  opacity: 0;
+}
+
+.dash-nav-toggle.is-active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.dash-mobile-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  padding: 1rem 1.5rem 1.5rem;
+  box-shadow: 0 8px 16px rgba(28, 2, 4, 0.1);
+  z-index: 20;
+}
+
+.dash-mobile-panel.is-open {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dash-mobile-panel .facility-switcher,
+.dash-mobile-panel .dash-profile {
+  width: 100%;
+}
+
+.dash-mobile-panel .dash-profile {
+  justify-content: flex-start;
+}
+
+.dash-mobile-panel .dash-profile__info {
+  display: flex;
+}
+
+/* ---- Main layout grid ---- */
+.dash-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dash-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/* ---- Card ---- */
+.dash-card {
+  background: var(--color-bg);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  padding: 1.5rem;
+}
+
+.dash-card--wide {
+  width: 100%;
+}
+
+.dash-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dash-card__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-accent);
+}
+
+.dash-card__meta {
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.5);
+  white-space: nowrap;
+}
+
+.dash-card__meta-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.dash-card__severity {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dash-card__severity-item--critical {
+  color: var(--color-primary);
+}
+
+.dash-card__severity-item--low {
+  color: var(--color-accent);
+}
+
+.dash-card__severity-sep {
+  color: rgba(28, 2, 4, 0.3);
+  margin: 0 0.3rem;
+}
+
+.dash-card__step-badge {
+  flex-shrink: 0;
+  background: var(--color-secondary);
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ---- Current stock table (Step 2) ---- */
+.stock-table {
+  list-style: none;
+}
+
+.stock-row {
+  border-bottom: 1px solid rgba(17, 20, 21, 0.08);
+}
+
+.stock-row:last-child {
+  border-bottom: none;
+}
+
+.stock-row__main {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: none;
+  border: none;
+  font: inherit;
+  text-align: left;
+  padding: 0.9rem 0.35rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.stock-row__main:hover {
+  background: rgba(17, 20, 21, 0.03);
+}
+
+.stock-row__main:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.stock-row__group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.stock-row__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stock-row__label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-text);
+  min-width: 2.4ch;
+}
+
+.stock-row__right {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.stock-row__qty {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  min-width: 90px;
+  text-align: right;
+}
+
+.stock-row__unit {
+  font-weight: 400;
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.5);
+  margin-left: 0.15rem;
+}
+
+.stock-row__status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.28rem 0.6rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: center;
+}
+
+.stock-row__chevron {
+  color: rgba(28, 2, 4, 0.3);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.stock-row.is-open .stock-row__chevron {
+  transform: rotate(180deg);
+}
+
+.stock-row__detail {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.35rem 0.9rem 1.9rem;
+  font-size: 0.8rem;
+  color: rgba(28, 2, 4, 0.55);
+}
+
+.stock-row.is-open .stock-row__detail {
+  display: flex;
+}
+
+.stock-row__detail-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stock-row__detail-link:hover {
+  text-decoration: underline;
+}
+
+/* Status → color mapping, shared across the dashboard wherever status appears.
+   Healthy rows show only the dot — the pill is reserved for rows that need attention,
+   so low/critical stand out instead of competing with a "Healthy" label of equal weight. */
+.stock-row__status {
+  display: none;
+}
+
+[data-status="healthy"] .stock-row__dot { background: var(--color-healthy); }
+
+[data-status="low"] .stock-row__dot { background: var(--color-secondary); }
+[data-status="low"] .stock-row__status {
+  display: inline-block;
+  background: rgba(240, 184, 86, 0.25);
+  color: var(--color-accent);
+}
+
+[data-status="critical"] .stock-row__dot { background: var(--color-primary); }
+[data-status="critical"] .stock-row__qty { color: var(--color-primary); }
+[data-status="critical"] .stock-row__status {
+  display: inline-block;
+  background: rgba(216, 50, 58, 0.12);
+  color: var(--color-primary);
+}
+
+/* ---- Activity timeline (Step 3) ---- */
+.activity-timeline {
+  position: relative;
+  padding: 1.5rem 0.5rem 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.activity-timeline__track {
+  position: relative;
+  height: 2px;
+  background: rgba(17, 20, 21, 0.12);
+  margin: 0 6px;
+}
+
+.activity-node {
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.activity-node:hover,
+.activity-node:focus-visible {
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.activity-node[data-type="in"] { background: var(--color-healthy); }
+.activity-node[data-type="out"] { background: var(--color-primary); }
+
+.activity-node:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.activity-node__tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.activity-node__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--color-accent);
+}
+
+.activity-node:hover .activity-node__tooltip,
+.activity-node:focus-visible .activity-node__tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.activity-timeline__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.6rem;
+  font-size: 0.68rem;
+  color: rgba(28, 2, 4, 0.45);
+}
+
+.activity-node__card {
+  display: none;
+  margin-top: 1rem;
+  border-left: 4px solid transparent;
+  border-radius: 4px;
+  padding: 0.9rem 1.1rem;
+}
+
+.activity-node__card.is-visible {
+  display: block;
+}
+
+.activity-node__card[data-type="in"] {
+  border-left-color: var(--color-healthy);
+  background: rgba(46, 125, 107, 0.07);
+}
+
+.activity-node__card[data-type="out"] {
+  border-left-color: var(--color-primary);
+  background: rgba(216, 50, 58, 0.07);
+}
+
+.activity-node__card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.3rem;
+}
+
+.activity-node__group {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.activity-node__delta {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.activity-node__card[data-type="in"] .activity-node__delta { color: var(--color-healthy); }
+.activity-node__card[data-type="out"] .activity-node__delta { color: var(--color-primary); }
+
+.activity-node__source-badge {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: rgba(17, 20, 21, 0.08);
+  color: var(--color-accent);
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.activity-node__meta {
+  font-size: 0.85rem;
+  color: rgba(28, 2, 4, 0.6);
+}
+
+.expiring-strip {
+  border-top: 1px solid rgba(17, 20, 21, 0.08);
+  padding-top: 1rem;
+}
+
+.expiring-strip__header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.expiring-strip__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.expiring-strip__list strong {
+  color: var(--color-primary);
+}
+
+/* ---- Log Blood button + dropdown ---- */
+.dash-card__header-right {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  flex-shrink: 0;
+}
+
+.log-blood-wrap {
+  position: relative;
+}
+
+.log-blood-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.log-blood-btn:hover { opacity: 0.9; }
+
+.log-blood-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 190px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  box-shadow: 0 8px 22px rgba(28, 2, 4, 0.14);
+  padding: 0.4rem;
+  z-index: 30;
+}
+
+.log-blood-menu.is-open { display: block; }
+
+.log-blood-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 0.6rem 0.65rem;
+  font-family: var(--font-body);
+  font-size: 0.87rem;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.log-blood-menu__item:hover { background: rgba(17, 20, 21, 0.05); }
+.log-blood-menu__item svg { flex-shrink: 0; color: rgba(28, 2, 4, 0.55); }
+
+/* ---- Stock table edit mode: save bar ---- */
+.stock-savebar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(216, 50, 58, 0.05);
+  border: 1px solid rgba(216, 50, 58, 0.15);
+  border-radius: 4px;
+  padding: 0.65rem 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.stock-savebar.is-active { display: flex; }
+
+.stock-savebar__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.stock-savebar__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* ---- Stock table inline editor (replaces qty display while editing) ---- */
+.stock-row__editor {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stock-table.is-editing .stock-row__editor { display: flex; }
+.stock-table.is-editing .stock-row__qty { display: none; }
+.stock-table.is-editing .stock-row__status { display: none !important; }
+.stock-table.is-editing .stock-row__detail { display: none !important; }
+.stock-table.is-editing .stock-row__main { cursor: default; }
+
+.stock-row__step {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  border: 1px solid rgba(17, 20, 21, 0.15);
+  background: var(--color-bg);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.stock-row__step:hover { background: rgba(17, 20, 21, 0.05); }
+
+.stock-row__input {
+  width: 62px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  padding: 0.4rem 0.2rem;
+  color: var(--color-text);
+}
+
+.stock-row.is-changed {
+  background: rgba(240, 184, 86, 0.08);
+  border-radius: 4px;
+}
+
+.stock-row.is-changed .stock-row__input {
+  border-color: var(--color-secondary);
+}
+
+/* ---- AI Ledger Reader slide-over ---- */
+.ledger-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 20, 21, 0.35);
+  z-index: 90;
+}
+
+.ledger-overlay.is-open { display: block; }
+
+.ledger-slideover {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-bg);
+  box-shadow: -8px 0 24px rgba(28, 2, 4, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 91;
+  overflow-y: auto;
+}
+
+.ledger-slideover.is-open {
+  transform: translateX(0);
+}
+
+.ledger-slideover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(17, 20, 21, 0.08);
+}
+
+.ledger-slideover__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+}
+
+.ledger-slideover__close {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 4px;
+}
+
+.ledger-slideover__close:hover { background: rgba(17, 20, 21, 0.06); }
+
+.ledger-slideover__body {
+  padding: 1.5rem;
+}
+
+/* ---- Shared buttons ---- */
+.btn-solid {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn-solid:hover { opacity: 0.88; }
+
+.btn-solid--wide {
+  width: 100%;
+  margin-top: 1.1rem;
+  padding: 0.7rem;
+}
+
+.btn-ghost {
+  background: none;
+  border: 1px solid rgba(17, 20, 21, 0.2);
+  color: var(--color-text);
+  border-radius: 4px;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-ghost:hover { background: rgba(17, 20, 21, 0.05); }
+
+/* ---- Tabs (shared: notifications + log new stock) ---- */
+.notif-tabs {
+  display: flex;
+  gap: 0.4rem;
+  border-bottom: 1px solid rgba(17, 20, 21, 0.1);
+  margin-bottom: 1.25rem;
+}
+
+.notif-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 0.2rem;
+  margin-bottom: -1px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: rgba(28, 2, 4, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.notif-tab.is-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.notif-tab__count {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.notif-panel,
+.entry-panel {
+  display: none;
+}
+
+.notif-panel.is-active,
+.entry-panel.is-active {
+  display: block;
+}
+
+/* ---- Live requests ---- */
+.notif-request {
+  border-bottom: 1px solid rgba(17, 20, 21, 0.08);
+  padding: 0.9rem 0;
+}
+
+.notif-request:first-child { padding-top: 0; }
+.notif-request:last-child { border-bottom: none; padding-bottom: 0; }
+
+.notif-request__top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.notif-request__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.notif-request__dot--urgent { background: var(--color-primary); }
+.notif-request__dot--warn { background: var(--color-secondary); }
+
+.notif-request__facility {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.notif-request__time {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.45);
+}
+
+.notif-request__body {
+  font-size: 0.88rem;
+  color: rgba(28, 2, 4, 0.75);
+  margin-bottom: 0.7rem;
+}
+
+.notif-request__body strong { color: var(--color-primary); }
+
+.notif-request__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* ---- History ---- */
+.notif-history-item {
+  border-bottom: 1px solid rgba(17, 20, 21, 0.08);
+  padding: 0.75rem 0;
+}
+
+.notif-history-item:first-child { padding-top: 0; }
+.notif-history-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+.notif-history-item__body {
+  font-size: 0.87rem;
+  color: rgba(28, 2, 4, 0.75);
+  margin-bottom: 0.25rem;
+}
+
+.notif-history-item__body strong { color: var(--color-text); }
+
+.notif-history-item__time {
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.45);
+}
+
+/* ---- Log new stock — Manual Entry ---- */
+.entry-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.entry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.entry-field__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(28, 2, 4, 0.6);
+}
+
+.entry-field__select {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  border: 1px solid rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  padding: 0.55rem 0.7rem;
+  background: var(--color-bg);
+}
+
+.entry-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.entry-stepper__btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  border: 1px solid rgba(17, 20, 21, 0.15);
+  background: var(--color-bg);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.entry-stepper__btn:hover { background: rgba(17, 20, 21, 0.05); }
+
+.entry-stepper__value {
+  width: 64px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  border: 1px solid rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  padding: 0.5rem 0.3rem;
+}
+
+.entry-stepper__unit {
+  font-size: 0.8rem;
+  color: rgba(28, 2, 4, 0.5);
+}
+
+/* ---- Log new stock — AI Ledger Reader ---- */
+.ledger-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 2.25rem 1.5rem;
+  border: 1.5px dashed rgba(17, 20, 21, 0.18);
+  border-radius: 4px;
+  color: var(--color-accent);
+}
+
+.ledger-upload__title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-top: 0.3rem;
+}
+
+.ledger-upload__or {
+  font-size: 0.75rem;
+  color: rgba(28, 2, 4, 0.4);
+}
+
+.ledger-upload__hint {
+  font-size: 0.72rem;
+  color: rgba(28, 2, 4, 0.45);
+  margin-top: 0.4rem;
+  max-width: 280px;
+}
+
+.ledger-review {
+  display: none;
+}
+
+.ledger-review.is-active {
+  display: block;
+}
+
+.ledger-review__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ledger-review__label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-text);
+}
+
+.ledger-review__confidence {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-healthy);
+  background: rgba(46, 125, 107, 0.12);
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+}
+
+.ledger-review__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+}
+
+/* ---- Placeholder state (removed as each step is built) ---- */
+.dash-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1.25rem;
+  border: 1.5px dashed rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  color: rgba(28, 2, 4, 0.5);
+}
+
+.dash-placeholder__icon {
+  color: var(--color-secondary);
+}
+
+.dash-placeholder__text {
+  font-size: 0.85rem;
+  max-width: 220px;
+}
+
+/* ---- Responsive ---- */
+@media (min-width: 768px) {
+  .dash-header {
+    padding: 1rem 2.5rem;
+  }
+
+  .dash-header__brand-name {
+    font-size: 1.4rem;
+  }
+
+  .facility-switcher-wrap {
+    display: block;
+  }
+
+  .dash-header__actions {
+    display: flex;
+  }
+
+  .dash-nav-toggle,
+  .dash-mobile-panel {
+    display: none;
+  }
+
+  .dash-main {
+    padding: 2rem 2.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .dash-profile__info {
+    display: flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dash-grid {
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+  }
+}
+
+</style>
+</head>
+<body class="dashboard-body">
+
+  <!-- ================= Header ================= -->
+  <header class="dash-header">
+
+    <a href="dashboard.html" class="dash-header__brand">
+      <img src="assets/logo.jpg" alt="SURKH logo" class="dash-header__logo">
+      <span class="dash-header__brand-name">SURKH</span>
+    </a>
+
+    <!-- Facility switcher — desktop, sits inline in the header -->
+    <div class="facility-switcher-wrap">
+      <button class="facility-switcher" id="facility-switcher-btn" aria-haspopup="true" aria-expanded="false">
+        <span class="facility-switcher__label">
+          <span class="facility-switcher__name">Services Hospital Blood Bank</span>
+          <span class="facility-switcher__meta"><span class="facility-switcher__meta-dot"></span>Synced 2 min ago</span>
+        </span>
+        <svg class="facility-switcher__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="facility-switcher__menu" id="facility-switcher-menu">
+        <button class="facility-switcher__item is-active">Services Hospital Blood Bank</button>
+        <div class="facility-switcher__divider"></div>
+        <button class="facility-switcher__item">Manage facility details</button>
+      </div>
+    </div>
+
+    <!-- Bell + profile — desktop -->
+    <div class="dash-header__actions">
+      <button class="notif-bell" id="notif-bell-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-bell__badge">3</span>
+      </button>
+
+      <div class="dash-profile-wrap">
+        <button class="dash-profile" id="dash-profile-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="dash-profile__avatar">DA</span>
+          <span class="dash-profile__info">
+            <span class="dash-profile__name">Dr. Ahmad</span>
+            <span class="dash-profile__role">Facility Admin</span>
+          </span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dash-profile__menu" id="dash-profile-menu">
+          <a href="#" class="dash-profile__menu-item">Account settings</a>
+          <a href="#" class="dash-profile__menu-item">Facility staff</a>
+          <div class="facility-switcher__divider"></div>
+          <a href="#" class="dash-profile__menu-item dash-profile__menu-item--danger">Log out</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile trigger -->
+    <button class="dash-nav-toggle" id="dash-nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Mobile panel: facility switcher + profile, bell stays in the header above -->
+    <div class="dash-mobile-panel" id="dash-mobile-panel">
+      <button class="facility-switcher" id="facility-switcher-btn-mobile" aria-haspopup="true" aria-expanded="false">
+        <span class="facility-switcher__label">
+          <span class="facility-switcher__name">Services Hospital Blood Bank</span>
+          <span class="facility-switcher__meta"><span class="facility-switcher__meta-dot"></span>Synced 2 min ago</span>
+        </span>
+        <svg class="facility-switcher__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="facility-switcher__menu" id="facility-switcher-menu-mobile">
+        <button class="facility-switcher__item is-active">Services Hospital Blood Bank</button>
+        <div class="facility-switcher__divider"></div>
+        <button class="facility-switcher__item">Manage facility details</button>
+      </div>
+
+      <button class="dash-profile">
+        <span class="dash-profile__avatar">DA</span>
+        <span class="dash-profile__info">
+          <span class="dash-profile__name">Dr. Ahmad</span>
+          <span class="dash-profile__role">Facility Admin</span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= Main ================= -->
+  <main class="dash-main">
+    <div class="dash-grid">
+
+      <!-- Secondary column: notifications -->
+      <aside class="dash-col dash-col--secondary">
+
+        <div class="dash-card">
+          <div class="dash-card__header">
+            <h2 class="dash-card__title">Notifications</h2>
+          </div>
+
+          <div class="notif-tabs" role="tablist">
+            <button class="notif-tab is-active" role="tab" aria-selected="true" data-tab="live">Live Requests <span class="notif-tab__count">2</span></button>
+            <button class="notif-tab" role="tab" aria-selected="false" data-tab="history">History</button>
+          </div>
+
+          <div class="notif-panel is-active" data-panel="live">
+            <div class="notif-request">
+              <div class="notif-request__top">
+                <span class="notif-request__dot notif-request__dot--urgent"></span>
+                <span class="notif-request__facility">City Hospital</span>
+                <span class="notif-request__time">12 min ago</span>
+              </div>
+              <p class="notif-request__body">Needs <strong>O−</strong> · 4 units · 2.3 km away</p>
+              <div class="notif-request__actions">
+                <button class="btn-ghost">Acknowledge</button>
+                <button class="btn-solid">Fulfill</button>
+              </div>
+            </div>
+
+            <div class="notif-request">
+              <div class="notif-request__top">
+                <span class="notif-request__dot notif-request__dot--warn"></span>
+                <span class="notif-request__facility">Services Hospital</span>
+                <span class="notif-request__time">40 min ago</span>
+              </div>
+              <p class="notif-request__body">Needs <strong>A+</strong> · 10 units · 5.1 km away</p>
+              <div class="notif-request__actions">
+                <button class="btn-ghost">Acknowledge</button>
+                <button class="btn-solid">Fulfill</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="notif-panel" data-panel="history">
+            <div class="notif-history-item">
+              <p class="notif-history-item__body">Patient reserved <strong>B+</strong> · 2 units via Surkh public search</p>
+              <span class="notif-history-item__time">Today, 9:14 AM</span>
+            </div>
+            <div class="notif-history-item">
+              <p class="notif-history-item__body">Patient reserved <strong>O+</strong> · 1 unit via Surkh public search</p>
+              <span class="notif-history-item__time">Yesterday, 6:02 PM</span>
+            </div>
+            <div class="notif-history-item">
+              <p class="notif-history-item__body">Patient reserved <strong>A−</strong> · 3 units via Surkh public search</p>
+              <span class="notif-history-item__time">2 days ago, 11:47 AM</span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Primary column: stock + timeline -->
+      <section class="dash-col dash-col--primary">
+
+        <div class="dash-card">
+          <div class="dash-card__header">
+            <h2 class="dash-card__title">Current stock</h2>
+            <div class="dash-card__header-right">
+              <div class="dash-card__meta-group">
+                <span class="dash-card__severity">
+                  <span class="dash-card__severity-item dash-card__severity-item--critical">2 critical</span>
+                  <span class="dash-card__severity-sep">·</span>
+                  <span class="dash-card__severity-item dash-card__severity-item--low">2 low</span>
+                </span>
+                <span class="dash-card__meta">Updated 2 hrs ago</span>
+              </div>
+              <div class="log-blood-wrap">
+                <button class="log-blood-btn" id="log-blood-btn" aria-haspopup="true" aria-expanded="false">
+                  Log Blood
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="log-blood-menu" id="log-blood-menu">
+                  <button class="log-blood-menu__item" id="log-blood-manual-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Manual Entry
+                  </button>
+                  <button class="log-blood-menu__item" id="log-blood-ai-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    AI Ledger Reader
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stock-savebar" id="stock-savebar">
+            <span class="stock-savebar__label"><span id="stock-savebar-count">0</span> changes pending</span>
+            <div class="stock-savebar__actions">
+              <button class="btn-ghost" id="stock-cancel-btn">Cancel</button>
+              <button class="btn-solid" id="stock-save-btn">Save changes</button>
+            </div>
+          </div>
+
+          <ul class="stock-table" id="stock-table">
+
+            <li class="stock-row" data-value="124" data-status="healthy">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">O+</span><span class="stock-row__status">Healthy</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="124" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">124 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 2 hrs ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="8" data-status="critical">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">O−</span><span class="stock-row__status">Critical</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="8" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">8 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 6 hrs ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="41" data-status="healthy">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">A+</span><span class="stock-row__status">Healthy</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="41" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">41 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 1 hr ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="15" data-status="low">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">A−</span><span class="stock-row__status">Low</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="15" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">15 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 4 hrs ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="52" data-status="healthy">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">B+</span><span class="stock-row__status">Healthy</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="52" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">52 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 5 hrs ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="3" data-status="critical">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">B−</span><span class="stock-row__status">Critical</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="3" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">3 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 30 min ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="22" data-status="healthy">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">AB+</span><span class="stock-row__status">Healthy</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="22" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">22 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 3 hrs ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+            <li class="stock-row" data-value="6" data-status="low">
+              <button class="stock-row__main" aria-expanded="false">
+                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">AB−</span><span class="stock-row__status">Low</span></span>
+                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="6" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+                  <span class="stock-row__qty">6 <span class="stock-row__unit">units</span></span>
+                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </button>
+              <div class="stock-row__detail">
+                <span>Last updated 8 hrs ago</span>
+                <a href="#" class="stock-row__detail-link">View history →</a>
+              </div>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card__header">
+            <h2 class="dash-card__title">Recent activity</h2>
+            <span class="dash-card__meta">Last 6 entries</span>
+          </div>
+
+          <div class="activity-timeline">
+            <div class="activity-timeline__track">
+              <span class="activity-node" data-type="in" data-source="manual" style="left:4%" tabindex="0" role="button" aria-label="6 days ago, O+ logged, manual entry">
+                <span class="activity-node__tooltip">Manual Entry</span>
+              </span>
+              <span class="activity-node" data-type="out" data-source="manual" style="left:22%" tabindex="0" role="button" aria-label="4 days ago, O− used, manual entry">
+                <span class="activity-node__tooltip">Manual Entry</span>
+              </span>
+              <span class="activity-node" data-type="in" data-source="ai" style="left:40%" tabindex="0" role="button" aria-label="3 days ago, A+ logged, AI Ledger Reader">
+                <span class="activity-node__tooltip">AI Ledger Reader</span>
+              </span>
+              <span class="activity-node" data-type="out" data-source="manual" style="left:60%" tabindex="0" role="button" aria-label="2 days ago, A− used, manual entry">
+                <span class="activity-node__tooltip">Manual Entry</span>
+              </span>
+              <span class="activity-node" data-type="in" data-source="ai" style="left:80%" tabindex="0" role="button" aria-label="yesterday, AB+ logged, AI Ledger Reader">
+                <span class="activity-node__tooltip">AI Ledger Reader</span>
+              </span>
+              <span class="activity-node" data-type="in" data-source="ai" style="left:97%" tabindex="0" role="button" aria-label="today, B− logged, AI Ledger Reader">
+                <span class="activity-node__tooltip">AI Ledger Reader</span>
+              </span>
+            </div>
+            <div class="activity-timeline__labels">
+              <span>6d ago</span><span>4d ago</span><span>3d ago</span><span>2d ago</span><span>Yesterday</span><span>Today</span>
+            </div>
+
+            <div class="activity-node__card" id="activity-node-card" data-type="in">
+              <div class="activity-node__card-top">
+                <span class="activity-node__group">B−</span>
+                <span class="activity-node__delta">+12 units</span>
+                <span class="activity-node__source-badge">AI Ledger Reader</span>
+              </div>
+              <p class="activity-node__meta">Today · confirmed by Dr. Ahmad</p>
+            </div>
+          </div>
+
+          <div class="expiring-strip">
+            <div class="expiring-strip__header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Expiring soon</span>
+            </div>
+            <ul class="expiring-strip__list">
+              <li><strong>O+</strong> · 6 units · expires in <strong>3 days</strong></li>
+              <li><strong>AB−</strong> · 2 units · expires in <strong>5 days</strong></li>
+            </ul>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- AI Ledger Reader — slide-over, opened from Log Blood menu -->
+  <div class="ledger-overlay" id="ledger-overlay"></div>
+  <aside class="ledger-slideover" id="ledger-slideover" aria-hidden="true">
+    <div class="ledger-slideover__header">
+      <h2 class="ledger-slideover__title">AI Ledger Reader</h2>
+      <button class="ledger-slideover__close" id="ledger-close-btn" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="ledger-slideover__body">
+      <div class="ledger-upload" id="ledger-upload">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <p class="ledger-upload__title">Take a photo of the paper register</p>
+        <p class="ledger-upload__or">— or —</p>
+        <button class="btn-ghost" id="ledger-upload-btn">Upload an image</button>
+        <p class="ledger-upload__hint">On mobile this opens your camera. On desktop, choose a file.</p>
+      </div>
+
+      <div class="ledger-review" id="ledger-review">
+        <div class="ledger-review__top">
+          <span class="ledger-review__label">Review before confirming</span>
+          <span class="ledger-review__confidence">Confidence: 92%</span>
+        </div>
+        <div class="entry-form">
+          <label class="entry-field">
+            <span class="entry-field__label">Blood Group</span>
+            <select class="entry-field__select">
+              <option>O+</option><option>O−</option><option>A+</option><option>A−</option>
+              <option selected>B+</option><option>B−</option><option>AB+</option><option>AB−</option>
+            </select>
+          </label>
+          <label class="entry-field">
+            <span class="entry-field__label">Quantity</span>
+            <input type="number" class="entry-field__select" value="8" min="0">
+          </label>
+          <label class="entry-field">
+            <span class="entry-field__label">Date</span>
+            <input type="date" class="entry-field__select">
+          </label>
+        </div>
+        <div class="ledger-review__actions">
+          <button class="btn-solid">Confirm &amp; Log</button>
+          <button class="btn-ghost" id="ledger-retake-btn">Retake / Re-upload</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+// ---- Why SURKH: cards rendered from data, not hand-written ----
+const whyCards = [
+  {
+    accent: 'var(--color-accent)',
+    icon: 'assets/icon-hospital.png',
+    title: 'Connecting <span>hospitals</span> in the donor-patient loop',
+    desc: 'Develop trust channels through certified facilities'
+  },
+  {
+    accent: 'var(--color-secondary)',
+    icon: 'assets/icon-sync.png',
+    title: 'Allowing facilities to <span>sync</span> blood inventories',
+    desc: 'Real-time updates about available blood nearby'
+  },
+  {
+    accent: 'var(--color-primary)',
+    icon: 'assets/icon-network.png',
+    title: 'Including smaller blood camps via <span>AI</span> technology',
+    desc: 'AI Ledger Reader enables local setups to get connected'
+  }
+];
+
+const cardsContainer = document.getElementById('why-cards');
+
+if (cardsContainer) {
+  whyCards.forEach((card) => {
+    const el = document.createElement('div');
+    el.className = 'why-card';
+    el.style.setProperty('--card-accent', card.accent);
+    el.innerHTML = `
+      <img src="${card.icon}" alt="" class="why-card__icon">
+      <h4 class="why-card__title">${card.title}</h4>
+      <p class="why-card__desc">${card.desc}</p>
+    `;
+    cardsContainer.appendChild(el);
+  });
+}
+
+// ---- Footer: always show the current year, never a hardcoded one ----
+const footerYear = document.getElementById('footer-year');
+if (footerYear) footerYear.textContent = new Date().getFullYear();
+
+// ---- Float-in on scroll for heading/paragraph ----
+const floatTargets = document.querySelectorAll('.js-float-in');
+
+if (floatTargets.length) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  floatTargets.forEach((el) => observer.observe(el));
+}
+
+// ---- Find Blood Now: interactive state (Step 2) ----
+// This mirrors the shape a future API call will need:
+// { blood_group, quantity, city, coords }. TODO: match to schema once
+// the /inventory endpoint's real query params are finalized.
+const findBloodState = {
+  bloodGroup: null,
+  quantity: null,
+  city: null,
+  coords: null
+};
+
+const quickCities = ['Islamabad', 'Lahore', 'Karachi', 'Peshawar'];
+const chipsContainer = document.getElementById('quick-search-chips');
+const citySelect = document.getElementById('city-select');
+
+// Approximate city centers — used to turn a picked city into coordinates so
+// filtering/sorting can run on lat/long (matching facilities.latitude/longitude)
+// the same way a GPS-based search would, instead of a separate string match.
+const CITY_COORDS = {
+  Islamabad: { lat: 33.6844, lng: 73.0479 },
+  Lahore: { lat: 31.5497, lng: 74.3436 },
+  Karachi: { lat: 24.8607, lng: 67.0011 },
+  Peshawar: { lat: 34.0151, lng: 71.5249 },
+  Quetta: { lat: 30.1798, lng: 66.9750 },
+  Multan: { lat: 30.1575, lng: 71.5249 }
+};
+
+// Reverse-geocode-lite: given raw GPS coords, find the closest known city so
+// the dropdown can auto-fill without a real geocoding API. Real coords are
+// still kept for distance sorting — this only drives the displayed label.
+function nearestCityFromCoords(lat, lng) {
+  let closest = null;
+  let minDist = Infinity;
+  Object.entries(CITY_COORDS).forEach(([name, coord]) => {
+    const dist = distanceKm(lat, lng, coord.lat, coord.lng);
+    if (dist < minDist) {
+      minDist = dist;
+      closest = name;
+    }
+  });
+  return closest;
+}
+
+// Keep quick-search chips and the city dropdown in sync with each other
+function setCity(cityName) {
+  findBloodState.city = cityName;
+  findBloodState.coords = CITY_COORDS[cityName] || null;
+
+  // Picking a city overrides any GPS lock — reset that button's label
+  if (locationBtnText) locationBtnText.textContent = 'Use Live Location';
+  if (locationStatus) {
+    locationStatus.textContent = '';
+    locationStatus.className = 'find-blood__location-status';
+  }
+
+  if (citySelect) {
+    const match = Array.from(citySelect.options).find(
+      (opt) => opt.textContent.trim().toLowerCase() === cityName.toLowerCase()
+    );
+    if (match) citySelect.value = match.value;
+  }
+
+  if (chipsContainer) {
+    chipsContainer.querySelectorAll('.chip').forEach((chip) => {
+      chip.classList.toggle('is-active', chip.textContent.trim() === cityName);
+    });
+  }
+}
+
+if (chipsContainer) {
+  quickCities.forEach((city) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip';
+    btn.textContent = city;
+    btn.addEventListener('click', () => setCity(city));
+    chipsContainer.appendChild(btn);
+  });
+}
+
+if (citySelect) {
+  citySelect.addEventListener('change', () => {
+    const cityName = citySelect.selectedOptions[0]?.textContent.trim() || null;
+    findBloodState.city = cityName;
+    findBloodState.coords = cityName ? CITY_COORDS[cityName] || null : null;
+    if (chipsContainer) {
+      chipsContainer.querySelectorAll('.chip').forEach((chip) => {
+        chip.classList.toggle('is-active', chip.textContent.trim() === cityName);
+      });
+    }
+  });
+}
+
+// Blood group — single select, click again to deselect
+const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+const DEFAULT_BLOOD_GROUP = 'O+'; // pre-selected so the user has a visual cue on load
+const groupGrid = document.getElementById('blood-group-grid');
+
+if (groupGrid) {
+  bloodGroups.forEach((group) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'group-btn';
+    btn.textContent = group;
+
+    if (group === DEFAULT_BLOOD_GROUP) {
+      btn.classList.add('is-active');
+      findBloodState.bloodGroup = group;
+    }
+
+    btn.addEventListener('click', () => {
+      const alreadyActive = btn.classList.contains('is-active');
+      groupGrid.querySelectorAll('.group-btn').forEach((b) => b.classList.remove('is-active'));
+      if (!alreadyActive) {
+        btn.classList.add('is-active');
+        findBloodState.bloodGroup = group;
+      } else {
+        findBloodState.bloodGroup = null;
+      }
+    });
+    groupGrid.appendChild(btn);
+  });
+}
+
+// Quantity — presets or custom input, mutually exclusive
+const quantityPresets = [1, 5, 10];
+const qtyRow = document.getElementById('quantity-options');
+let customInput;
+let customWrap;
+
+function selectPresetQty(value, btn) {
+  findBloodState.quantity = value;
+  if (customInput) customInput.value = '';
+  if (customWrap) customWrap.classList.remove('is-active');
+  qtyRow.querySelectorAll('.qty-btn').forEach((b) => b.classList.remove('is-active'));
+  btn.classList.add('is-active');
+}
+
+function useCustomQty() {
+  const value = parseInt(customInput.value, 10);
+  findBloodState.quantity = Number.isNaN(value) ? null : value;
+  qtyRow.querySelectorAll('.qty-btn').forEach((b) => b.classList.remove('is-active'));
+  customWrap.classList.toggle('is-active', !Number.isNaN(value) && value > 0);
+}
+
+if (qtyRow) {
+  quantityPresets.forEach((qty) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'qty-btn';
+    btn.textContent = qty;
+    btn.addEventListener('click', () => selectPresetQty(qty, btn));
+    qtyRow.appendChild(btn);
+  });
+
+  customWrap = document.createElement('div');
+  customWrap.className = 'find-blood__qty-custom';
+  customWrap.innerHTML = `
+    <input type="number" min="1" class="find-blood__qty-custom-input" placeholder="Select Custom">
+    <button type="button" class="find-blood__qty-step">+1</button>
+  `;
+  qtyRow.appendChild(customWrap);
+
+  customInput = customWrap.querySelector('.find-blood__qty-custom-input');
+  const stepBtn = customWrap.querySelector('.find-blood__qty-step');
+
+  customInput.addEventListener('input', useCustomQty);
+  stepBtn.addEventListener('click', () => {
+    const current = parseInt(customInput.value, 10) || 0;
+    customInput.value = current + 1;
+    useCustomQty();
+  });
+}
+
+// Use Live Location — real Geolocation API call
+const locationBtn = document.getElementById('use-location-btn');
+const locationBtnText = document.getElementById('location-btn-text');
+const locationStatus = document.getElementById('location-status');
+
+if (locationBtn) {
+  locationBtn.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      locationStatus.textContent = 'Geolocation is not supported on this device.';
+      locationStatus.className = 'find-blood__location-status find-blood__location-status--error';
+      return;
+    }
+
+    locationBtn.disabled = true;
+    locationBtnText.textContent = 'Locating…';
+    locationStatus.textContent = '';
+    locationStatus.className = 'find-blood__location-status';
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        findBloodState.coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+        // Fill the city select/chip with the nearest known city for display,
+        // but keep the exact GPS coords above for real distance sorting.
+        const nearestCity = nearestCityFromCoords(findBloodState.coords.lat, findBloodState.coords.lng);
+        findBloodState.city = nearestCity;
+
+        if (citySelect) {
+          const match = Array.from(citySelect.options).find(
+            (opt) => opt.textContent.trim().toLowerCase() === (nearestCity || '').toLowerCase()
+          );
+          citySelect.value = match ? match.value : '';
+        }
+        if (chipsContainer) {
+          chipsContainer.querySelectorAll('.chip').forEach((chip) => {
+            chip.classList.toggle('is-active', chip.textContent.trim() === nearestCity);
+          });
+        }
+
+        locationBtn.disabled = false;
+        locationBtnText.textContent = 'Location Detected ✓';
+        locationStatus.textContent = nearestCity
+          ? `Using your current location — closest to ${nearestCity}.`
+          : 'Using your current location for nearby results.';
+        locationStatus.className = 'find-blood__location-status find-blood__location-status--success';
+      },
+      (error) => {
+        findBloodState.coords = null;
+        locationBtn.disabled = false;
+        locationBtnText.textContent = 'Use Live Location';
+        locationStatus.textContent =
+          error.code === error.PERMISSION_DENIED
+            ? 'Location permission denied — select a city instead.'
+            : 'Could not detect location — select a city instead.';
+        locationStatus.className = 'find-blood__location-status find-blood__location-status--error';
+      }
+    );
+  });
+}
+
+// Form submit — validates, then hands off a clean state object
+// (this is the exact shape a real fetch('/inventory?...') call would consume)
+const findBloodForm = document.getElementById('find-blood-form');
+const searchBtn = document.getElementById('search-blood-btn');
+const searchBtnText = document.getElementById('search-btn-text');
+const formError = document.getElementById('form-error');
+const resultsSection = document.querySelector('.find-blood__results');
+
+if (findBloodForm) {
+  findBloodForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    formError.textContent = '';
+
+    let invalid = false;
+
+    if (!findBloodState.bloodGroup) {
+      formError.textContent = 'Please select a blood group.';
+      invalid = true;
+    } else if (!findBloodState.coords) {
+      formError.textContent = 'Please select a city or use your live location.';
+      invalid = true;
+    }
+
+    if (invalid) {
+      // Visible shake so a blocked submit is never mistaken for "nothing happened"
+      findBloodForm.classList.remove('shake');
+      // eslint-disable-next-line no-unused-expressions
+      void findBloodForm.offsetWidth; // restart the animation if triggered twice in a row
+      findBloodForm.classList.add('shake');
+      return;
+    }
+
+    searchBtn.disabled = true;
+    searchBtnText.textContent = 'Searching…';
+
+    // TODO: replace fetchFacilities() with the real API call, e.g.
+    // fetch(`/inventory?blood_group=${findBloodState.bloodGroup}&lat=${findBloodState.coords.lat}&lng=${findBloodState.coords.lng}`).then(r => r.json())
+    fetchFacilities(findBloodState).then((results) => {
+      searchBtn.disabled = false;
+      searchBtnText.textContent = 'Search Blood';
+      currentFilteredResults = results;
+      visibleResultsCount = RESULTS_PAGE_SIZE;
+      resultsSubtext.textContent = 'Showing Closest to You';
+      renderResultsList();
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+// ---- Find Blood Now: results (Step 3) ----
+// Mirrors your real schema: `facilities` (location data) joined with
+// `inventory` (stock per blood_group, owned/updated by partner hospitals).
+// Profile and Exchange Request aren't needed for public search, so they're
+// left out here. TODO: swap these two arrays for
+// GET /facilities + GET /inventory once the backend is wired up.
+const mockFacilities = [
+  { id: 1, name: 'Pakistan Red Crescent Society', location: 'Ashfaq Ahmed Road, Sector H-8/2, Islamabad', latitude: 33.7106, longitude: 73.0497, has_emr: true, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 51 111 111 222' },
+  { id: 2, name: 'Al Khidmat Raazi Hospital', location: '24-B-1, near Chandni Chowk Flyover, Satellite Town, Islamabad', latitude: 33.6600, longitude: 73.0169, has_emr: false, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 51 111 222 333' },
+  { id: 3, name: 'Services Hospital Blood Bank', location: 'Jail Road, Lahore', latitude: 31.5204, longitude: 74.3345, has_emr: true, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 42 111 333 444' },
+  { id: 4, name: 'Indus Hospital Karachi', location: 'Korangi Crossing, Karachi', latitude: 24.8447, longitude: 67.1364, has_emr: true, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 21 111 444 555' },
+  { id: 5, name: 'Lady Reading Hospital', location: 'Soekarno Chowk, Peshawar', latitude: 34.0083, longitude: 71.5405, has_emr: false, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 91 111 555 666' },
+  { id: 6, name: 'Sandeman Provincial Hospital', location: 'Jinnah Town, Quetta', latitude: 30.2095, longitude: 67.0182, has_emr: false, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 81 111 666 777' },
+  { id: 7, name: 'Nishtar Hospital Blood Bank', location: 'Nishtar Road, Multan', latitude: 30.1969, longitude: 71.4306, has_emr: true, photo: 'assets/donation-camp.jpg', logo: 'assets/logo.jpg', phone: '+92 61 111 777 888' }
+];
+
+// TODO: schema has no facility contact field yet — CTA phone numbers above
+// are placeholders standing in until Profile/facility contact info exists.
+const mockInventory = [
+  { id: 1, facility_id: 1, blood_group: 'A+', quantity: 4, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-15' },
+  { id: 2, facility_id: 1, blood_group: 'O+', quantity: 6, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-10' },
+  { id: 3, facility_id: 1, blood_group: 'B-', quantity: 0, status: 'expired', component_type: 'Whole Blood', expiry_date: '2026-08-01' },
+  { id: 4, facility_id: 2, blood_group: 'O+', quantity: 2, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-05' },
+  { id: 5, facility_id: 2, blood_group: 'AB+', quantity: 1, status: 'available', component_type: 'Plasma', expiry_date: '2026-09-20' },
+  { id: 6, facility_id: 3, blood_group: 'A+', quantity: 3, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-08' },
+  { id: 7, facility_id: 3, blood_group: 'O-', quantity: 1, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-02' },
+  { id: 8, facility_id: 4, blood_group: 'B+', quantity: 5, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-18' },
+  { id: 9, facility_id: 4, blood_group: 'O+', quantity: 0, status: 'reserved', component_type: 'Whole Blood', expiry_date: '2026-09-01' },
+  { id: 10, facility_id: 5, blood_group: 'AB-', quantity: 2, status: 'available', component_type: 'Plasma', expiry_date: '2026-09-12' },
+  { id: 11, facility_id: 5, blood_group: 'A+', quantity: 4, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-14' },
+  { id: 12, facility_id: 6, blood_group: 'B+', quantity: 3, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-09' },
+  { id: 13, facility_id: 6, blood_group: 'O+', quantity: 2, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-06' },
+  { id: 14, facility_id: 7, blood_group: 'A-', quantity: 2, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-11' },
+  { id: 15, facility_id: 7, blood_group: 'O+', quantity: 5, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-07' }
+];
+
+// Haversine distance in km — real GPS/city coords in, sorted-by-proximity out,
+// the same way a real facilities.latitude/longitude query would work.
+function distanceKm(lat1, lng1, lat2, lng2) {
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Rough drive-time estimate from straight-line distance, assuming ~30km/h
+// average city traffic. Good enough for card sorting/display without a real
+// routing API; TODO: swap for a maps ETA once one is wired up.
+function estimateEtaMinutes(km) {
+  const AVG_CITY_SPEED_KMH = 30;
+  return Math.max(5, Math.round((km / AVG_CITY_SPEED_KMH) * 60));
+}
+
+const RESULTS_PAGE_SIZE = 3; // matches the 3-cards-per-row desktop grid
+
+// Pre-search default view: all known facilities in no particular order,
+// standing in for a real "popular/common searches" endpoint.
+const commonSearches = [...mockFacilities];
+
+let currentFilteredResults = commonSearches;
+let visibleResultsCount = RESULTS_PAGE_SIZE;
+
+const resultsList = document.getElementById('results-list');
+const resultsEmpty = document.getElementById('results-empty');
+const resultsSubtext = document.getElementById('results-subtext');
+const seeAllBtn = document.getElementById('see-all-btn');
+
+function getInventoryFor(facilityId, group) {
+  const rows = mockInventory.filter((row) => row.facility_id === facilityId);
+  if (group) return rows.find((row) => row.blood_group === group);
+  return rows.find((row) => row.status === 'available' && row.quantity > 0);
+}
+
+function facilityHasGroup(facilityId, group) {
+  return mockInventory.some(
+    (row) => row.facility_id === facilityId && row.blood_group === group && row.status === 'available' && row.quantity > 0
+  );
+}
+
+function buildResultCard(facility) {
+  const stock = getInventoryFor(facility.id, findBloodState.bloodGroup);
+  const available = !!stock && stock.status === 'available' && stock.quantity > 0;
+  const distance = findBloodState.coords
+    ? distanceKm(findBloodState.coords.lat, findBloodState.coords.lng, facility.latitude, facility.longitude)
+    : null;
+
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <div class="result-card__photo-wrap">
+      <img src="${facility.photo}" alt="${facility.name}" class="result-card__photo">
+      ${available ? '<span class="result-card__badge">Available</span>' : ''}
+    </div>
+    <div class="result-card__body">
+      <div class="result-card__top">
+        <img src="${facility.logo}" alt="" class="result-card__logo">
+        <div>
+          <p class="result-card__name">${facility.name}</p>
+          <p class="result-card__address">${facility.location}</p>
+        </div>
+      </div>
+      <div class="result-card__bottom">
+        <span class="result-card__eta"><img src="assets/icon-car.svg" alt="" class="icon-inline">${distance !== null ? `~${estimateEtaMinutes(distance)} min` : 'ETA N/A'}</span>
+        <button type="button" class="result-card__reserve" data-facility-id="${facility.id}">Reserve Blood</button>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+function renderResultsList() {
+  if (!resultsList) return;
+  resultsList.innerHTML = '';
+  const toShow = currentFilteredResults.slice(0, visibleResultsCount);
+
+  toShow.forEach((facility) => resultsList.appendChild(buildResultCard(facility)));
+
+  if (resultsEmpty) resultsEmpty.classList.toggle('is-visible', currentFilteredResults.length === 0);
+  if (seeAllBtn) seeAllBtn.style.display = visibleResultsCount < currentFilteredResults.length ? 'inline-flex' : 'none';
+}
+
+// Mock API call — shaped like a future
+// fetch(`/inventory?blood_group=${bloodGroup}&lat=${lat}&lng=${lng}`).then(r => r.json())
+// so swapping this out later is a one-function change.
+function fetchFacilities(state) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const filtered = mockFacilities
+        .filter((f) => !state.bloodGroup || facilityHasGroup(f.id, state.bloodGroup))
+        .sort((a, b) => {
+          if (!state.coords) return 0;
+          const distA = distanceKm(state.coords.lat, state.coords.lng, a.latitude, a.longitude);
+          const distB = distanceKm(state.coords.lat, state.coords.lng, b.latitude, b.longitude);
+          return distA - distB;
+        });
+      resolve(filtered);
+    }, 500);
+  });
+}
+
+if (seeAllBtn) {
+  seeAllBtn.addEventListener('click', () => {
+    visibleResultsCount = currentFilteredResults.length;
+    renderResultsList();
+  });
+}
+
+// Reserve Blood — opens a dialog with the searched blood group, contact info,
+// and a WhatsApp hand-off CTA (only the dialog is built here; the actual send
+// happens on WhatsApp's side via the wa.me link).
+const reserveModal = document.getElementById('reserve-modal');
+const reserveModalBackdrop = document.getElementById('reserve-modal-backdrop');
+const reserveModalClose = document.getElementById('reserve-modal-close');
+const reserveModalGroup = document.getElementById('reserve-modal-group');
+const reserveModalFacility = document.getElementById('reserve-modal-facility');
+const reserveModalContact = document.getElementById('reserve-modal-contact');
+const reserveModalCta = document.getElementById('reserve-modal-cta');
+
+function openReserveModal(facility) {
+  const group = findBloodState.bloodGroup || 'Blood';
+  reserveModalGroup.textContent = `${group} is available at this facility`;
+  reserveModalFacility.textContent = `${facility.name} — ${facility.location}`;
+  reserveModalContact.textContent = facility.phone || 'Contact info not available';
+
+  const phoneDigits = (facility.phone || '').replace(/\D/g, '');
+  const message = `Hi, I'd like to reserve ${group} blood at ${facility.name}.`;
+  reserveModalCta.href = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
+
+  reserveModal.hidden = false;
+}
+
+function closeReserveModal() {
+  reserveModal.hidden = true;
+}
+
+if (resultsList) {
+  resultsList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.result-card__reserve');
+    if (!btn) return;
+    const facility = mockFacilities.find((f) => f.id === Number(btn.dataset.facilityId));
+    if (facility) openReserveModal(facility);
+  });
+}
+
+if (reserveModalClose) reserveModalClose.addEventListener('click', closeReserveModal);
+if (reserveModalBackdrop) reserveModalBackdrop.addEventListener('click', closeReserveModal);
+
+renderResultsList();
+// Nav toggle — opens/closes the mobile nav dropdown
+const navToggle = document.querySelector('.nav-toggle');
+const mainNav = document.getElementById('main-nav');
+
+if (navToggle && mainNav) {
+  navToggle.addEventListener('click', () => {
+    const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+    navToggle.setAttribute('aria-expanded', String(!isOpen));
+    navToggle.classList.toggle('is-active', !isOpen);
+    mainNav.classList.toggle('is-open', !isOpen);
+  });
+
+  // Close the menu after picking a link, so it doesn't stay open post-navigation
+  mainNav.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      navToggle.setAttribute('aria-expanded', 'false');
+      navToggle.classList.remove('is-active');
+      mainNav.classList.remove('is-open');
+    });
+  });
+}
+
+
+// ================================================================
+// Partner with Surkh — hospital sign-up form (partner.html only)
+// TODO: replace the mock submit below with a real POST /facilities call
+// (+ linked Profile row) once that backend endpoint exists. See
+// partner-signup-wireframe.md for the full field-to-schema mapping.
+// ================================================================
+const partnerForm = document.getElementById('partner-signup-form');
+
+if (partnerForm) {
+  // has_emr — single-select Yes/No toggle
+  const emrToggle = document.getElementById('has-emr-toggle');
+  let hasEmr = false; // matches the pre-selected "No" button in the markup
+
+  if (emrToggle) {
+    emrToggle.querySelectorAll('.toggle-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        emrToggle.querySelectorAll('.toggle-btn').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        hasEmr = btn.dataset.value === 'true';
+      });
+    });
+  }
+
+  // Precise location — same Geolocation API pattern as Find Blood, kept as
+  // its own state here since this page has no shared findBloodState.
+  const partnerLocationBtn = document.getElementById('partner-location-btn');
+  const partnerLocationBtnText = document.getElementById('partner-location-btn-text');
+  const partnerLocationStatus = document.getElementById('partner-location-status');
+  let facilityCoords = null;
+
+  if (partnerLocationBtn) {
+    partnerLocationBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        partnerLocationStatus.textContent = 'Geolocation is not supported on this device.';
+        partnerLocationStatus.className = 'partner-form__location-status partner-form__location-status--error';
+        return;
+      }
+
+      partnerLocationBtn.disabled = true;
+      partnerLocationBtnText.textContent = 'Locating…';
+      partnerLocationStatus.textContent = '';
+      partnerLocationStatus.className = 'partner-form__location-status';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          facilityCoords = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          partnerLocationBtn.disabled = false;
+          partnerLocationBtnText.textContent = 'Location Detected ✓';
+          partnerLocationStatus.textContent = "We'll use this as your facility's pinned location.";
+          partnerLocationStatus.className = 'partner-form__location-status partner-form__location-status--success';
+        },
+        (error) => {
+          facilityCoords = null;
+          partnerLocationBtn.disabled = false;
+          partnerLocationBtnText.textContent = 'Detect My Location';
+          partnerLocationStatus.textContent =
+            error.code === error.PERMISSION_DENIED
+              ? 'Location permission denied — this is required to list your facility.'
+              : 'Could not detect location — please try again.';
+          partnerLocationStatus.className = 'partner-form__location-status partner-form__location-status--error';
+        }
+      );
+    });
+  }
+
+  // Submit — validates required fields, then builds a payload shaped exactly
+  // like facilities + Profile (see schema mapping in the wireframe doc).
+  const partnerFormError = document.getElementById('partner-form-error');
+  const partnerSubmitBtn = document.getElementById('partner-submit-btn');
+  const partnerSubmitBtnText = document.getElementById('partner-submit-btn-text');
+
+  partnerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    partnerFormError.textContent = '';
+
+    const facilityName = document.getElementById('facility-name').value.trim();
+    const facilityLocation = document.getElementById('facility-location').value.trim();
+    const staffName = document.getElementById('staff-name').value.trim();
+    const staffEmail = document.getElementById('staff-email').value.trim();
+    const staffPassword = document.getElementById('staff-password').value;
+    const staffRole = document.getElementById('staff-role').value;
+
+    let invalid = false;
+    if (!facilityName || !facilityLocation) {
+      partnerFormError.textContent = 'Please fill in your facility name and address.';
+      invalid = true;
+    } else if (!facilityCoords) {
+      partnerFormError.textContent = "Please detect your facility's location before continuing.";
+      invalid = true;
+    } else if (!staffName || !staffEmail || staffPassword.length < 8 || !staffRole) {
+      partnerFormError.textContent = 'Please complete all of your details, including an 8+ character password.';
+      invalid = true;
+    }
+
+    if (invalid) {
+      // Reuses the same shake animation as the Find Blood form
+      partnerForm.classList.remove('shake');
+      // eslint-disable-next-line no-unused-expressions
+      void partnerForm.offsetWidth;
+      partnerForm.classList.add('shake');
+      return;
+    }
+
+    // Matches facilities + Profile schema exactly — nothing invented here.
+    // TODO: POST this to /facilities (creates facility + linked Profile row)
+    const payload = {
+      facility: {
+        name: facilityName,
+        location: facilityLocation,
+        latitude: facilityCoords.lat,
+        longitude: facilityCoords.lng,
+        has_emr: hasEmr
+      },
+      profile: {
+        full_name: staffName,
+        email: staffEmail,
+        role: staffRole
+        // facility_id is assigned server-side once the facility row exists
+      }
+      // password goes to Supabase Auth directly — it's not a Profile column
+    };
+
+    partnerSubmitBtn.disabled = true;
+    partnerSubmitBtnText.textContent = 'Creating Account…';
+
+    // Mock network delay standing in for the real request above
+    setTimeout(() => {
+      partnerSubmitBtnText.textContent = 'Account Created ✓';
+      // TODO: redirect to the hospital dashboard once it's built
+    }, 900);
+  });
+}
+
+
+// ============================================================
+// Dashboard shell — Step 1
+// Mobile menu, facility switcher, profile menu, notifications bell.
+// Widget bodies (stock table, timeline, notifications, ledger reader)
+// are wired up in their own steps — this file only owns the shell chrome.
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  const navToggle = document.getElementById('dash-nav-toggle');
+  const mobilePanel = document.getElementById('dash-mobile-panel');
+
+  const facilityBtn = document.getElementById('facility-switcher-btn');
+  const facilityMenu = document.getElementById('facility-switcher-menu');
+  const facilityBtnMobile = document.getElementById('facility-switcher-btn-mobile');
+  const facilityMenuMobile = document.getElementById('facility-switcher-menu-mobile');
+
+  const profileBtn = document.getElementById('dash-profile-btn');
+  const profileMenu = document.getElementById('dash-profile-menu');
+
+  const notifBtn = document.getElementById('notif-bell-btn');
+  const logBloodBtnRef = document.getElementById('log-blood-btn');
+  const logBloodMenuRef = document.getElementById('log-blood-menu');
+
+  // Close every open dropdown/panel except the one passed in
+  function closeAllExcept(keep) {
+    [
+      [navToggle, mobilePanel],
+      [facilityBtn, facilityMenu],
+      [facilityBtnMobile, facilityMenuMobile],
+      [profileBtn, profileMenu],
+      [logBloodBtnRef, logBloodMenuRef],
+    ].forEach(([btn, menu]) => {
+      if (!btn || !menu || btn === keep) return;
+      menu.classList.remove('is-open');
+      if (btn.hasAttribute('aria-expanded')) btn.setAttribute('aria-expanded', 'false');
+      btn.classList.remove('is-active');
+    });
+  }
+
+  function toggleMenu(btn, menu) {
+    if (!btn || !menu) return;
+    const isOpen = menu.classList.contains('is-open');
+    closeAllExcept(btn);
+    menu.classList.toggle('is-open', !isOpen);
+    if (btn.hasAttribute('aria-expanded')) btn.setAttribute('aria-expanded', String(!isOpen));
+    btn.classList.toggle('is-active', !isOpen);
+  }
+
+  navToggle?.addEventListener('click', () => toggleMenu(navToggle, mobilePanel));
+  facilityBtn?.addEventListener('click', () => toggleMenu(facilityBtn, facilityMenu));
+  facilityBtnMobile?.addEventListener('click', () => toggleMenu(facilityBtnMobile, facilityMenuMobile));
+  profileBtn?.addEventListener('click', () => toggleMenu(profileBtn, profileMenu));
+
+  // Bell scrolls the notifications card into view (no dropdown of its own yet)
+  notifBtn?.addEventListener('click', () => {
+    document.getElementById('log-blood-btn')?.closest('.dash-card')?.previousElementSibling; // no-op guard
+    document.querySelector('.notif-tabs')?.closest('.dash-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // Activity timeline — click/hover a node to preview that entry (mock data for now)
+  const nodeCard = document.getElementById('activity-node-card');
+  const nodeData = {
+    0: { type: 'in',  group: 'O+',  delta: '+18 units', source: 'Manual Entry',     meta: '6 days ago · logged by Dr. Ahmad' },
+    1: { type: 'out', group: 'O−',  delta: '−6 units',  source: 'Manual Entry',     meta: '4 days ago · logged by Dr. Ahmad · crossed into Critical' },
+    2: { type: 'in',  group: 'A+',  delta: '+9 units',  source: 'AI Ledger Reader', meta: '3 days ago · confirmed by Dr. Ahmad' },
+    3: { type: 'out', group: 'A−',  delta: '−4 units',  source: 'Manual Entry',     meta: '2 days ago · logged by Dr. Ahmad · crossed into Low' },
+    4: { type: 'in',  group: 'AB+', delta: '+5 units',  source: 'AI Ledger Reader', meta: 'Yesterday · confirmed by Dr. Ahmad' },
+    5: { type: 'in',  group: 'B−',  delta: '+12 units', source: 'AI Ledger Reader', meta: 'Today · confirmed by Dr. Ahmad' },
+  };
+  function addTimelineNode(type, group, delta, source) {
+    const track = document.querySelector('.activity-timeline__track');
+    if (!track) return;
+    const nodes = track.querySelectorAll('.activity-node');
+    const i = nodes.length;
+    nodeData[i] = { type, group, delta, source, meta: 'Just now · logged by Dr. Ahmad' };
+    const node = document.createElement('span');
+    node.className = 'activity-node';
+    node.dataset.type = type;
+    node.style.left = '97%';
+    node.tabIndex = 0;
+    node.setAttribute('role', 'button');
+    node.setAttribute('aria-label', `Just now, ${group} ${delta}`);
+    const tip = document.createElement('span');
+    tip.className = 'activity-node__tooltip';
+    tip.textContent = source;
+    node.appendChild(tip);
+    wireTimelineNode(node, i);
+    track.appendChild(node);
+  }
+  function wireTimelineNode(node, i) {
+    const show = () => {
+      if (!nodeCard) return;
+      const d = nodeData[i];
+      nodeCard.dataset.type = d.type;
+      nodeCard.querySelector('.activity-node__group').textContent = d.group;
+      nodeCard.querySelector('.activity-node__delta').textContent = d.delta;
+      nodeCard.querySelector('.activity-node__source-badge').textContent = d.source;
+      nodeCard.querySelector('.activity-node__meta').textContent = d.meta;
+      nodeCard.classList.add('is-visible');
+    };
+    node.addEventListener('click', show);
+    node.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); } });
+  }
+  document.querySelectorAll('.activity-node').forEach((node, i) => wireTimelineNode(node, i));
+
+  // Notifications tabs (Live Requests / History) — unchanged
+  function setupTabs(tabSelector, panelSelector, tabAttr, panelAttr) {
+    document.querySelectorAll(tabSelector).forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const group = tab.closest('.dash-card');
+        group.querySelectorAll(tabSelector).forEach((t) => {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+
+        const target = tab.getAttribute(tabAttr);
+        group.querySelectorAll(panelSelector).forEach((p) => {
+          p.classList.toggle('is-active', p.getAttribute(panelAttr) === target);
+        });
+      });
+    });
+  }
+  setupTabs('[data-tab]', '[data-panel]', 'data-tab', 'data-panel');
+
+  // ---- Log Blood menu ----
+  const logBloodBtn = document.getElementById('log-blood-btn');
+  const logBloodMenu = document.getElementById('log-blood-menu');
+  logBloodBtn?.addEventListener('click', () => toggleMenu(logBloodBtn, logBloodMenu));
+
+  const stockTable = document.getElementById('stock-table');
+  const saveBar = document.getElementById('stock-savebar');
+  const saveCount = document.getElementById('stock-savebar-count');
+
+  function updatePendingCount() {
+    const changed = stockTable.querySelectorAll('.stock-row.is-changed').length;
+    saveCount.textContent = String(changed);
+    saveBar.classList.toggle('is-active', changed > 0 || stockTable.classList.contains('is-editing'));
+  }
+
+  function enterEditMode() {
+    closeAllExcept(null);
+    stockTable.classList.add('is-editing');
+    saveBar.classList.add('is-active');
+    updatePendingCount();
+  }
+
+  function exitEditMode() {
+    stockTable.classList.remove('is-editing');
+    saveBar.classList.remove('is-active');
+    // reset any unsaved edits back to their original values
+    stockTable.querySelectorAll('.stock-row').forEach((row) => {
+      const original = row.dataset.value;
+      row.querySelector('.stock-row__input').value = original;
+      row.classList.remove('is-changed');
+    });
+  }
+
+  document.getElementById('log-blood-manual-btn')?.addEventListener('click', () => {
+    logBloodMenu.classList.remove('is-open');
+    enterEditMode();
+  });
+
+  document.getElementById('log-blood-ai-btn')?.addEventListener('click', () => {
+    logBloodMenu.classList.remove('is-open');
+    openLedgerSlideover();
+  });
+
+  document.getElementById('stock-cancel-btn')?.addEventListener('click', exitEditMode);
+
+  document.getElementById('stock-save-btn')?.addEventListener('click', () => {
+    stockTable.querySelectorAll('.stock-row.is-changed').forEach((row) => {
+      const label = row.querySelector('.stock-row__label').textContent;
+      const oldVal = Number(row.dataset.value);
+      const input = row.querySelector('.stock-row__input');
+      const newVal = Number(input.value);
+      const delta = newVal - oldVal;
+      if (delta === 0) return;
+
+      // update row's live values
+      row.dataset.value = String(newVal);
+      row.querySelector('.stock-row__qty').firstChild.textContent = `${newVal} `;
+      row.classList.remove('is-changed');
+
+      // log to timeline
+      const deltaText = `${delta > 0 ? '+' : ''}${delta} units`;
+      addTimelineNode(delta > 0 ? 'in' : 'out', label, deltaText, 'Manual Entry');
+    });
+    exitEditMode();
+  });
+
+  // Per-row live editing: track changes as staff adjust individual rows
+  stockTable?.addEventListener('input', (e) => {
+    if (!e.target.classList.contains('stock-row__input')) return;
+    const row = e.target.closest('.stock-row');
+    const isChanged = Number(e.target.value) !== Number(row.dataset.value);
+    row.classList.toggle('is-changed', isChanged);
+    updatePendingCount();
+  });
+
+  stockTable?.addEventListener('click', (e) => {
+    const stepBtn = e.target.closest('.stock-row__step');
+    if (!stepBtn) return;
+    const row = stepBtn.closest('.stock-row');
+    const input = row.querySelector('.stock-row__input');
+    const dir = Number(stepBtn.dataset.step);
+    input.value = Math.max(0, Number(input.value) + dir);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+  // ---- AI Ledger Reader slide-over ----
+  const ledgerOverlay = document.getElementById('ledger-overlay');
+  const ledgerSlideover = document.getElementById('ledger-slideover');
+  const ledgerUpload = document.getElementById('ledger-upload');
+  const ledgerReview = document.getElementById('ledger-review');
+
+  function openLedgerSlideover() {
+    ledgerOverlay.classList.add('is-open');
+    ledgerSlideover.classList.add('is-open');
+    ledgerSlideover.setAttribute('aria-hidden', 'false');
+  }
+  function closeLedgerSlideover() {
+    ledgerOverlay.classList.remove('is-open');
+    ledgerSlideover.classList.remove('is-open');
+    ledgerSlideover.setAttribute('aria-hidden', 'true');
+    ledgerUpload.style.display = 'flex';
+    ledgerReview.classList.remove('is-active');
+  }
+  document.getElementById('ledger-close-btn')?.addEventListener('click', closeLedgerSlideover);
+  ledgerOverlay?.addEventListener('click', closeLedgerSlideover);
+
+  document.getElementById('ledger-upload-btn')?.addEventListener('click', () => {
+    ledgerUpload.style.display = 'none';
+    ledgerReview.classList.add('is-active');
+  });
+  document.getElementById('ledger-retake-btn')?.addEventListener('click', () => {
+    ledgerReview.classList.remove('is-active');
+    ledgerUpload.style.display = 'flex';
+  });
+
+  // Stock table — each row expands to show its last-updated detail (view mode only).
+  // Full per-batch history view is a later addition; this is the lightweight version.
+  document.querySelectorAll('.stock-row__main').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (stockTable.classList.contains('is-editing')) return;
+      const row = btn.closest('.stock-row');
+      const isOpen = row.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+
+  // Click outside any open menu closes it (but not the Log Blood menu while editing is active)
+  document.addEventListener('click', (e) => {
+    const isInsideHeader = e.target.closest('.dash-header');
+    const isInsideLogBlood = e.target.closest('.log-blood-wrap');
+    if (!isInsideHeader && !isInsideLogBlood) closeAllExcept(null);
+  });
+
+  // Escape closes everything, including the slide-over
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllExcept(null);
+      if (ledgerSlideover.classList.contains('is-open')) closeLedgerSlideover();
+    }
+  });
+});
+
+</script>
+</body>
+</html>
