@@ -2,7 +2,6 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 const VALID_BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 const VALID_STATUSES = ['available', 'low', 'not available']
-const VALID_COMPONENT_TYPES = ['Whole Blood', 'Red Blood Cells', 'Platelets', 'Fresh Frozen Plasma']
 
 export async function GET() {
   const supabase = await createSupabaseServerClient()
@@ -58,7 +57,7 @@ export async function POST(request) {
     )
   }
 
-  const { blood_group, quantity, expiry_date, status, component_type } = body
+  const { blood_group, quantity, expiry_date, status } = body
 
   if (!blood_group || !VALID_BLOOD_GROUPS.includes(blood_group)) {
     return Response.json(
@@ -83,13 +82,6 @@ export async function POST(request) {
     )
   }
 
-  if (!component_type || !VALID_COMPONENT_TYPES.includes(component_type)) {
-    return Response.json(
-      { error: `component_type must be one of: ${VALID_COMPONENT_TYPES.join(', ')}` },
-      { status: 400 }
-    )
-  }
-
   // Step 4: insert — facility_id always from server-side Profile
   const { data, error } = await supabase
     .from('Inventory')
@@ -99,7 +91,6 @@ export async function POST(request) {
       quantity: parsedQuantity,
       expiry_date,
       status,
-      component_type,
     })
     .select()
     .single()
@@ -141,7 +132,7 @@ export async function PATCH(request) {
 
   // Step 3: extract and validate id + fields to update
   const body = await request.json()
-  const { id, blood_group, quantity, expiry_date, status, component_type } = body
+  const { id, blood_group, quantity, expiry_date, status } = body
 
   const parsedId = Number(id)
   if (!Number.isInteger(parsedId) || parsedId < 1) {
@@ -183,16 +174,6 @@ export async function PATCH(request) {
       )
     }
     updates.status = status
-  }
-
-  if (component_type !== undefined) {
-    if (!VALID_COMPONENT_TYPES.includes(component_type)) {
-      return Response.json(
-        { error: `component_type must be one of: ${VALID_COMPONENT_TYPES.join(', ')}` },
-        { status: 400 }
-      )
-    }
-    updates.component_type = component_type
   }
 
   if (Object.keys(updates).length === 0) {
