@@ -3,12 +3,57 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 const VALID_BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 const VALID_STATUSES = ['available', 'low', 'not available']
 
-export async function GET() {
+export default async function GET(request) {
   const supabase = await createSupabaseServerClient()
 
-  const { data, error } = await supabase
+  // Extract query params for Find Blood feature
+  const { searchParams } = new URL(request.url)
+  const blood_group = searchParams.get('blood_group')
+  const lat = searchParams.get('lat')
+  const lng = searchParams.get('lng')
+
+  // Validate blood_group if provided
+  if (blood_group && !VALID_BLOOD_GROUPS.includes(blood_group)) {
+    return Response.json(
+      { error: `blood_group must be one of: ${VALID_BLOOD_GROUPS.join(', ')}` },
+      { status: 400 }
+    )
+  }
+
+  // Validate lat/lng if provided (both must be present together)
+  if ((lat && !lng) || (!lat && lng)) {
+    return Response.json(
+      { error: 'lat and lng must both be provided' },
+      { status: 400 }
+    )
+  }
+
+  if (lat && (isNaN(Number(lat)) || Number(lat) < -90 || Number(lat) > 90)) {
+    return Response.json(
+      { error: 'lat must be a number between -90 and 90' },
+      { status: 400 }
+    )
+  }
+
+  if (lng && (isNaN(Number(lng)) || Number(lng) < -180 || Number(lng) > 180)) {
+    return Response.json(
+      { error: 'lng must be a number between -180 and 180' },
+      { status: 400 }
+    )
+  }
+
+  // Query inventory with facility join; filter by availability
+  let query = supabase
     .from('Inventory')
-    .select('*')
+    .select('*, Facility(*)')
+    .eq('status', 'available')
+    .gt('quantity', 0)
+
+  if (blood_group) {
+    query = query.eq('blood_group', blood_group)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     return Response.json(
