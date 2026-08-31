@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Facility Dashboard — SURKH</title>
+  <link rel="icon" type=""image/x-icon" href="assets/icon-drop-of-blood.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -2622,7 +2623,8 @@ body {
 .stock-row__editor {
   display: none;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  margin-left: auto;
 }
 
 .stock-table.is-editing .stock-row__editor { display: flex; }
@@ -2630,6 +2632,8 @@ body {
 .stock-table.is-editing .stock-row__status { display: none !important; }
 .stock-table.is-editing .stock-row__detail { display: none !important; }
 .stock-table.is-editing .stock-row__main { cursor: default; }
+.stock-table.is-editing .stock-row__right { justify-content: flex-end; }
+.stock-table.is-editing .stock-row__chevron { display: none; }
 
 .stock-row__step {
   width: 30px;
@@ -2647,7 +2651,7 @@ body {
 .stock-row__step:hover { background: rgba(17, 20, 21, 0.05); }
 
 .stock-row__input {
-  width: 62px;
+  width: 56px;
   text-align: center;
   font-family: var(--font-body);
   font-weight: 700;
@@ -2656,6 +2660,13 @@ body {
   border-radius: 4px;
   padding: 0.4rem 0.2rem;
   color: var(--color-text);
+  -moz-appearance: textfield;
+}
+
+.stock-row__input::-webkit-outer-spin-button,
+.stock-row__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .stock-row.is-changed {
@@ -3086,7 +3097,112 @@ body {
     align-items: start;
   }
 }
+/* ---- Enhanced Footer ---- */
+.site-footer {
+  background: var(--color-hero-navy);
+  color: var(--color-bg);
+  padding: 3rem 1.5rem 1.5rem;
+  margin-top: 3.5rem;
+  border-top: 3px solid var(--color-primary);
+}
 
+.site-footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 252, 247, 0.12);
+}
+
+.site-footer__brand-name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.site-footer__desc {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  opacity: 0.8;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.site-footer__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--color-secondary);
+}
+
+.site-footer__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.site-footer__list a,
+.site-footer__legal a {
+  color: var(--color-bg);
+  opacity: 0.75;
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.site-footer__list a:hover,
+.site-footer__legal a:hover {
+  opacity: 1;
+  color: var(--color-secondary);
+}
+
+.site-footer__contact {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+
+.site-footer__contact strong {
+  color: var(--color-bg);
+}
+
+.site-footer__bottom {
+  max-width: 1200px;
+  margin: 1.5rem auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.8rem;
+  opacity: 0.65;
+  text-align: center;
+}
+
+.site-footer__legal {
+  display: flex;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .site-footer__inner {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  
+  .site-footer__bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
 </style>
 </head>
 <body class="dashboard-body">
@@ -3278,12 +3394,12 @@ body {
           <ul class="stock-table" id="stock-table">
 
             <li class="stock-row" data-value="124" data-status="healthy">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">O+</span><span class="stock-row__status">Healthy</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="124" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">124 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 2 hrs ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3291,12 +3407,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="8" data-status="critical">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">O−</span><span class="stock-row__status">Critical</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="8" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">8 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 6 hrs ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3304,12 +3420,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="41" data-status="healthy">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">A+</span><span class="stock-row__status">Healthy</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="41" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">41 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 1 hr ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3317,12 +3433,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="15" data-status="low">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">A−</span><span class="stock-row__status">Low</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="15" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">15 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 4 hrs ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3330,12 +3446,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="52" data-status="healthy">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">B+</span><span class="stock-row__status">Healthy</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="52" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">52 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 5 hrs ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3343,12 +3459,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="3" data-status="critical">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">B−</span><span class="stock-row__status">Critical</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="3" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">3 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 30 min ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3356,12 +3472,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="22" data-status="healthy">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">AB+</span><span class="stock-row__status">Healthy</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="22" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">22 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 3 hrs ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3369,12 +3485,12 @@ body {
             </li>
 
             <li class="stock-row" data-value="6" data-status="low">
-              <button class="stock-row__main" aria-expanded="false">
+              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
                 <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">AB−</span><span class="stock-row__status">Low</span></span>
                 <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="6" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
                   <span class="stock-row__qty">6 <span class="stock-row__unit">units</span></span>
                   <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </button>
+              </div>
               <div class="stock-row__detail">
                 <span>Last updated 8 hrs ago</span>
                 <a href="#" class="stock-row__detail-link">View history →</a>
@@ -3442,6 +3558,40 @@ body {
     </div>
 
   </main>
+  <!-- ================= Footer ================= -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__col site-footer__col--brand">
+        <span class="site-footer__brand-name">SURKH</span>
+        <p class="site-footer__desc">Connecting blood banks and emergency donors in real-time to streamline vital healthcare response.</p>
+      </div>
+
+      <div class="site-footer__col">
+        <h4 class="site-footer__title">Quick Links</h4>
+        <ul class="site-footer__list">
+          <li><a href="dashboard.html">Facility Dashboard</a></li>
+          <li><a href="dashboard.html">Inventory Tracker</a></li>
+          <li><a href="dashboard.html">Live Requests</a></li>
+          <li><a href="index.html">Hospital Network</a></li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <h4 class="site-footer__title">Emergency Support</h4>
+        <p class="site-footer__contact">24/7 Helpline: <strong>111-SURKH-00</strong></p>
+        <p class="site-footer__contact">Support: <strong>help@surkh.org</strong></p>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>&copy; 2026 SURKH Blood Network. All rights reserved.</p>
+      <div class="site-footer__legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </footer>
 
   <!-- AI Ledger Reader — slide-over, opened from Log Blood menu -->
   <div class="ledger-overlay" id="ledger-overlay"></div>
@@ -4432,11 +4582,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Stock table — each row expands to show its last-updated detail (view mode only).
   // Full per-batch history view is a later addition; this is the lightweight version.
   document.querySelectorAll('.stock-row__main').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    const toggleRow = () => {
       if (stockTable.classList.contains('is-editing')) return;
       const row = btn.closest('.stock-row');
       const isOpen = row.classList.toggle('is-open');
       btn.setAttribute('aria-expanded', String(isOpen));
+    };
+    btn.addEventListener('click', toggleRow);
+    // btn is now a div[role="button"] (it wraps the stepper buttons, which
+    // can't legally nest inside a real <button>), so wire up keyboard activation.
+    btn.addEventListener('keydown', (e) => {
+      if (e.target !== btn) return; // don't hijack Enter/Space on the stepper controls
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleRow();
+      }
     });
   });
 

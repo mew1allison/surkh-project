@@ -39,7 +39,9 @@ body {
 
 /* ---- Header ---- */
 .site-header {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: var(--color-bg);
   display: flex;
   align-items: center;
@@ -785,6 +787,18 @@ body {
   display: block;
 }
 
+/* Root-cause fix: if a facility photo or logo fails to load, hide the
+   fallback alt text instead of letting it spill across the card. The box's
+   own width/height/overflow still clip the broken-image icon. This applies
+   no matter what layout wraps these images later, so it keeps protecting
+   the card once real photos are wired in — no need to revisit this. */
+.result-card__photo,
+.result-card__logo {
+  color: transparent;
+  font-size: 0;
+  overflow: hidden;
+}
+
 .result-card__badge {
   position: absolute;
   top: 1rem;
@@ -800,6 +814,14 @@ body {
 /* ADD THIS — Low Stock variant, primary color */
 .result-card__badge--low {
   background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+/* Unavailable/out-of-stock variant — neutral so it reads as "no stock",
+   not an error, keeping it visually distinct from Available (gold) and
+   Low Stock (red). Every card now always shows one of these three states. */
+.result-card__badge--out {
+  background: rgba(28, 2, 4, 0.35);
   color: var(--color-bg);
 }
 
@@ -1124,11 +1146,11 @@ body {
     max-width: none;
   }
 
-  /* Fixed-width grid tracks keep cards uniform in size, never stretched,
-     and simply centered as a group when fewer than 3 results are shown. */
+  /* Wider tracks so desktop cards read as generously as the mobile
+     full-width card, while staying uniform and centered as a pair. */
   .find-blood__results-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 300px));
+    grid-template-columns: repeat(2, minmax(0, 460px));
     justify-content: center;
     gap: 1.75rem;
   }
@@ -1136,6 +1158,11 @@ body {
   .result-card {
     width: 100%;
     min-width: 0;
+    height: 400px;
+  }
+
+  .result-card__photo {
+    height: 200px;
   }
 }
 
