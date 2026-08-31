@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 const VALID_BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 const VALID_STATUSES = ['available', 'low', 'not available']
 
-export default async function GET(request) {
+export async function GET(request) {
   const supabase = await createSupabaseServerClient()
 
   // Extract query params for Find Blood feature
