@@ -516,7 +516,6 @@ const mockInventory = [
     blood_group: "A+",
     quantity: 4,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-15",
   },
   {
@@ -525,7 +524,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 6,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-10",
   },
   {
@@ -534,7 +532,6 @@ const mockInventory = [
     blood_group: "B-",
     quantity: 0,
     status: "expired",
-    component_type: "Whole Blood",
     expiry_date: "2026-08-01",
   },
   {
@@ -543,7 +540,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 2,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-05",
   },
   {
@@ -552,7 +548,6 @@ const mockInventory = [
     blood_group: "AB+",
     quantity: 1,
     status: "available",
-    component_type: "Plasma",
     expiry_date: "2026-09-20",
   },
   {
@@ -561,7 +556,6 @@ const mockInventory = [
     blood_group: "A+",
     quantity: 3,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-08",
   },
   {
@@ -570,7 +564,6 @@ const mockInventory = [
     blood_group: "O-",
     quantity: 1,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-02",
   },
   {
@@ -579,7 +572,6 @@ const mockInventory = [
     blood_group: "B+",
     quantity: 0,
     status: "reserved",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-18",
   },
   {
@@ -588,7 +580,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 0,
     status: "reserved",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-01",
   },
   {
@@ -597,7 +588,6 @@ const mockInventory = [
     blood_group: "AB-",
     quantity: 2,
     status: "available",
-    component_type: "Plasma",
     expiry_date: "2026-09-12",
   },
   {
@@ -606,7 +596,6 @@ const mockInventory = [
     blood_group: "A+",
     quantity: 4,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-14",
   },
   {
@@ -615,7 +604,6 @@ const mockInventory = [
     blood_group: "B+",
     quantity: 3,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-09",
   },
   {
@@ -624,7 +612,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 2,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-06",
   },
   {
@@ -633,7 +620,6 @@ const mockInventory = [
     blood_group: "A-",
     quantity: 2,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-11",
   },
   {
@@ -642,7 +628,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 5,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-07",
   },
 ];
@@ -664,7 +649,6 @@ mockFacilities.forEach((facility) => {
         blood_group: group,
         quantity: Math.floor(Math.random() * 6) + 1,
         status: "available",
-        component_type: "Whole Blood",
         expiry_date: "2026-09-30",
       });
     }
