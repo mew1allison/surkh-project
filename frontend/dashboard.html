@@ -7,6 +7,9 @@
   <link rel="icon" type=""image/x-icon" href="assets/icon-drop-of-blood.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Supabase client — auth guard + session check at the top of the inline JS below -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
   <style>
 /* ---- Design tokens ---- */
 :root {
@@ -3392,112 +3395,12 @@ body {
           </div>
 
           <ul class="stock-table" id="stock-table">
-
-            <li class="stock-row" data-value="124" data-status="healthy">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">O+</span><span class="stock-row__status">Healthy</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="124" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">124 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 2 hrs ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="8" data-status="critical">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">O−</span><span class="stock-row__status">Critical</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="8" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">8 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 6 hrs ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="41" data-status="healthy">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">A+</span><span class="stock-row__status">Healthy</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="41" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">41 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 1 hr ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="15" data-status="low">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">A−</span><span class="stock-row__status">Low</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="15" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">15 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 4 hrs ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="52" data-status="healthy">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">B+</span><span class="stock-row__status">Healthy</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="52" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">52 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 5 hrs ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="3" data-status="critical">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">B−</span><span class="stock-row__status">Critical</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="3" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">3 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 30 min ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="22" data-status="healthy">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">AB+</span><span class="stock-row__status">Healthy</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="22" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">22 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 3 hrs ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
-            <li class="stock-row" data-value="6" data-status="low">
-              <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
-                <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">AB−</span><span class="stock-row__status">Low</span></span>
-                <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="6" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
-                  <span class="stock-row__qty">6 <span class="stock-row__unit">units</span></span>
-                  <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-              <div class="stock-row__detail">
-                <span>Last updated 8 hrs ago</span>
-                <a href="#" class="stock-row__detail-link">View history →</a>
-              </div>
-            </li>
-
+            <!-- Rows are rendered by loadInventory() from GET /api/profile + GET /api/inventory?facility_id=...
+                 (see the JS below) — no hardcoded rows here anymore. -->
           </ul>
+          <p class="stock-table__empty" id="stock-table-empty" style="display:none; padding: 16px 4px; color: var(--color-text); opacity: 0.7;">
+            No inventory rows yet for your facility.
+          </p>
         </div>
 
         <div class="dash-card">
@@ -3643,6 +3546,37 @@ body {
   </aside>
 
   <script>
+// ---- Supabase client + config ----
+// Same pair as script.js / lib/supabase.js — the anon key is safe to expose,
+// access control comes from RLS, not key secrecy.
+// No need to initialize again!
+async function loadInventory() {
+  const { data, error } = await supabaseClient.from('inventory').select('*');
+  // ... rest of your logic that depends on data/error
+}
+loadInventory();
+
+
+// Backend base URL — separate Next.js app, not same-origin as this static page.
+// TODO: point this at your backend's real deployed/dev URL.
+
+// ---- Auth guard ----
+// The backend's route handlers (GET /api/profile, GET/PATCH /api/inventory)
+// authenticate via createSupabaseServerClient(), which reads the session from
+// cookies — not from an Authorization header. That means every fetch() to the
+// backend below uses `credentials: 'include'`, and for that to actually work
+// this frontend and the backend need to be deployed so the Supabase auth
+// cookie is visible to both (same site / shared cookie domain), with the
+// backend's CORS config allowing credentials from this origin. If that's not
+// set up yet, GET /api/profile and GET /api/inventory below will come back
+// 401 even with a valid client-side session.
+(async function authGuard() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.href = "login.html";
+  }
+})();
+
 // ---- Why SURKH: cards rendered from data, not hand-written ----
 const whyCards = [
   {
@@ -4005,21 +3939,21 @@ const mockFacilities = [
 // TODO: schema has no facility contact field yet — CTA phone numbers above
 // are placeholders standing in until Profile/facility contact info exists.
 const mockInventory = [
-  { id: 1, facility_id: 1, blood_group: 'A+', quantity: 4, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-15' },
-  { id: 2, facility_id: 1, blood_group: 'O+', quantity: 6, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-10' },
-  { id: 3, facility_id: 1, blood_group: 'B-', quantity: 0, status: 'expired', component_type: 'Whole Blood', expiry_date: '2026-08-01' },
-  { id: 4, facility_id: 2, blood_group: 'O+', quantity: 2, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-05' },
-  { id: 5, facility_id: 2, blood_group: 'AB+', quantity: 1, status: 'available', component_type: 'Plasma', expiry_date: '2026-09-20' },
-  { id: 6, facility_id: 3, blood_group: 'A+', quantity: 3, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-08' },
-  { id: 7, facility_id: 3, blood_group: 'O-', quantity: 1, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-02' },
-  { id: 8, facility_id: 4, blood_group: 'B+', quantity: 5, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-18' },
-  { id: 9, facility_id: 4, blood_group: 'O+', quantity: 0, status: 'reserved', component_type: 'Whole Blood', expiry_date: '2026-09-01' },
-  { id: 10, facility_id: 5, blood_group: 'AB-', quantity: 2, status: 'available', component_type: 'Plasma', expiry_date: '2026-09-12' },
-  { id: 11, facility_id: 5, blood_group: 'A+', quantity: 4, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-14' },
-  { id: 12, facility_id: 6, blood_group: 'B+', quantity: 3, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-09' },
-  { id: 13, facility_id: 6, blood_group: 'O+', quantity: 2, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-06' },
-  { id: 14, facility_id: 7, blood_group: 'A-', quantity: 2, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-11' },
-  { id: 15, facility_id: 7, blood_group: 'O+', quantity: 5, status: 'available', component_type: 'Whole Blood', expiry_date: '2026-09-07' }
+  { id: 1, facility_id: 1, blood_group: 'A+', quantity: 4, status: 'available', expiry_date: '2026-09-15' },
+  { id: 2, facility_id: 1, blood_group: 'O+', quantity: 6, status: 'available', expiry_date: '2026-09-10' },
+  { id: 3, facility_id: 1, blood_group: 'B-', quantity: 0, status: 'expired', expiry_date: '2026-08-01' },
+  { id: 4, facility_id: 2, blood_group: 'O+', quantity: 2, status: 'available', expiry_date: '2026-09-05' },
+  { id: 5, facility_id: 2, blood_group: 'AB+', quantity: 1, status: 'available', expiry_date: '2026-09-20' },
+  { id: 6, facility_id: 3, blood_group: 'A+', quantity: 3, status: 'available', expiry_date: '2026-09-08' },
+  { id: 7, facility_id: 3, blood_group: 'O-', quantity: 1, status: 'available', expiry_date: '2026-09-02' },
+  { id: 8, facility_id: 4, blood_group: 'B+', quantity: 5, status: 'available', expiry_date: '2026-09-18' },
+  { id: 9, facility_id: 4, blood_group: 'O+', quantity: 0, status: 'reserved', expiry_date: '2026-09-01' },
+  { id: 10, facility_id: 5, blood_group: 'AB-', quantity: 2, status: 'available', expiry_date: '2026-09-12' },
+  { id: 11, facility_id: 5, blood_group: 'A+', quantity: 4, status: 'available', expiry_date: '2026-09-14' },
+  { id: 12, facility_id: 6, blood_group: 'B+', quantity: 3, status: 'available', expiry_date: '2026-09-09' },
+  { id: 13, facility_id: 6, blood_group: 'O+', quantity: 2, status: 'available', expiry_date: '2026-09-06' },
+  { id: 14, facility_id: 7, blood_group: 'A-', quantity: 2, status: 'available', expiry_date: '2026-09-11' },
+  { id: 15, facility_id: 7, blood_group: 'O+', quantity: 5, status: 'available', expiry_date: '2026-09-07' }
 ];
 
 // Haversine distance in km — real GPS/city coords in, sorted-by-proximity out,
@@ -4470,8 +4404,86 @@ document.addEventListener('DOMContentLoaded', () => {
   logBloodBtn?.addEventListener('click', () => toggleMenu(logBloodBtn, logBloodMenu));
 
   const stockTable = document.getElementById('stock-table');
+  const stockTableEmpty = document.getElementById('stock-table-empty');
   const saveBar = document.getElementById('stock-savebar');
   const saveCount = document.getElementById('stock-savebar-count');
+
+  // ---- Quantity → severity tier / API status ----
+  // The dashboard's 3-tier UI (critical/low/healthy, drives the dot color via
+  // the existing [data-status] CSS) maps 1:1 onto the backend's Inventory.status
+  // enum (VALID_STATUSES in inventory/route.js: 'available' | 'low' | 'not available').
+  // LOW_STOCK_THRESHOLD is a placeholder assumption, not a value from any spec
+  // doc — tune it with the team.
+  const LOW_STOCK_THRESHOLD = 10;
+  function computeStockTier(quantity) {
+    if (quantity <= 0) return { tier: 'critical', label: 'Critical', apiStatus: 'not available' };
+    if (quantity <= LOW_STOCK_THRESHOLD) return { tier: 'low', label: 'Low', apiStatus: 'low' };
+    return { tier: 'healthy', label: 'Healthy', apiStatus: 'available' };
+  }
+
+  // Builds one <li> exactly matching the previous hardcoded markup shape,
+  // from a real Inventory row: { id, blood_group, quantity, expiry_date, status, facility_id }
+  function renderStockRow(row) {
+    const { tier, label } = computeStockTier(row.quantity);
+    const li = document.createElement('li');
+    li.className = 'stock-row';
+    li.dataset.id = row.id;
+    li.dataset.value = row.quantity;
+    li.dataset.status = tier;
+    const expiry = row.expiry_date ? new Date(row.expiry_date).toLocaleDateString() : '—';
+    li.innerHTML = `
+      <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
+        <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">${row.blood_group}</span><span class="stock-row__status">${label}</span></span>
+        <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="${row.quantity}" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+          <span class="stock-row__qty">${row.quantity} <span class="stock-row__unit">units</span></span>
+          <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="stock-row__detail">
+        <!-- The old mock showed "Last updated X hrs ago" — that field isn't
+             part of the real Inventory row per the backend routes, so this
+             shows expiry_date (a real column) instead. -->
+        <span>Expires ${expiry}</span>
+        <a href="#" class="stock-row__detail-link">View history →</a>
+      </div>
+    `;
+    return li;
+  }
+
+  // Fetches the logged-in staffer's facility, then that facility's inventory,
+  // and renders it into #stock-table. Requires GET /api/inventory to support
+  // a facility_id filter that returns ALL of that facility's rows (including
+  // zero-quantity / not-available ones) — not the current public-search
+  // version, which hardcodes status='available' AND quantity>0 and has no
+  // facility_id param at all.
+  async function loadInventory() {
+    try {
+      const profileRes = await fetch(`${BACKEND_BASE_URL}/api/profile`, {
+        credentials: 'include',
+      });
+      if (!profileRes.ok) throw new Error(`GET /api/profile failed (${profileRes.status})`);
+      const profile = await profileRes.json();
+
+      const invRes = await fetch(
+        `${BACKEND_BASE_URL}/api/inventory?facility_id=${encodeURIComponent(profile.facility_id)}`,
+        { credentials: 'include' },
+      );
+      if (!invRes.ok) throw new Error(`GET /api/inventory failed (${invRes.status})`);
+      const rows = await invRes.json();
+
+      stockTable.innerHTML = '';
+      if (!rows.length) {
+        stockTableEmpty.style.display = 'block';
+      } else {
+        stockTableEmpty.style.display = 'none';
+        rows.forEach((row) => stockTable.appendChild(renderStockRow(row)));
+      }
+    } catch (err) {
+      console.error('Failed to load inventory:', err);
+      // TODO: show an inline error state in the stock table card instead of
+      // just logging — left as a mock/empty table for now.
+    }
+  }
+  loadInventory();
 
   function updatePendingCount() {
     const changed = stockTable.querySelectorAll('.stock-row.is-changed').length;
@@ -4509,25 +4521,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('stock-cancel-btn')?.addEventListener('click', exitEditMode);
 
-  document.getElementById('stock-save-btn')?.addEventListener('click', () => {
-    stockTable.querySelectorAll('.stock-row.is-changed').forEach((row) => {
+  document.getElementById('stock-save-btn')?.addEventListener('click', async () => {
+    const changedRows = Array.from(stockTable.querySelectorAll('.stock-row.is-changed'));
+    let anyFailed = false;
+
+    for (const row of changedRows) {
+      const id = row.dataset.id;
       const label = row.querySelector('.stock-row__label').textContent;
       const oldVal = Number(row.dataset.value);
       const input = row.querySelector('.stock-row__input');
       const newVal = Number(input.value);
       const delta = newVal - oldVal;
-      if (delta === 0) return;
+      if (delta === 0) {
+        row.classList.remove('is-changed');
+        continue;
+      }
 
-      // update row's live values
-      row.dataset.value = String(newVal);
-      row.querySelector('.stock-row__qty').firstChild.textContent = `${newVal} `;
-      row.classList.remove('is-changed');
+      const { tier, label: tierLabel, apiStatus } = computeStockTier(newVal);
 
-      // log to timeline
-      const deltaText = `${delta > 0 ? '+' : ''}${delta} units`;
-      addTimelineNode(delta > 0 ? 'in' : 'out', label, deltaText, 'Manual Entry');
-    });
-    exitEditMode();
+      try {
+        const res = await fetch(`${BACKEND_BASE_URL}/api/inventory`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: Number(id), quantity: newVal, status: apiStatus }),
+        });
+
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          console.error(`Failed to save ${label}:`, errBody.error || res.status);
+          anyFailed = true;
+          continue; // leave this row marked is-changed so staff can retry
+        }
+
+        // Only update the row's live values once the PATCH actually succeeded.
+        row.dataset.value = String(newVal);
+        row.dataset.status = tier;
+        row.querySelector('.stock-row__status').textContent = tierLabel;
+        row.querySelector('.stock-row__qty').firstChild.textContent = `${newVal} `;
+        row.classList.remove('is-changed');
+
+        const deltaText = `${delta > 0 ? '+' : ''}${delta} units`;
+        addTimelineNode(delta > 0 ? 'in' : 'out', label, deltaText, 'Manual Entry');
+      } catch (err) {
+        console.error(`Network error saving ${label}:`, err);
+        anyFailed = true;
+      }
+    }
+
+    if (anyFailed) {
+      // Keep edit mode open so the still-is-changed rows stay editable/visible.
+      updatePendingCount();
+      // TODO: surface a real inline error instead of console.error above.
+    } else {
+      exitEditMode();
+    }
   });
 
   // Per-row live editing: track changes as staff adjust individual rows
@@ -4581,23 +4629,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Stock table — each row expands to show its last-updated detail (view mode only).
   // Full per-batch history view is a later addition; this is the lightweight version.
-  document.querySelectorAll('.stock-row__main').forEach((btn) => {
-    const toggleRow = () => {
-      if (stockTable.classList.contains('is-editing')) return;
-      const row = btn.closest('.stock-row');
-      const isOpen = row.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', String(isOpen));
-    };
-    btn.addEventListener('click', toggleRow);
-    // btn is now a div[role="button"] (it wraps the stepper buttons, which
-    // can't legally nest inside a real <button>), so wire up keyboard activation.
-    btn.addEventListener('keydown', (e) => {
-      if (e.target !== btn) return; // don't hijack Enter/Space on the stepper controls
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleRow();
-      }
-    });
+  // Converted to event delegation (listener lives on #stock-table itself, not
+  // on each .stock-row__main) because rows are now rendered asynchronously by
+  // loadInventory() after the GET /api/inventory fetch resolves — they don't
+  // exist in the DOM yet when this script runs, so per-element listeners
+  // attached here would silently attach to nothing.
+  function toggleStockRow(btn) {
+    if (stockTable.classList.contains('is-editing')) return;
+    const row = btn.closest('.stock-row');
+    const isOpen = row.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  stockTable?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.stock-row__main');
+    if (!btn) return;
+    toggleStockRow(btn);
+  });
+
+  // btn is a div[role="button"] (it wraps the stepper buttons, which can't
+  // legally nest inside a real <button>), so wire up keyboard activation too.
+  stockTable?.addEventListener('keydown', (e) => {
+    const btn = e.target.closest('.stock-row__main');
+    if (!btn || e.target !== btn) return; // don't hijack Enter/Space on the stepper controls
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleStockRow(btn);
+    }
   });
 
   // Click outside any open menu closes it (but not the Log Blood menu while editing is active)

@@ -1,3 +1,16 @@
+// ---- Supabase client ----
+// The anon/publishable key is safe to expose in frontend code by design —
+// access control is enforced by Row Level Security policies in the database,
+// not by keeping this key secret. See lib/supabase.js on the backend for the
+// same URL + key pair used server-side.
+// TODO: fill in your project's real values (Supabase dashboard > Project Settings > API).
+
+// Backend base URL — the backend is a separate Next.js app (its API routes
+// live under app/api/), not served from the same origin as this static
+// frontend, so calls to it need an absolute base.
+// TODO: point this at your backend's real deployed/dev URL.
+const BACKEND_BASE_URL = "http://localhost:3000";
+
 // ---- Why SURKH: cards rendered from data, not hand-written ----
 const whyCards = [
   {
@@ -516,7 +529,6 @@ const mockInventory = [
     blood_group: "A+",
     quantity: 4,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-15",
   },
   {
@@ -525,7 +537,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 6,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-10",
   },
   {
@@ -534,7 +545,6 @@ const mockInventory = [
     blood_group: "B-",
     quantity: 0,
     status: "expired",
-    component_type: "Whole Blood",
     expiry_date: "2026-08-01",
   },
   {
@@ -543,7 +553,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 2,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-05",
   },
   {
@@ -552,7 +561,6 @@ const mockInventory = [
     blood_group: "AB+",
     quantity: 1,
     status: "available",
-    component_type: "Plasma",
     expiry_date: "2026-09-20",
   },
   {
@@ -561,7 +569,6 @@ const mockInventory = [
     blood_group: "A+",
     quantity: 3,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-08",
   },
   {
@@ -570,7 +577,6 @@ const mockInventory = [
     blood_group: "O-",
     quantity: 1,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-02",
   },
   {
@@ -579,7 +585,6 @@ const mockInventory = [
     blood_group: "B+",
     quantity: 0,
     status: "reserved",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-18",
   },
   {
@@ -588,7 +593,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 0,
     status: "reserved",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-01",
   },
   {
@@ -597,7 +601,6 @@ const mockInventory = [
     blood_group: "AB-",
     quantity: 2,
     status: "available",
-    component_type: "Plasma",
     expiry_date: "2026-09-12",
   },
   {
@@ -606,7 +609,6 @@ const mockInventory = [
     blood_group: "A+",
     quantity: 4,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-14",
   },
   {
@@ -615,7 +617,6 @@ const mockInventory = [
     blood_group: "B+",
     quantity: 3,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-09",
   },
   {
@@ -624,7 +625,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 2,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-06",
   },
   {
@@ -633,7 +633,6 @@ const mockInventory = [
     blood_group: "A-",
     quantity: 2,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-11",
   },
   {
@@ -642,7 +641,6 @@ const mockInventory = [
     blood_group: "O+",
     quantity: 5,
     status: "available",
-    component_type: "Whole Blood",
     expiry_date: "2026-09-07",
   },
 ];
@@ -664,7 +662,6 @@ mockFacilities.forEach((facility) => {
         blood_group: group,
         quantity: Math.floor(Math.random() * 6) + 1,
         status: "available",
-        component_type: "Whole Blood",
         expiry_date: "2026-09-30",
       });
     }
@@ -965,126 +962,35 @@ if (navToggle && mainNav) {
 }
 
 // ================================================================
-// Partner with Surkh — hospital sign-up form (partner.html only)
-// TODO: replace the mock submit below with a real POST /facilities call
-// (+ linked Profile row) once that backend endpoint exists. See
-// partner-signup-wireframe.md for the full field-to-schema mapping.
+// Partner with Surkh — hospital staff sign-up form (signup.html only)
+// Staff join a facility that's already been registered (looked up
+// server-side by facility_code) — this form does not create a facility.
+// Wired to the real POST /api/auth/signup contract in
+// backend/app/api/auth/signup/route.js: { full_name, email, password,
+// facility_code } only. role and facility_id are server-controlled and
+// must never be sent from the client.
 // ================================================================
 const partnerForm = document.getElementById("partner-signup-form");
 
 if (partnerForm) {
-  // has_emr — single-select Yes/No toggle
-  const emrToggle = document.getElementById("has-emr-toggle");
-  let hasEmr = false; // matches the pre-selected "No" button in the markup
-
-  if (emrToggle) {
-    emrToggle.querySelectorAll(".toggle-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        emrToggle
-          .querySelectorAll(".toggle-btn")
-          .forEach((b) => b.classList.remove("is-active"));
-        btn.classList.add("is-active");
-        hasEmr = btn.dataset.value === "true";
-      });
-    });
-  }
-
-  // Precise location — same Geolocation API pattern as Find Blood, kept as
-  // its own state here since this page has no shared findBloodState.
-  const partnerLocationBtn = document.getElementById("partner-location-btn");
-  const partnerLocationBtnText = document.getElementById(
-    "partner-location-btn-text",
-  );
-  const partnerLocationStatus = document.getElementById(
-    "partner-location-status",
-  );
-  let facilityCoords = null;
-
-  if (partnerLocationBtn) {
-    partnerLocationBtn.addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        partnerLocationStatus.textContent =
-          "Geolocation is not supported on this device.";
-        partnerLocationStatus.className =
-          "partner-form__location-status partner-form__location-status--error";
-        return;
-      }
-
-      partnerLocationBtn.disabled = true;
-      partnerLocationBtnText.textContent = "Locating…";
-      partnerLocationStatus.textContent = "";
-      partnerLocationStatus.className = "partner-form__location-status";
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          facilityCoords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          partnerLocationBtn.disabled = false;
-          partnerLocationBtnText.textContent = "Location Detected ✓";
-          partnerLocationStatus.textContent =
-            "We'll use this as your facility's pinned location.";
-          partnerLocationStatus.className =
-            "partner-form__location-status partner-form__location-status--success";
-        },
-        (error) => {
-          facilityCoords = null;
-          partnerLocationBtn.disabled = false;
-          partnerLocationBtnText.textContent = "Detect My Location";
-          partnerLocationStatus.textContent =
-            error.code === error.PERMISSION_DENIED
-              ? "Location permission denied — this is required to list your facility."
-              : "Could not detect location — please try again.";
-          partnerLocationStatus.className =
-            "partner-form__location-status partner-form__location-status--error";
-        },
-      );
-    });
-  }
-
-  // Submit — validates required fields, then builds a payload shaped exactly
-  // like facilities + Profile (see schema mapping in the wireframe doc).
   const partnerFormError = document.getElementById("partner-form-error");
   const partnerSubmitBtn = document.getElementById("partner-submit-btn");
   const partnerSubmitBtnText = document.getElementById(
     "partner-submit-btn-text",
   );
 
-  partnerForm.addEventListener("submit", (e) => {
+  partnerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     partnerFormError.textContent = "";
 
-    const facilityName = document.getElementById("facility-name").value.trim();
-    const facilityLocation = document
-      .getElementById("facility-location")
-      .value.trim();
+    const facilityCode = document.getElementById("facility-code").value.trim();
     const staffName = document.getElementById("staff-name").value.trim();
     const staffEmail = document.getElementById("staff-email").value.trim();
     const staffPassword = document.getElementById("staff-password").value;
-    const staffRole = document.getElementById("staff-role").value;
 
-    let invalid = false;
-    if (!facilityName || !facilityLocation) {
+    if (!facilityCode || !staffName || !staffEmail || staffPassword.length < 8) {
       partnerFormError.textContent =
-        "Please fill in your facility name and address.";
-      invalid = true;
-    } else if (!facilityCoords) {
-      partnerFormError.textContent =
-        "Please detect your facility's location before continuing.";
-      invalid = true;
-    } else if (
-      !staffName ||
-      !staffEmail ||
-      staffPassword.length < 8 ||
-      !staffRole
-    ) {
-      partnerFormError.textContent =
-        "Please complete all of your details, including an 8+ character password.";
-      invalid = true;
-    }
-
-    if (invalid) {
+        "Please complete all fields, including an 8+ character password.";
       // Reuses the same shake animation as the Find Blood form
       partnerForm.classList.remove("shake");
       // eslint-disable-next-line no-unused-expressions
@@ -1093,33 +999,44 @@ if (partnerForm) {
       return;
     }
 
-    // Matches facilities + Profile schema exactly — nothing invented here.
-    // TODO: POST this to /facilities (creates facility + linked Profile row)
+    // Matches the signup route's expected body exactly — nothing invented here.
     const payload = {
-      facility: {
-        name: facilityName,
-        location: facilityLocation,
-        latitude: facilityCoords.lat,
-        longitude: facilityCoords.lng,
-        has_emr: hasEmr,
-      },
-      profile: {
-        full_name: staffName,
-        email: staffEmail,
-        role: staffRole,
-        // facility_id is assigned server-side once the facility row exists
-      },
-      // password goes to Supabase Auth directly — it's not a Profile column
+      full_name: staffName,
+      email: staffEmail,
+      password: staffPassword,
+      facility_code: facilityCode,
     };
 
     partnerSubmitBtn.disabled = true;
     partnerSubmitBtnText.textContent = "Creating Account…";
 
-    // Mock network delay standing in for the real request above
-    setTimeout(() => {
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // e.g. "No facility found with that facility_code", weak password, etc.
+        partnerFormError.textContent = data.error || "Could not create your account.";
+        partnerSubmitBtn.disabled = false;
+        partnerSubmitBtnText.textContent = "Create Hospital Account";
+        return;
+      }
+
       partnerSubmitBtnText.textContent = "Account Created ✓";
-      // TODO: redirect to the hospital dashboard once it's built
-    }, 900);
+      // Signup creates the Auth user + Profile row but does not sign them in
+      // (no session is returned) — send them to log in next.
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 900);
+    } catch (err) {
+      partnerFormError.textContent = "Network error — please try again.";
+      partnerSubmitBtn.disabled = false;
+      partnerSubmitBtnText.textContent = "Create Hospital Account";
+    }
   });
 }
 
@@ -1131,7 +1048,7 @@ if (loginForm) {
   const loginSubmitBtn = document.getElementById("login-submit-btn");
   const loginSubmitBtnText = document.getElementById("login-submit-btn-text");
 
-  loginForm.addEventListener("submit", (e) => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     loginError.textContent = "";
 
@@ -1149,10 +1066,22 @@ if (loginForm) {
     loginSubmitBtn.disabled = true;
     loginSubmitBtnText.textContent = "Logging In…";
 
-    // TODO: replace with a real Supabase Auth sign-in call
-    setTimeout(() => {
-      loginSubmitBtnText.textContent = "Logged In ✓";
-      // TODO: redirect to the hospital dashboard once it's built
-    }, 900);
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      loginError.textContent = error.message;
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtnText.textContent = "Log In";
+      loginForm.classList.remove("shake");
+      void loginForm.offsetWidth;
+      loginForm.classList.add("shake");
+      return;
+    }
+
+    loginSubmitBtnText.textContent = "Logged In ✓";
+    window.location.href = "dashboard.html";
   });
 }
