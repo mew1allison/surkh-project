@@ -5,7 +5,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("Facility")
-    .select("*");
+    .select('id, name, location, latitude, longitude, has_emr')
 
   if (error) {
     return Response.json(
