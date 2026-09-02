@@ -11,6 +11,7 @@ export async function GET(request) {
   const blood_group = searchParams.get('blood_group')
   const lat = searchParams.get('lat')
   const lng = searchParams.get('lng')
+  const city = searchParams.get('city')
 
   // Validate blood_group if provided
   if (blood_group && !VALID_BLOOD_GROUPS.includes(blood_group)) {
@@ -42,15 +43,31 @@ export async function GET(request) {
     )
   }
 
+  // Validate city if provided
+  if (city && city.trim().length === 0) {
+    return Response.json(
+      { error: 'city must be a non-empty string' },
+      { status: 400 }
+    )
+  }
+
   // Query inventory with facility join; filter by availability
+  // !inner makes the Facility join an inner join when filtering by city,
+  // so non-matching Inventory rows are excluded instead of returning Facility: null
   let query = supabase
     .from('Inventory')
-    .select('*, Facility(*)')
+    .select(
+      `blood_group, quantity, expiry_date, Facility${city ? '!inner' : ''} (name, city, location)`
+    )
     .eq('status', 'available')
     .gt('quantity', 0)
 
   if (blood_group) {
     query = query.eq('blood_group', blood_group)
+  }
+
+  if (city) {
+    query = query.eq('Facility.city', city.trim())
   }
 
   const { data, error } = await query
