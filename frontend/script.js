@@ -4,7 +4,14 @@
 // not by keeping this key secret. See lib/supabase.js on the backend for the
 // same URL + key pair used server-side.
 // TODO: fill in your project's real values (Supabase dashboard > Project Settings > API).
+// ---- Supabase client ----
+const SUPABASE_URL = "https://fpvlbkdcqmcatvxhuzta.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jJ_I0osFLEfqcjR2t3tz8A_3DsYKPwE";
 
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 // Backend base URL — the backend is a separate Next.js app (its API routes
 // live under app/api/), not served from the same origin as this static
 // frontend, so calls to it need an absolute base.
@@ -365,17 +372,22 @@ if (findBloodForm) {
     searchBtn.disabled = true;
     searchBtnText.textContent = "Searching…";
 
-    // TODO: replace fetchFacilities() with the real API call, e.g.
-    // fetch(`/inventory?blood_group=${findBloodState.bloodGroup}&lat=${findBloodState.coords.lat}&lng=${findBloodState.coords.lng}`).then(r => r.json())
-    fetchFacilities(findBloodState).then((results) => {
-      searchBtn.disabled = false;
-      searchBtnText.textContent = "Search Blood";
-      currentFilteredResults = results;
-      visibleResultsCount = RESULTS_PAGE_SIZE;
-      resultsSubtext.textContent = "Showing Closest to You";
-      renderResultsList();
-      resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    fetchInventoryFromApi(findBloodState.bloodGroup, findBloodState.city)
+      .then((rows) => {
+        searchBtn.disabled = false;
+        searchBtnText.textContent = "Search Blood";
+        currentFilteredResults = groupByFacility(rows);
+        visibleResultsCount = RESULTS_PAGE_SIZE;
+        resultsSubtext.textContent = "Showing Closest to You";
+        renderResultsList();
+        resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      })
+      .catch((err) => {
+        searchBtn.disabled = false;
+        searchBtnText.textContent = "Search Blood";
+        formError.textContent = "Search failed — please try again.";
+        console.error("Blood search failed:", err);
+      });
   });
 }
 // ---- Find Blood Now: results (Step 3) ----
@@ -698,13 +710,50 @@ function formatEta(km) {
   return mins > 0 ? `${hrs} hr ${mins} mins` : `${hrs} hr`;
 }
 
+// ---- API: fetch inventory from backend ----
+// GET /api/inventory returns one row per blood-group-per-facility:
+//   { blood_group, quantity, expiry_date, Facility: { name, city, location } }
+// Always filtered to status='available' and quantity>0 server-side.
+async function fetchInventoryFromApi(bloodGroup, city) {
+  const params = new URLSearchParams();
+  if (bloodGroup) params.set('blood_group', bloodGroup);
+  if (city) params.set('city', city);
+
+  const res = await fetch(
+    `${BACKEND_BASE_URL}/api/inventory${params.toString() ? '?' + params.toString() : ''}`
+  );
+  if (!res.ok) {
+    throw new Error(`Search failed (${res.status})`);
+  }
+  return res.json();
+}
+
+// Group flat inventory rows by facility name so each result card
+// represents one facility (matching the previous mock-based shape).
+function groupByFacility(rows) {
+  const map = {};
+  rows.forEach((row) => {
+    const name = row.Facility?.name || 'Unknown Facility';
+    if (!map[name]) {
+      map[name] = {
+        name,
+        city: row.Facility?.city || '',
+        location: row.Facility?.location || '',
+        inventory: [],
+      };
+    }
+    map[name].inventory.push({
+      blood_group: row.blood_group,
+      quantity: row.quantity,
+      expiry_date: row.expiry_date,
+    });
+  });
+  return Object.values(map);
+}
+
 const RESULTS_PAGE_SIZE = 3; // matches the 3-cards-per-row desktop grid
 
-// Pre-search default view: all known facilities in no particular order,
-// standing in for a real "popular/common searches" endpoint.
-const commonSearches = [...mockFacilities];
-
-let currentFilteredResults = commonSearches;
+let currentFilteredResults = [];
 let visibleResultsCount = RESULTS_PAGE_SIZE;
 
 const resultsList = document.getElementById("results-list");
@@ -743,26 +792,24 @@ function getStockTier(facilityId, bloodGroup, reqQty = 1) {
   return 0; // Fully available
 }
 function buildResultCard(facility) {
-  const stock = getInventoryFor(facility.id, findBloodState.bloodGroup);
-  const available =
-    !!stock && stock.status === "available" && stock.quantity > 0;
-  const reqQty = findBloodState.quantity || 1;
-  const lowStock =
-    available && (stock.quantity < reqQty || stock.quantity <= 2);
-  const distance = findBloodState.coords
-    ? distanceKm(
-        findBloodState.coords.lat,
-        findBloodState.coords.lng,
-        facility.latitude,
-        facility.longitude,
-      )
-    : null;
+  // Find stock for the currently selected blood group in this facility's
+  // grouped inventory rows (all already status='available', quantity>0
+  // per the backend filter).
+  const group = findBloodState.bloodGroup;
+  const stock = group
+    ? facility.inventory.find((r) => r.blood_group === group)
+    : facility.inventory[0];
+  const available = !!stock;
+  const lowStock = available && stock.quantity <= 2;
 
   const card = document.createElement("div");
   card.className = "result-card";
+
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
   card.innerHTML = `
     <div class="result-card__photo-wrap">
-      <img src="${facility.photo}" alt="${facility.name}" class="result-card__photo">
+      <img src="assets/donation-camp.jpg" alt="${esc(facility.name)}" class="result-card__photo">
       ${
         available
           ? lowStock
@@ -774,18 +821,18 @@ function buildResultCard(facility) {
     <div class="result-card__body">
       ${lowStock ? '<p class="result-card__notice">Low Stock — confirm availability directly via contact as well.</p>' : ""}
       <div class="result-card__top">
-        <img src="${facility.logo}" alt="" class="result-card__logo">
+        <img src="assets/logo.jpg" alt="" class="result-card__logo">
         <div>
-          <p class="result-card__name">${facility.name}</p>
-          <p class="result-card__address">${facility.location}</p>
+          <p class="result-card__name">${esc(facility.name)}</p>
+          <p class="result-card__address">${esc(facility.location)}</p>
         </div>
       </div>
       <div class="result-card__bottom">
-        <span class="result-card__eta"><img src="assets/icon-car.svg" alt="" class="icon-inline">${distance !== null ? `~${formatEta(distance)}` : "ETA N/A"}</span>
+        <span class="result-card__eta"></span>
         ${
           available
-            ? `<button type="button" class="result-card__reserve" data-facility-id="${facility.id}">Reserve Blood</button>`
-            : `<button type="button" class="result-card__reserve result-card__reserve--contact" data-facility-id="${facility.id}" data-contact-only="true">Contact on WhatsApp</button>`
+            ? `<button type="button" class="result-card__reserve" data-facility-name="${esc(facility.name)}" data-facility-location="${esc(facility.location)}">Reserve Blood</button>`
+            : `<button type="button" class="result-card__reserve result-card__reserve--contact" data-facility-name="${esc(facility.name)}" data-facility-location="${esc(facility.location)}" data-contact-only="true">Contact on WhatsApp</button>`
         }
       </div>
     </div>
@@ -925,11 +972,12 @@ if (resultsList) {
   resultsList.addEventListener("click", (e) => {
     const btn = e.target.closest(".result-card__reserve");
     if (!btn) return;
-    const facility = mockFacilities.find(
-      (f) => f.id === Number(btn.dataset.facilityId),
-    );
-    if (facility)
-      openReserveModal(facility, btn.dataset.contactOnly === "true");
+    const facility = {
+      name: btn.dataset.facilityName || '',
+      location: btn.dataset.facilityLocation || '',
+      phone: null,
+    };
+    openReserveModal(facility, btn.dataset.contactOnly === "true");
   });
 }
 
@@ -938,7 +986,16 @@ if (reserveModalClose)
 if (reserveModalBackdrop)
   reserveModalBackdrop.addEventListener("click", closeReserveModal);
 
-renderResultsList();
+// Initial render — fetch all available inventory from the API
+(async () => {
+  try {
+    const rows = await fetchInventoryFromApi();
+    currentFilteredResults = groupByFacility(rows);
+  } catch (err) {
+    console.error('Failed to load initial inventory:', err);
+  }
+  renderResultsList();
+})();
 // Nav toggle — opens/closes the mobile nav dropdown
 const navToggle = document.querySelector(".nav-toggle");
 const mainNav = document.getElementById("main-nav");
@@ -1066,7 +1123,7 @@ if (loginForm) {
     loginSubmitBtn.disabled = true;
     loginSubmitBtnText.textContent = "Logging In…";
 
-    const { error } = await supabaseClient.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password,
     });
