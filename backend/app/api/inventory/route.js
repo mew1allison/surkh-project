@@ -44,14 +44,20 @@ export async function GET(request) {
   }
 
   // Query inventory with facility join; filter by availability
+  // !inner: with a city filter on the embedded Facility, a plain embed would
+  // left-join and still return non-matching rows (Facility: null).
   let query = supabase
     .from('Inventory')
-    .select(`*, Facility (id, name, location, latitude, longitude, has_emr)`)
+    .select(`*, Facility!inner (id, name, city, location, latitude, longitude, has_emr)`)
     .eq('status', 'available')
     .gt('quantity', 0)
 
   if (blood_group) {
     query = query.eq('blood_group', blood_group)
+  }
+
+  if (city) {
+    query = query.eq('Facility.city', city)
   }
 
   const { data, error } = await query
