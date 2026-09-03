@@ -3,15 +3,40 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 const VALID_BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 const VALID_STATUSES = ['available', 'low', 'not available']
 
-export async function GET(request) {
-  const supabase = await createSupabaseServerClient()
+export function extractBearerToken(request) {
+  const authHeader = request.headers.get('Authorization') || ''
+  return authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+}
 
-  // Extract query params for Find Blood feature
+export async function GET(request) {
+  // Extract query params
   const { searchParams } = new URL(request.url)
   const blood_group = searchParams.get('blood_group')
   const lat = searchParams.get('lat')
   const lng = searchParams.get('lng')
   const city = searchParams.get('city')
+  const facility_id = searchParams.get('facility_id')
+
+  // When facility_id is supplied, authenticate the caller and verify ownership
+  // so the dashboard can see ALL of its own rows (including zero-stock ones).
+  let authenticatedUserId = null
+  if (facility_id) {
+    const accessToken = extractBearerToken(request)
+    if (!accessToken) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const authSupabase = await createSupabaseServerClient(accessToken)
+    const { data: { user }, error: authError } = await authSupabase.auth.getUser(accessToken)
+    if (authError || !user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    authenticatedUserId = user.id
+  }
+
+  // For unauthenticated (public) requests, use an anonymous Supabase client.
+  const supabase = authenticatedUserId
+    ? await createSupabaseServerClient(extractBearerToken(request))
+    : await createSupabaseServerClient()
 
   // Validate blood_group if provided
   if (blood_group && !VALID_BLOOD_GROUPS.includes(blood_group)) {
@@ -43,14 +68,47 @@ export async function GET(request) {
     )
   }
 
-  // Query inventory with facility join; filter by availability
-  // !inner: with a city filter on the embedded Facility, a plain embed would
-  // left-join and still return non-matching rows (Facility: null).
-  let query = supabase
-    .from('Inventory')
-    .select(`*, Facility!inner (id, name, city, location, latitude, longitude, has_emr)`)
-    .eq('status', 'available')
-    .gt('quantity', 0)
+  let query
+
+  if (facility_id) {
+    // Dashboard mode: return ALL inventory for the caller's facility,
+    // including zero-quantity and non-available rows.
+    const parsedFacilityId = Number(facility_id)
+    if (!Number.isInteger(parsedFacilityId) || parsedFacilityId < 1) {
+      return Response.json(
+        { error: 'facility_id must be a positive integer' },
+        { status: 400 }
+      )
+    }
+
+    // Verify the authenticated user's Profile matches the requested facility
+    const { data: profile, error: profileError } = await supabase
+      .from('Profile')
+      .select('facility_id')
+      .eq('id', authenticatedUserId)
+      .single()
+
+    if (profileError || !profile || profile.facility_id !== parsedFacilityId) {
+      return Response.json(
+        { error: 'Not authorized to view this facility inventory' },
+        { status: 403 }
+      )
+    }
+
+    query = supabase
+      .from('Inventory')
+      .select('*, Facility!inner (id, name, city, location, latitude, longitude, has_emr)')
+      .eq('facility_id', parsedFacilityId)
+  } else {
+    // Public search: only available stock with quantity > 0
+    // !inner: with a city filter on the embedded Facility, a plain embed would
+    // left-join and still return non-matching rows (Facility: null).
+    query = supabase
+      .from('Inventory')
+      .select(`*, Facility!inner (id, name, city, location, latitude, longitude, has_emr)`)
+      .eq('status', 'available')
+      .gt('quantity', 0)
+  }
 
   if (blood_group) {
     query = query.eq('blood_group', blood_group)
@@ -73,10 +131,11 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const supabase = await createSupabaseServerClient()
+  const accessToken = extractBearerToken(request)
+  const supabase = await createSupabaseServerClient(accessToken)
 
   // Step 1: authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
   if (authError || !user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -156,10 +215,11 @@ export async function POST(request) {
 }
 
 export async function PATCH(request) {
-  const supabase = await createSupabaseServerClient()
+  const accessToken = extractBearerToken(request)
+  const supabase = await createSupabaseServerClient(accessToken)
 
   // Step 1: authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
   if (authError || !user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }

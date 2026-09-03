@@ -1,9 +1,11 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { extractBearerToken } from '@/app/api/inventory/route'
 
-export async function GET() {
-  const supabase = await createSupabaseServerClient()
+export async function GET(request) {
+  const accessToken = extractBearerToken(request)
+  const supabase = await createSupabaseServerClient(accessToken)
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
   if (authError || !user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -105,10 +107,11 @@ export async function POST(request) {
 }
 
 export async function PATCH(request) {
-  const supabase = await createSupabaseServerClient()
+  const accessToken = extractBearerToken(request)
+  const supabase = await createSupabaseServerClient(accessToken)
 
   // Step 1: authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
   if (authError || !user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
