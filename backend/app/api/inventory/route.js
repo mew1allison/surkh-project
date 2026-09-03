@@ -193,7 +193,55 @@ export async function POST(request) {
     )
   }
 
-  // Step 4: insert — facility_id always from server-side Profile
+  // Step 4: check for an existing row (same facility + blood_group) so
+  // new stock is merged into the existing row instead of creating a duplicate.
+  const { data: existingRow, error: lookupError } = await supabase
+    .from('Inventory')
+    .select('id, quantity, expiry_date')
+    .eq('facility_id', profile.facility_id)
+    .eq('blood_group', blood_group)
+    .maybeSingle()
+
+  if (lookupError) {
+    return Response.json({ error: lookupError.message }, { status: 500 })
+  }
+
+  if (existingRow) {
+    // Merge: add quantities, keep the later expiry date, recalculate status.
+    const mergedQuantity = existingRow.quantity + parsedQuantity
+    const mergedExpiry =
+      existingRow.expiry_date && existingRow.expiry_date > expiry_date
+        ? existingRow.expiry_date
+        : expiry_date
+
+    let mergedStatus
+    if (mergedQuantity <= 0) {
+      mergedStatus = 'not available'
+    } else if (mergedQuantity <= 10) {
+      mergedStatus = 'low'
+    } else {
+      mergedStatus = 'available'
+    }
+
+    const { data: updated, error: updateError } = await supabase
+      .from('Inventory')
+      .update({
+        quantity: mergedQuantity,
+        expiry_date: mergedExpiry,
+        status: mergedStatus,
+      })
+      .eq('id', existingRow.id)
+      .select()
+      .single()
+
+    if (updateError) {
+      return Response.json({ error: updateError.message }, { status: 500 })
+    }
+
+    return Response.json(updated, { status: 200 })
+  }
+
+  // Step 5: no existing row — insert a new one.
   const { data, error } = await supabase
     .from('Inventory')
     .insert({
@@ -210,7 +258,6 @@ export async function POST(request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  // Step 5: return created record
   return Response.json(data, { status: 201 })
 }
 

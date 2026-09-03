@@ -3001,6 +3001,26 @@ body {
   max-width: 280px;
 }
 
+.ledger-upload__status {
+  font-size: 0.78rem;
+  margin-top: 0.5rem;
+  min-height: 1.2em;
+}
+
+.ledger-upload__status--loading {
+  color: rgba(28, 2, 4, 0.55);
+}
+
+.ledger-upload__status--error {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.ledger-upload__status--success {
+  color: #2a7d4f;
+  font-weight: 600;
+}
+
 .ledger-review {
   display: none;
 }
@@ -3035,6 +3055,29 @@ body {
   display: flex;
   gap: 0.6rem;
   margin-top: 1.1rem;
+}
+
+.ledger-review__multi {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  background: rgba(240, 184, 86, 0.12);
+  padding: 0.45rem 0.65rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  display: none;
+}
+
+.ledger-review__multi.is-visible {
+  display: block;
+}
+
+.ledger-review__error {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-top: 0.5rem;
+  min-height: 1.2em;
 }
 
 /* ---- Placeholder state (removed as each step is built) ---- */
@@ -3222,13 +3265,13 @@ body {
     <div class="facility-switcher-wrap">
       <button class="facility-switcher" id="facility-switcher-btn" aria-haspopup="true" aria-expanded="false">
         <span class="facility-switcher__label">
-          <span class="facility-switcher__name">Services Hospital Blood Bank</span>
+          <span class="facility-switcher__name">Loading…</span>
           <span class="facility-switcher__meta"><span class="facility-switcher__meta-dot"></span>Synced 2 min ago</span>
         </span>
         <svg class="facility-switcher__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div class="facility-switcher__menu" id="facility-switcher-menu">
-        <button class="facility-switcher__item is-active">Services Hospital Blood Bank</button>
+        <button class="facility-switcher__item is-active">Loading…</button>
         <div class="facility-switcher__divider"></div>
         <button class="facility-switcher__item">Manage facility details</button>
       </div>
@@ -3243,10 +3286,10 @@ body {
 
       <div class="dash-profile-wrap">
         <button class="dash-profile" id="dash-profile-btn" aria-haspopup="true" aria-expanded="false">
-          <span class="dash-profile__avatar">DA</span>
+          <span class="dash-profile__avatar">…</span>
           <span class="dash-profile__info">
-            <span class="dash-profile__name">Dr. Ahmad</span>
-            <span class="dash-profile__role">Facility Admin</span>
+            <span class="dash-profile__name">Loading…</span>
+            <span class="dash-profile__role">Loading…</span>
           </span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
@@ -3268,22 +3311,22 @@ body {
     <div class="dash-mobile-panel" id="dash-mobile-panel">
       <button class="facility-switcher" id="facility-switcher-btn-mobile" aria-haspopup="true" aria-expanded="false">
         <span class="facility-switcher__label">
-          <span class="facility-switcher__name">Services Hospital Blood Bank</span>
+          <span class="facility-switcher__name">Loading…</span>
           <span class="facility-switcher__meta"><span class="facility-switcher__meta-dot"></span>Synced 2 min ago</span>
         </span>
         <svg class="facility-switcher__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div class="facility-switcher__menu" id="facility-switcher-menu-mobile">
-        <button class="facility-switcher__item is-active">Services Hospital Blood Bank</button>
+        <button class="facility-switcher__item is-active">Loading…</button>
         <div class="facility-switcher__divider"></div>
         <button class="facility-switcher__item">Manage facility details</button>
       </div>
 
       <button class="dash-profile">
-        <span class="dash-profile__avatar">DA</span>
+        <span class="dash-profile__avatar">…</span>
         <span class="dash-profile__info">
-          <span class="dash-profile__name">Dr. Ahmad</span>
-          <span class="dash-profile__role">Facility Admin</span>
+          <span class="dash-profile__name">Loading…</span>
+          <span class="dash-profile__role">Loading…</span>
         </span>
       </button>
     </div>
@@ -3476,35 +3519,43 @@ body {
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         <p class="ledger-upload__title">Take a photo of the paper register</p>
         <p class="ledger-upload__or">— or —</p>
-        <button class="btn-ghost" id="ledger-upload-btn">Upload an image</button>
+        <button class="btn-ghost" id="ledger-upload-btn" type="button">Upload an image</button>
+        <input type="file" id="ledger-file-input" accept="image/*" capture="environment" hidden>
         <p class="ledger-upload__hint">On mobile this opens your camera. On desktop, choose a file.</p>
+        <p class="ledger-upload__status" id="ledger-upload-status"></p>
       </div>
 
       <div class="ledger-review" id="ledger-review">
         <div class="ledger-review__top">
           <span class="ledger-review__label">Review before confirming</span>
-          <span class="ledger-review__confidence">Confidence: 92%</span>
+          <span class="ledger-review__confidence" id="ledger-confidence"></span>
         </div>
+        <p class="ledger-review__multi" id="ledger-multi-notice"></p>
         <div class="entry-form">
           <label class="entry-field">
             <span class="entry-field__label">Blood Group</span>
-            <select class="entry-field__select">
-              <option>O+</option><option>O−</option><option>A+</option><option>A−</option>
-              <option selected>B+</option><option>B−</option><option>AB+</option><option>AB−</option>
+            <select class="entry-field__select" id="ledger-blood-group">
+              <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
             </select>
           </label>
           <label class="entry-field">
             <span class="entry-field__label">Quantity</span>
-            <input type="number" class="entry-field__select" value="8" min="0">
+            <input type="number" class="entry-field__select" id="ledger-quantity" min="0">
           </label>
           <label class="entry-field">
-            <span class="entry-field__label">Date</span>
-            <input type="date" class="entry-field__select">
+            <span class="entry-field__label">Ledger Date</span>
+            <input type="date" class="entry-field__select" id="ledger-date" disabled>
+          </label>
+          <label class="entry-field">
+            <span class="entry-field__label">Expiry Date</span>
+            <input type="date" class="entry-field__select" id="ledger-expiry-date">
           </label>
         </div>
+        <p class="ledger-review__error" id="ledger-review-error"></p>
         <div class="ledger-review__actions">
-          <button class="btn-solid">Confirm &amp; Log</button>
-          <button class="btn-ghost" id="ledger-retake-btn">Retake / Re-upload</button>
+          <button class="btn-solid" id="ledger-confirm-btn" type="button">Confirm &amp; Log</button>
+          <button class="btn-ghost" id="ledger-retake-btn" type="button">Retake / Re-upload</button>
         </div>
       </div>
     </div>
@@ -3874,8 +3925,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // ---- Header identity (facility switcher + profile chip) ----
+  // Populated from the authenticated user's Profile — /api/profile embeds the
+  // related Facility(name). querySelectorAll is required because every element
+  // exists twice: once in the desktop header, once in the mobile panel.
+  function renderIdentity(profile) {
+    const facilityName = profile.Facility?.name || 'No facility linked';
+    document.querySelectorAll('.facility-switcher__name, .facility-switcher__item.is-active')
+      .forEach((el) => { el.textContent = facilityName; });
+    document.querySelectorAll('.dash-profile__name')
+      .forEach((el) => { el.textContent = profile.full_name || ''; });
+    document.querySelectorAll('.dash-profile__role')
+      .forEach((el) => { el.textContent = profile.role || ''; });
+    // Initials from the first two words of full_name (e.g. "Dr. Ahmad" → "DA").
+    // filter(Boolean) keeps empty/whitespace names from producing undefined tokens.
+    const initials = (profile.full_name || '')
+      .trim().split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join('');
+    document.querySelectorAll('.dash-profile__avatar')
+      .forEach((el) => { el.textContent = initials || '·'; });
+  }
+
   const profile = await loadInventory();
   if (profile) {
+    renderIdentity(profile);
     loadExchangeRequests(profile.facility_id);
   }
 
@@ -3995,29 +4071,305 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ledgerSlideover = document.getElementById('ledger-slideover');
   const ledgerUpload = document.getElementById('ledger-upload');
   const ledgerReview = document.getElementById('ledger-review');
+  const ledgerUploadBtn = document.getElementById('ledger-upload-btn');
+  const ledgerFileInput = document.getElementById('ledger-file-input');
+  const ledgerUploadStatus = document.getElementById('ledger-upload-status');
+  const ledgerConfidence = document.getElementById('ledger-confidence');
+  const ledgerMultiNotice = document.getElementById('ledger-multi-notice');
+  const ledgerBloodGroup = document.getElementById('ledger-blood-group');
+  const ledgerQuantity = document.getElementById('ledger-quantity');
+  const ledgerDate = document.getElementById('ledger-date');
+  const ledgerExpiryDate = document.getElementById('ledger-expiry-date');
+  const ledgerReviewError = document.getElementById('ledger-review-error');
+  const ledgerConfirmBtn = document.getElementById('ledger-confirm-btn');
+  const ledgerRetakeBtn = document.getElementById('ledger-retake-btn');
+
+  // All extracted entries preserved in state (never silently discarded).
+  // currentEntryIndex tracks which entry is shown in the review form.
+  let ledgerExtractedEntries = [];
+  let currentEntryIndex = 0;
 
   function openLedgerSlideover() {
     ledgerOverlay.classList.add('is-open');
     ledgerSlideover.classList.add('is-open');
     ledgerSlideover.setAttribute('aria-hidden', 'false');
   }
+
+  function resetLedgerState() {
+    ledgerUpload.style.display = 'flex';
+    ledgerReview.classList.remove('is-active');
+    ledgerUploadStatus.textContent = '';
+    ledgerUploadStatus.className = 'ledger-upload__status';
+    ledgerUploadBtn.disabled = false;
+    ledgerFileInput.value = '';
+    ledgerExtractedEntries = [];
+    currentEntryIndex = 0;
+    ledgerConfidence.textContent = '';
+    ledgerMultiNotice.textContent = '';
+    ledgerMultiNotice.classList.remove('is-visible');
+    ledgerReviewError.textContent = '';
+    ledgerBloodGroup.value = 'O+';
+    ledgerQuantity.value = '';
+    ledgerDate.value = '';
+    ledgerExpiryDate.value = '';
+    ledgerConfirmBtn.disabled = false;
+    ledgerConfirmBtn.textContent = 'Confirm & Log';
+  }
+
   function closeLedgerSlideover() {
     ledgerOverlay.classList.remove('is-open');
     ledgerSlideover.classList.remove('is-open');
     ledgerSlideover.setAttribute('aria-hidden', 'true');
-    ledgerUpload.style.display = 'flex';
-    ledgerReview.classList.remove('is-active');
+    resetLedgerState();
   }
+
+  // Populate the review form from a single extracted entry.
+  function populateReviewForm(entry) {
+    if (entry.blood_group) {
+      // Match the option value — the dropdown uses plain text like "O+".
+      const match = Array.from(ledgerBloodGroup.options).find(
+        (opt) => opt.textContent.trim() === entry.blood_group
+      );
+      if (match) ledgerBloodGroup.value = match.value;
+    }
+    ledgerQuantity.value = entry.quantity != null ? entry.quantity : '';
+    ledgerDate.value = entry.date || '';
+    ledgerExpiryDate.value = '';
+    ledgerReviewError.textContent = '';
+
+    // Confidence: API does not provide a score, so show a neutral status.
+    if (entry.validation && entry.validation.status === 'MANUAL_CONFIRMATION') {
+      ledgerConfidence.textContent = 'Needs review';
+      ledgerConfidence.style.color = 'var(--color-primary)';
+      ledgerConfidence.style.background = 'rgba(216, 50, 58, 0.10)';
+    } else {
+      ledgerConfidence.textContent = 'AI extraction complete';
+      ledgerConfidence.style.color = '';
+      ledgerConfidence.style.background = '';
+    }
+
+    // Multiple-entries notice.
+    if (ledgerExtractedEntries.length > 1) {
+      const remaining = ledgerExtractedEntries.length - 1;
+      ledgerMultiNotice.textContent =
+        `${ledgerExtractedEntries.length} entries detected. Showing entry ${currentEntryIndex + 1} of ${ledgerExtractedEntries.length}. Log each entry individually — ${remaining} more to review after this one.`;
+      ledgerMultiNotice.classList.add('is-visible');
+    } else {
+      ledgerMultiNotice.textContent = '';
+      ledgerMultiNotice.classList.remove('is-visible');
+    }
+  }
+
+  // Upload → Gemini → populate review form.
+  async function handleFileSelected(file) {
+    if (!file) return;
+
+    // Validate mime type before sending.
+    const SUPPORTED = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    if (!SUPPORTED.includes(file.type)) {
+      ledgerUploadStatus.textContent = `Unsupported file type: ${file.type || 'unknown'}. Please use JPEG, PNG, or WebP.`;
+      ledgerUploadStatus.className = 'ledger-upload__status ledger-upload__status--error';
+      return;
+    }
+
+    // Loading state.
+    ledgerUploadBtn.disabled = true;
+    ledgerUploadStatus.textContent = 'Extracting ledger data…';
+    ledgerUploadStatus.className = 'ledger-upload__status ledger-upload__status--loading';
+
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          // Strip the data URL prefix to get raw base64.
+          const dataUrl = reader.result;
+          const commaIndex = dataUrl.indexOf(',');
+          resolve(dataUrl.slice(commaIndex + 1));
+        };
+        reader.onerror = () => reject(new Error('Could not read file'));
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch(`${BACKEND_BASE_URL}/api/ledger-extract`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ image_base64: base64, mime_type: file.type }),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error('Ledger extraction failed:', res.status, errBody);
+        let userMsg;
+        if (res.status === 401) {
+          userMsg = 'Your session has expired. Please log in again.';
+        } else if (res.status === 400) {
+          userMsg = 'Please select a valid ledger image and try again.';
+        } else if (res.status === 429) {
+          userMsg = 'AI Ledger is temporarily busy. Please try again shortly.';
+        } else if (res.status === 502 || res.status === 503) {
+          userMsg = 'AI Ledger is temporarily unavailable. Please try again in a moment.';
+        } else {
+          userMsg = 'We couldn\u2019t process the ledger image. Please try again.';
+        }
+        throw new Error(userMsg);
+      }
+
+      const result = await res.json();
+
+      if (!result.entries || !Array.isArray(result.entries) || result.entries.length === 0) {
+        throw new Error('No entries were extracted from this image.');
+      }
+
+      // Preserve all entries in state.
+      ledgerExtractedEntries = result.entries;
+      currentEntryIndex = 0;
+
+      // Show the first entry in the review form.
+      populateReviewForm(result.entries[0]);
+
+      // Switch from upload view to review view.
+      ledgerUpload.style.display = 'none';
+      ledgerReview.classList.add('is-active');
+      ledgerUploadStatus.textContent = '';
+      ledgerUploadStatus.className = 'ledger-upload__status';
+    } catch (err) {
+      console.error('Ledger extraction error:', err);
+      // If the error was already mapped to a user-friendly message above,
+      // display it. Otherwise fall back to the generic message.
+      const knownMessages = [
+        'Your session has expired. Please log in again.',
+        'Please select a valid ledger image and try again.',
+        'AI Ledger is temporarily busy. Please try again shortly.',
+        'AI Ledger is temporarily unavailable. Please try again in a moment.',
+        'We couldn\u2019t process the ledger image. Please try again.',
+        'No entries were extracted from this image.',
+      ];
+      ledgerUploadStatus.textContent = knownMessages.includes(err.message)
+        ? err.message
+        : 'We couldn\u2019t process the ledger image. Please try again.';
+      ledgerUploadStatus.className = 'ledger-upload__status ledger-upload__status--error';
+      ledgerUploadBtn.disabled = false;
+    }
+  }
+
+  // Confirm & Log — POST the currently displayed entry to /api/inventory.
+  async function handleConfirmAndLog() {
+    ledgerReviewError.textContent = '';
+
+    const bloodGroup = ledgerBloodGroup.value;
+    const quantity = Number(ledgerQuantity.value);
+    const expiryDate = ledgerExpiryDate.value;
+
+    // Client-side validation.
+    if (!bloodGroup) {
+      ledgerReviewError.textContent = 'Please select a blood group.';
+      return;
+    }
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      ledgerReviewError.textContent = 'Please enter a valid non-negative quantity.';
+      return;
+    }
+    if (!expiryDate || isNaN(Date.parse(expiryDate))) {
+      ledgerReviewError.textContent = 'Please enter a valid expiry date.';
+      return;
+    }
+
+    // Status convention matches the existing computeStockTier() used by
+    // the Current Stock table and its PATCH handler.
+    let status;
+    if (quantity <= 0) {
+      status = 'not available';
+    } else if (quantity <= 10) {
+      status = 'low';
+    } else {
+      status = 'available';
+    }
+
+    // Disable button during POST to prevent duplicate submissions.
+    ledgerConfirmBtn.disabled = true;
+    ledgerConfirmBtn.textContent = 'Logging…';
+
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/api/inventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          blood_group: bloodGroup,
+          quantity,
+          expiry_date: expiryDate,
+          status,
+        }),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error('Inventory POST failed:', res.status, errBody);
+        throw new Error('We couldn\u2019t save this entry. Please try again.');
+      }
+
+      // Success — remove the logged entry from state.
+      ledgerExtractedEntries.splice(currentEntryIndex, 1);
+
+      // If more entries remain, show the next one instead of closing.
+      if (ledgerExtractedEntries.length > 0) {
+        // Wrap index if we removed the last entry.
+        if (currentEntryIndex >= ledgerExtractedEntries.length) {
+          currentEntryIndex = 0;
+        }
+        populateReviewForm(ledgerExtractedEntries[currentEntryIndex]);
+        ledgerConfirmBtn.disabled = false;
+        ledgerConfirmBtn.textContent = 'Confirm & Log';
+        return;
+      }
+
+      // All entries logged — close and refresh.
+      ledgerConfirmBtn.textContent = 'Logged ✓';
+      closeLedgerSlideover();
+      loadInventory();
+    } catch (err) {
+      console.error('Confirm & Log error:', err);
+      // Client-side validation errors are safe to show directly.
+      // Network/backend errors are replaced with a generic message.
+      const validationErrors = [
+        'Please select a blood group.',
+        'Please enter a valid non-negative quantity.',
+        'Please enter a valid expiry date.',
+      ];
+      ledgerReviewError.textContent = validationErrors.includes(err.message)
+        ? err.message
+        : 'We couldn\u2019t save this entry. Please try again.';
+      ledgerConfirmBtn.disabled = false;
+      ledgerConfirmBtn.textContent = 'Confirm & Log';
+    }
+  }
+
+  // Wire up event listeners.
   document.getElementById('ledger-close-btn')?.addEventListener('click', closeLedgerSlideover);
   ledgerOverlay?.addEventListener('click', closeLedgerSlideover);
 
-  document.getElementById('ledger-upload-btn')?.addEventListener('click', () => {
-    ledgerUpload.style.display = 'none';
-    ledgerReview.classList.add('is-active');
+  // "Upload an image" button triggers the hidden file input.
+  ledgerUploadBtn?.addEventListener('click', () => {
+    ledgerFileInput.click();
   });
-  document.getElementById('ledger-retake-btn')?.addEventListener('click', () => {
-    ledgerReview.classList.remove('is-active');
-    ledgerUpload.style.display = 'flex';
+
+  // File input change — read and send to Gemini.
+  ledgerFileInput?.addEventListener('change', () => {
+    const file = ledgerFileInput.files?.[0];
+    if (file) handleFileSelected(file);
+  });
+
+  // "Confirm & Log" button.
+  ledgerConfirmBtn?.addEventListener('click', handleConfirmAndLog);
+
+  // "Retake / Re-upload" button — reset back to upload view.
+  ledgerRetakeBtn?.addEventListener('click', () => {
+    resetLedgerState();
   });
 
   // Stock table — each row expands to show its last-updated detail (view mode only).

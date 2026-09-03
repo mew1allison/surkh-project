@@ -75,11 +75,10 @@ if (floatTargets.length) {
 
 // ---- Find Blood Now: interactive state (Step 2) ----
 // This mirrors the shape a future API call will need:
-// { blood_group, quantity, city, coords }. TODO: match to schema once
+// { blood_group, city, coords }. TODO: match to schema once
 // the /inventory endpoint's real query params are finalized.
 const findBloodState = {
   bloodGroup: null,
-  quantity: null,
   city: null,
   coords: null,
 };
@@ -98,6 +97,10 @@ const CITY_COORDS = {
   Peshawar: { lat: 34.0151, lng: 71.5249 },
   Quetta: { lat: 30.1798, lng: 66.975 },
   Multan: { lat: 30.1575, lng: 71.5249 },
+  Rawalpindi: { lat: 33.5651, lng: 73.0169 },
+  Faisalabad: { lat: 31.4504, lng: 73.1350 },
+  Bahawalpur: { lat: 29.3544, lng: 71.6911 },
+  Larkana: { lat: 27.5551, lng: 68.2147 },
 };
 
 // Reverse-geocode-lite: given raw GPS coords, find the closest known city so
@@ -199,60 +202,6 @@ if (groupGrid) {
       }
     });
     groupGrid.appendChild(btn);
-  });
-}
-
-// Quantity — presets or custom input, mutually exclusive
-const quantityPresets = [1, 5, 10];
-const qtyRow = document.getElementById("quantity-options");
-let customInput;
-let customWrap;
-
-function selectPresetQty(value, btn) {
-  findBloodState.quantity = value;
-  if (customInput) customInput.value = "";
-  if (customWrap) customWrap.classList.remove("is-active");
-  qtyRow
-    .querySelectorAll(".qty-btn")
-    .forEach((b) => b.classList.remove("is-active"));
-  btn.classList.add("is-active");
-}
-
-function useCustomQty() {
-  const value = parseInt(customInput.value, 10);
-  findBloodState.quantity = Number.isNaN(value) ? null : value;
-  qtyRow
-    .querySelectorAll(".qty-btn")
-    .forEach((b) => b.classList.remove("is-active"));
-  customWrap.classList.toggle("is-active", !Number.isNaN(value) && value > 0);
-}
-
-if (qtyRow) {
-  quantityPresets.forEach((qty) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "qty-btn";
-    btn.textContent = qty;
-    btn.addEventListener("click", () => selectPresetQty(qty, btn));
-    qtyRow.appendChild(btn);
-  });
-
-  customWrap = document.createElement("div");
-  customWrap.className = "find-blood__qty-custom";
-  customWrap.innerHTML = `
-    <input type="number" min="1" class="find-blood__qty-custom-input" placeholder="Select Custom">
-    <button type="button" class="find-blood__qty-step">+1</button>
-  `;
-  qtyRow.appendChild(customWrap);
-
-  customInput = customWrap.querySelector(".find-blood__qty-custom-input");
-  const stepBtn = customWrap.querySelector(".find-blood__qty-step");
-
-  customInput.addEventListener("input", useCustomQty);
-  stepBtn.addEventListener("click", () => {
-    const current = parseInt(customInput.value, 10) || 0;
-    customInput.value = current + 1;
-    useCustomQty();
   });
 }
 
@@ -384,295 +333,6 @@ if (findBloodForm) {
       });
   });
 }
-// ---- Find Blood Now: results (Step 3) ----
-// Mirrors your real schema: `facilities` (location data) joined with
-// `inventory` (stock per blood_group, owned/updated by partner hospitals).
-// Profile and Exchange Request aren't needed for public search, so they're
-// left out here. TODO: swap these two arrays for
-// GET /facilities + GET /inventory once the backend is wired up.
-//
-// =============================================================================
-// MOCK ASSET MAP — README
-// -----------------------------------------------------------------------------
-// `photo` / `logo` below are placeholders, not final assets. Until real
-// facility photography exists, `photo` points at a hand-picked Unsplash
-// hospital/medical image (5 distinct banners, cycled across 7 facilities so
-// no two adjacent cards repeat the same shot) and `logo` points at a
-// ui-avatars.com initials badge (neutral, auto-colored per facility name —
-// no real hospital logos are implied or used).
-//
-// When a real photo/logo is ready for a facility:
-//   1. Drop the file into assets/mock/ using the filename in the table below
-//      (created alongside this file — see assets/mock/README.md).
-//   2. Replace that facility's `photo`/`logo` string with the local path,
-//      e.g. 'assets/mock/facility-1-photo.jpg'.
-// No HTML/CSS changes are needed — `.result-card__photo` expects a ~4:3/16:9
-// crop and `.result-card__logo` expects a square image; both are already
-// `object-fit`, and the broken-image fallback in style.css keeps any
-// still-missing file from breaking the card layout in the meantime.
-//
-//   facility id | real file to swap in                    | current mock source
-//   ------------|------------------------------------------|---------------------------------
-//   1           | assets/mock/facility-1-photo.jpg          | Unsplash — hospital corridor
-//               | assets/mock/facility-1-logo.png           | ui-avatars initials
-//   2           | assets/mock/facility-2-photo.jpg          | Unsplash — hospital exterior
-//               | assets/mock/facility-2-logo.png           | ui-avatars initials
-//   3           | assets/mock/facility-3-photo.jpg          | Unsplash — blood donation drive
-//               | assets/mock/facility-3-logo.png           | ui-avatars initials
-//   4           | assets/mock/facility-4-photo.jpg          | Unsplash — medical staff/ward
-//               | assets/mock/facility-4-logo.png           | ui-avatars initials
-//   5           | assets/mock/facility-5-photo.jpg          | Unsplash — ER entrance
-//               | assets/mock/facility-5-logo.png           | ui-avatars initials
-//   6           | assets/mock/facility-6-photo.jpg          | reuses banner #2 (only 5 distinct banners on hand)
-//               | assets/mock/facility-6-logo.png           | ui-avatars initials
-//   7           | assets/mock/facility-7-photo.jpg          | reuses banner #4 (only 5 distinct banners on hand)
-//               | assets/mock/facility-7-logo.png           | ui-avatars initials
-// =============================================================================
-const MOCK_PHOTOS = [
-  "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=640&q=60", // hospital corridor
-  "https://images.unsplash.com/photo-1587351021355-a479a299d2f9?auto=format&fit=crop&w=640&q=60", // hospital exterior
-  "https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=640&q=60", // blood donation drive
-  "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=640&q=60", // medical staff/ward
-  "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=640&q=60", // ER entrance
-];
-
-function mockLogoFor(name) {
-  // Neutral initials avatar — distinct color per name, no real logo implied.
-  return `https://ui-avatars.com/api/?background=F0B856&color=1C0204&bold=true&size=96&name=${encodeURIComponent(name)}`;
-}
-
-const mockFacilities = [
-  {
-    id: 1,
-    name: "Pakistan Red Crescent Society",
-    location: "Ashfaq Ahmed Road, Sector H-8/2, Islamabad",
-    latitude: 33.7106,
-    longitude: 73.0497,
-    has_emr: true,
-    photo: MOCK_PHOTOS[0],
-    logo: mockLogoFor("Pakistan Red Crescent Society"),
-    phone: "+92 51 111 111 222",
-  },
-  {
-    id: 2,
-    name: "Al Khidmat Raazi Hospital",
-    location: "24-B-1, near Chandni Chowk Flyover, Satellite Town, Islamabad",
-    latitude: 33.66,
-    longitude: 73.0169,
-    has_emr: false,
-    photo: MOCK_PHOTOS[1],
-    logo: mockLogoFor("Al Khidmat Raazi Hospital"),
-    phone: "+92 51 111 222 333",
-  },
-  {
-    id: 3,
-    name: "Services Hospital Blood Bank",
-    location: "Jail Road, Lahore",
-    latitude: 31.5204,
-    longitude: 74.3345,
-    has_emr: true,
-    photo: MOCK_PHOTOS[2],
-    logo: mockLogoFor("Services Hospital Blood Bank"),
-    phone: "+92 42 111 333 444",
-  },
-  {
-    id: 4,
-    name: "Indus Hospital Karachi",
-    location: "Korangi Crossing, Karachi",
-    latitude: 24.8447,
-    longitude: 67.1364,
-    has_emr: true,
-    photo: MOCK_PHOTOS[3],
-    logo: mockLogoFor("Indus Hospital Karachi"),
-    phone: "+92 21 111 444 555",
-  },
-  {
-    id: 5,
-    name: "Lady Reading Hospital",
-    location: "Soekarno Chowk, Peshawar",
-    latitude: 34.0083,
-    longitude: 71.5405,
-    has_emr: false,
-    photo: MOCK_PHOTOS[4],
-    logo: mockLogoFor("Lady Reading Hospital"),
-    phone: "+92 91 111 555 666",
-  },
-  {
-    id: 6,
-    name: "Sandeman Provincial Hospital",
-    location: "Jinnah Town, Quetta",
-    latitude: 30.2095,
-    longitude: 67.0182,
-    has_emr: false,
-    photo: MOCK_PHOTOS[1],
-    logo: mockLogoFor("Sandeman Provincial Hospital"),
-    phone: "+92 81 111 666 777",
-  },
-  {
-    id: 7,
-    name: "Nishtar Hospital Blood Bank",
-    location: "Nishtar Road, Multan",
-    latitude: 30.1969,
-    longitude: 71.4306,
-    has_emr: true,
-    photo: MOCK_PHOTOS[3],
-    logo: mockLogoFor("Nishtar Hospital Blood Bank"),
-    phone: "+92 61 111 777 888",
-  },
-];
-
-// TODO: schema has no facility contact field yet — CTA phone numbers above
-// are placeholders standing in until Profile/facility contact info exists.
-const mockInventory = [
-  // NOTE: Indus Hospital Karachi (facility_id 4) is intentionally left with
-  // zero available stock across the board — it's the one deliberate demo
-  // card showing the "Unavailable" state + Contact CTA. Every other
-  // facility below always has at least one group in stock, so they only
-  // ever render as Available or Low Stock.
-  {
-    id: 1,
-    facility_id: 1,
-    blood_group: "A+",
-    quantity: 4,
-    status: "available",
-    expiry_date: "2026-09-15",
-  },
-  {
-    id: 2,
-    facility_id: 1,
-    blood_group: "O+",
-    quantity: 6,
-    status: "available",
-    expiry_date: "2026-09-10",
-  },
-  {
-    id: 3,
-    facility_id: 1,
-    blood_group: "B-",
-    quantity: 0,
-    status: "expired",
-    expiry_date: "2026-08-01",
-  },
-  {
-    id: 4,
-    facility_id: 2,
-    blood_group: "O+",
-    quantity: 2,
-    status: "available",
-    expiry_date: "2026-09-05",
-  },
-  {
-    id: 5,
-    facility_id: 2,
-    blood_group: "AB+",
-    quantity: 1,
-    status: "available",
-    expiry_date: "2026-09-20",
-  },
-  {
-    id: 6,
-    facility_id: 3,
-    blood_group: "A+",
-    quantity: 3,
-    status: "available",
-    expiry_date: "2026-09-08",
-  },
-  {
-    id: 7,
-    facility_id: 3,
-    blood_group: "O-",
-    quantity: 1,
-    status: "available",
-    expiry_date: "2026-09-02",
-  },
-  {
-    id: 8,
-    facility_id: 4,
-    blood_group: "B+",
-    quantity: 0,
-    status: "reserved",
-    expiry_date: "2026-09-18",
-  },
-  {
-    id: 9,
-    facility_id: 4,
-    blood_group: "O+",
-    quantity: 0,
-    status: "reserved",
-    expiry_date: "2026-09-01",
-  },
-  {
-    id: 10,
-    facility_id: 5,
-    blood_group: "AB-",
-    quantity: 2,
-    status: "available",
-    expiry_date: "2026-09-12",
-  },
-  {
-    id: 11,
-    facility_id: 5,
-    blood_group: "A+",
-    quantity: 4,
-    status: "available",
-    expiry_date: "2026-09-14",
-  },
-  {
-    id: 12,
-    facility_id: 6,
-    blood_group: "B+",
-    quantity: 3,
-    status: "available",
-    expiry_date: "2026-09-09",
-  },
-  {
-    id: 13,
-    facility_id: 6,
-    blood_group: "O+",
-    quantity: 2,
-    status: "available",
-    expiry_date: "2026-09-06",
-  },
-  {
-    id: 14,
-    facility_id: 7,
-    blood_group: "A-",
-    quantity: 2,
-    status: "available",
-    expiry_date: "2026-09-11",
-  },
-  {
-    id: 15,
-    facility_id: 7,
-    blood_group: "O+",
-    quantity: 5,
-    status: "available",
-    expiry_date: "2026-09-07",
-  },
-];
-// Auto-generate complete stock for all 8 blood groups across all facilities
-const ALL_BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-
-mockFacilities.forEach((facility) => {
-  if (facility.id === 4) return; // Keep Indus Hospital as Out of Stock test case
-
-  ALL_BLOOD_GROUPS.forEach((group) => {
-    const exists = mockInventory.some(
-      (item) => item.facility_id === facility.id && item.blood_group === group,
-    );
-
-    if (!exists) {
-      mockInventory.push({
-        id: mockInventory.length + 1,
-        facility_id: facility.id,
-        blood_group: group,
-        quantity: Math.floor(Math.random() * 6) + 1,
-        status: "available",
-        expiry_date: "2026-09-30",
-      });
-    }
-  });
-});
 
 // Haversine distance in km — real GPS/city coords in, sorted-by-proximity out,
 // the same way a real facilities.latitude/longitude query would work.
@@ -685,23 +345,6 @@ function distanceKm(lat1, lng1, lat2, lng2) {
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-// Rough drive-time estimate from straight-line distance, assuming ~30km/h
-// average city traffic. Good enough for card sorting/display without a real
-// routing API; TODO: swap for a maps ETA once one is wired up.
-function formatEta(km) {
-  const AVG_CITY_SPEED_KMH = 30;
-  const totalMinutes = Math.max(5, Math.round((km / AVG_CITY_SPEED_KMH) * 60));
-
-  if (totalMinutes < 60) {
-    return `${totalMinutes} min`;
-  }
-
-  const hrs = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
-
-  return mins > 0 ? `${hrs} hr ${mins} mins` : `${hrs} hr`;
 }
 
 // ---- API: fetch inventory from backend ----
@@ -755,36 +398,6 @@ const resultsEmpty = document.getElementById("results-empty");
 const resultsSubtext = document.getElementById("results-subtext");
 const seeAllBtn = document.getElementById("see-all-btn");
 
-function getInventoryFor(facilityId, group) {
-  const rows = mockInventory.filter((row) => row.facility_id === facilityId);
-  if (group) return rows.find((row) => row.blood_group === group);
-  return rows.find((row) => row.status === "available" && row.quantity > 0);
-}
-
-function facilityHasGroup(facilityId, group) {
-  return mockInventory.some(
-    (row) =>
-      row.facility_id === facilityId &&
-      row.blood_group === group &&
-      row.status === "available" &&
-      row.quantity > 0,
-  );
-}
-// Evaluates facility stock eligibility and returns a ranking tier:
-// Tier 0: Fully available (meets or exceeds requested quantity)
-// Tier 1: Low stock (available, but quantity is low or below requested amount)
-// Tier 2: Unavailable / Out of stock
-function getStockTier(facilityId, bloodGroup, reqQty = 1) {
-  if (!bloodGroup) return 0;
-  const targetQty = reqQty || 1;
-  const row = mockInventory.find(
-    (r) => r.facility_id === facilityId && r.blood_group === bloodGroup,
-  );
-
-  if (!row || row.status !== "available" || row.quantity <= 0) return 2; // Out of stock
-  if (row.quantity < targetQty || row.quantity <= 2) return 1; // Low stock
-  return 0; // Fully available
-}
 function buildResultCard(facility) {
   // Find stock for the currently selected blood group in this facility's
   // grouped inventory rows (all already status='available', quantity>0
@@ -855,62 +468,7 @@ function renderResultsList() {
         : "none";
 }
 
-// Mock API call — shaped like a future
-// fetch(`/inventory?blood_group=${bloodGroup}&lat=${lat}&lng=${lng}`).then(r => r.json())
-// so swapping this out later is a one-function change.
-// function fetchFacilities(state) {
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       const filtered = mockFacilities
-//         .filter((f) => !state.bloodGroup || facilityHasGroup(f.id, state.bloodGroup))
-//         .sort((a, b) => {
-//           if (!state.coords) return 0;
-//           const distA = distanceKm(state.coords.lat, state.coords.lng, a.latitude, a.longitude);
-//           const distB = distanceKm(state.coords.lat, state.coords.lng, b.latitude, b.longitude);
-//           return distA - distB;
-//         });
-//       resolve(filtered);
-//     }, 500);
-//   });
-// }
-function fetchFacilities(state) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const targetQty = state.quantity || 1;
-      const selectedCity = (state.city || "").toLowerCase();
 
-      const sorted = [...mockFacilities]
-        .map((facility) => {
-          const inSelectedCity =
-            selectedCity &&
-            facility.location.toLowerCase().includes(selectedCity);
-          const dist = state.coords
-            ? distanceKm(
-                state.coords.lat,
-                state.coords.lng,
-                facility.latitude,
-                facility.longitude,
-              )
-            : Infinity;
-          const tier = getStockTier(facility.id, state.bloodGroup, targetQty);
-
-          return { facility, inSelectedCity, dist, tier };
-        })
-        .sort((a, b) => {
-          // 1. Same-city matches come first
-          if (a.inSelectedCity !== b.inSelectedCity)
-            return a.inSelectedCity ? -1 : 1;
-          // 2. Best stock tier next (Available > Low Stock > Out of Stock)
-          if (a.tier !== b.tier) return a.tier - b.tier;
-          // 3. Closest distance last
-          return a.dist - b.dist;
-        })
-        .map((item) => item.facility);
-
-      resolve(sorted);
-    }, 500);
-  });
-}
 
 if (seeAllBtn) {
   seeAllBtn.addEventListener("click", () => {
