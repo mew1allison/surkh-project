@@ -4,14 +4,8 @@
 // not by keeping this key secret. See lib/supabase.js on the backend for the
 // same URL + key pair used server-side.
 // TODO: fill in your project's real values (Supabase dashboard > Project Settings > API).
-// ---- Supabase client ----
-const SUPABASE_URL = "https://fpvlbkdcqmcatvxhuzta.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jJ_I0osFLEfqcjR2t3tz8A_3DsYKPwE";
 
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+
 // Backend base URL — the backend is a separate Next.js app (its API routes
 // live under app/api/), not served from the same origin as this static
 // frontend, so calls to it need an absolute base.
