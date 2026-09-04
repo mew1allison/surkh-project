@@ -2681,6 +2681,69 @@ body {
   border-color: var(--color-secondary);
 }
 
+/* ---- Manual Entry: add-entry form (visible only in edit mode) ---- */
+.add-entry-form {
+  display: none;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+  border: 1px dashed rgba(17, 20, 21, 0.2);
+  border-radius: 4px;
+  background: rgba(17, 20, 21, 0.02);
+}
+
+.add-entry-form.is-visible { display: grid; }
+
+.add-entry-form .entry-field__select {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  border: 1px solid rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  padding: 0.5rem 0.4rem;
+  color: var(--color-text);
+  background: #fff;
+}
+
+.add-entry-form .entry-field__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(28, 2, 4, 0.6);
+  margin-bottom: 0.2rem;
+}
+
+.add-entry-form__error {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  min-height: 1.2em;
+}
+
+/* ---- Manual Entry: pending new rows ---- */
+.stock-row[data-new="true"] {
+  background: rgba(240, 184, 86, 0.08);
+  border-radius: 4px;
+}
+
+.stock-row[data-new="true"] .stock-row__input {
+  border-color: var(--color-secondary);
+}
+
+.stock-row__new-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+  background: rgba(240, 184, 86, 0.15);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+@media (max-width: 640px) {
+  .add-entry-form.is-visible { grid-template-columns: 1fr; }
+}
+
 /* ---- AI Ledger Reader slide-over ---- */
 .ledger-overlay {
   display: none;
@@ -3402,6 +3465,27 @@ body {
             </div>
           </div>
 
+          <!-- Manual Entry: add new inventory row form (visible only in edit mode) -->
+          <div class="add-entry-form" id="add-entry-form">
+            <label class="entry-field">
+              <span class="entry-field__label">Blood Group</span>
+              <select class="entry-field__select" id="add-entry-blood-group">
+                <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+              </select>
+            </label>
+            <label class="entry-field">
+              <span class="entry-field__label">Quantity</span>
+              <input type="number" class="entry-field__select" id="add-entry-quantity" min="1" value="">
+            </label>
+            <label class="entry-field">
+              <span class="entry-field__label">Expiry Date</span>
+              <input type="date" class="entry-field__select" id="add-entry-expiry">
+            </label>
+            <button type="button" class="btn-ghost" id="add-entry-btn" style="white-space:nowrap;">Add Entry</button>
+            <p class="add-entry-form__error" id="add-entry-error"></p>
+          </div>
+
           <ul class="stock-table" id="stock-table">
             <!-- Rows are rendered by loadInventory() from GET /api/profile + GET /api/inventory?facility_id=...
                  (see the JS below) — no hardcoded rows here anymore. -->
@@ -3574,7 +3658,9 @@ const BACKEND_BASE_URL = "http://localhost:3000";
 let accessToken = null;
 
 // ---- Auth guard ----
-// Stores a promise that resolves once the Supabase session is verified.
+// Stores a promise that resolves once the Supabase session is verified
+// AND the user is confirmed to NOT be an Admin. Admin accounts must not
+// reach the Staff Dashboard — they are redirected to login.
 // The dashboard-shell DOMContentLoaded block awaits this before calling
 // authenticated endpoints (loadInventory, profile, PATCH).
 const authReady = (async function authGuard() {
@@ -3583,6 +3669,25 @@ const authReady = (async function authGuard() {
     window.location.href = "login.html";
     return;
   }
+
+  // Role check — reject admin users from the staff dashboard.
+  try {
+    const profileRes = await fetch(`${BACKEND_BASE_URL}/api/profile`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    if (profileRes.ok) {
+      const profile = await profileRes.json();
+      if (profile && profile.role === "Admin") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html";
+        return;
+      }
+    }
+  } catch {
+    // If the profile check fails, let the dashboard continue —
+    // the API calls will fail gracefully on their own.
+  }
+
   accessToken = session.access_token;
 })();
 
@@ -3726,6 +3831,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const stockTableEmpty = document.getElementById('stock-table-empty');
   const saveBar = document.getElementById('stock-savebar');
   const saveCount = document.getElementById('stock-savebar-count');
+
+  // Manual Entry: add-entry form references
+  const addEntryForm = document.getElementById('add-entry-form');
+  const addEntryBloodGroup = document.getElementById('add-entry-blood-group');
+  const addEntryQuantity = document.getElementById('add-entry-quantity');
+  const addEntryExpiry = document.getElementById('add-entry-expiry');
+  const addEntryBtn = document.getElementById('add-entry-btn');
+  const addEntryError = document.getElementById('add-entry-error');
 
   // ---- Quantity → severity tier / API status ----
   // The dashboard's 3-tier UI (critical/low/healthy, drives the dot color via
@@ -3965,18 +4078,79 @@ document.addEventListener('DOMContentLoaded', async () => {
     closeAllExcept(null);
     stockTable.classList.add('is-editing');
     saveBar.classList.add('is-active');
+    addEntryForm.classList.add('is-visible');
+    stockTableEmpty.style.display = 'none';
     updatePendingCount();
   }
 
   function exitEditMode() {
     stockTable.classList.remove('is-editing');
     saveBar.classList.remove('is-active');
-    // reset any unsaved edits back to their original values
+    addEntryForm.classList.remove('is-visible');
+    addEntryError.textContent = '';
+    addEntryQuantity.value = '';
+    addEntryExpiry.value = '';
+    // Remove any unsaved new-entry rows from the DOM
+    stockTable.querySelectorAll('.stock-row[data-new="true"]').forEach(r => r.remove());
+    // Reset any unsaved quantity edits on existing rows back to their original values
     stockTable.querySelectorAll('.stock-row').forEach((row) => {
       const original = row.dataset.value;
       row.querySelector('.stock-row__input').value = original;
       row.classList.remove('is-changed');
     });
+  }
+
+  // Add a new pending inventory row to the stock table (Manual Entry).
+  // The row is rendered with data-new="true" and is-changed so the existing
+  // save handler picks it up for POSTing to /api/inventory on "Save changes".
+  function addNewEntry() {
+    addEntryError.textContent = '';
+    const bloodGroup = addEntryBloodGroup.value;
+    const quantity = Number(addEntryQuantity.value);
+    const expiryDate = addEntryExpiry.value;
+
+    if (!bloodGroup) { addEntryError.textContent = 'Please select a blood group.'; return; }
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      addEntryError.textContent = 'Please enter a positive quantity.'; return;
+    }
+    if (!expiryDate || isNaN(Date.parse(expiryDate))) {
+      addEntryError.textContent = 'Please enter a valid expiry date.'; return;
+    }
+
+    const { tier, label: tierLabel } = computeStockTier(quantity);
+
+    // Duplicate guard: same blood group in existing rows or already-pending new rows
+    const existingGroups = Array.from(stockTable.querySelectorAll('.stock-row .stock-row__label'))
+      .map(el => el.textContent.trim());
+    if (existingGroups.includes(bloodGroup)) {
+      addEntryError.textContent = `${bloodGroup} already exists. Edit the existing row instead.`;
+      return;
+    }
+
+    const li = document.createElement('li');
+    li.className = 'stock-row is-changed';
+    li.dataset.new = 'true';
+    li.dataset.value = String(quantity);
+    li.dataset.status = tier;
+    li.innerHTML = `
+      <div class="stock-row__main" role="button" tabindex="0" aria-expanded="false">
+        <span class="stock-row__group"><span class="stock-row__dot"></span><span class="stock-row__label">${bloodGroup}</span><span class="stock-row__new-badge">NEW</span></span>
+        <span class="stock-row__right"><span class="stock-row__editor"><button type="button" class="stock-row__step" data-step="-1" aria-label="Decrease">−</button><input type="number" class="stock-row__input" value="${quantity}" min="0"><button type="button" class="stock-row__step" data-step="1" aria-label="Increase">+</button></span>
+          <span class="stock-row__qty">${quantity} <span class="stock-row__unit">units</span></span>
+          <svg class="stock-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="stock-row__detail">
+        <span>Expires ${new Date(expiryDate).toLocaleDateString()}</span>
+      </div>
+    `;
+    // Store expiry in dataset for the save handler to read during POST
+    li.dataset.expiryDate = expiryDate;
+    stockTable.appendChild(li);
+
+    // Reset form fields for the next entry
+    addEntryQuantity.value = '';
+    addEntryExpiry.value = '';
+    updatePendingCount();
   }
 
   document.getElementById('log-blood-manual-btn')?.addEventListener('click', () => {
@@ -3991,10 +4165,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('stock-cancel-btn')?.addEventListener('click', exitEditMode);
 
+  addEntryBtn?.addEventListener('click', addNewEntry);
+
   document.getElementById('stock-save-btn')?.addEventListener('click', async () => {
-    const changedRows = Array.from(stockTable.querySelectorAll('.stock-row.is-changed'));
     let anyFailed = false;
 
+    // Phase 1: POST new pending entries (data-new rows have no DB id yet)
+    const newRows = Array.from(stockTable.querySelectorAll('.stock-row[data-new="true"]'));
+    for (const row of newRows) {
+      const bloodGroup = row.querySelector('.stock-row__label').textContent.trim();
+      const quantity = Number(row.querySelector('.stock-row__input').value);
+      const expiryDate = row.dataset.expiryDate;
+      const { apiStatus } = computeStockTier(quantity);
+
+      try {
+        const res = await fetch(`${BACKEND_BASE_URL}/api/inventory`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
+          body: JSON.stringify({ blood_group: bloodGroup, quantity, expiry_date: expiryDate, status: apiStatus }),
+        });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          console.error(`Failed to add ${bloodGroup}:`, errBody.error || res.status);
+          anyFailed = true;
+          continue;
+        }
+        row.remove();
+        addTimelineNode('in', bloodGroup, `+${quantity} units`, 'Manual Entry');
+      } catch (err) {
+        console.error(`Network error adding ${bloodGroup}:`, err);
+        anyFailed = true;
+      }
+    }
+
+    // Phase 2: PATCH existing rows with quantity changes (same logic as before)
+    const changedRows = Array.from(stockTable.querySelectorAll('.stock-row.is-changed:not([data-new])'));
     for (const row of changedRows) {
       const id = row.dataset.id;
       const label = row.querySelector('.stock-row__label').textContent;
@@ -4043,16 +4248,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       updatePendingCount();
       // TODO: surface a real inline error instead of console.error above.
     } else {
+      // All saved — reload from API to get proper IDs for new entries, then exit.
+      try { await loadInventory(); } catch (e) { console.error('Reload after save failed:', e); }
       exitEditMode();
     }
   });
 
-  // Per-row live editing: track changes as staff adjust individual rows
+  // Per-row live editing: track changes as staff adjust individual rows.
+  // New-entry rows (data-new) are always kept is-changed so they are always saved.
   stockTable?.addEventListener('input', (e) => {
     if (!e.target.classList.contains('stock-row__input')) return;
     const row = e.target.closest('.stock-row');
-    const isChanged = Number(e.target.value) !== Number(row.dataset.value);
-    row.classList.toggle('is-changed', isChanged);
+    if (row.dataset.new === 'true') {
+      row.classList.add('is-changed');
+    } else {
+      const isChanged = Number(e.target.value) !== Number(row.dataset.value);
+      row.classList.toggle('is-changed', isChanged);
+    }
     updatePendingCount();
   });
 

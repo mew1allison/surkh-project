@@ -81,14 +81,18 @@ export async function GET(request) {
       )
     }
 
-    // Verify the authenticated user's Profile matches the requested facility
+    // Verify the authenticated user's Profile matches the requested facility,
+    // OR the user holds the Admin role (admins may view any facility's inventory).
     const { data: profile, error: profileError } = await supabase
       .from('Profile')
-      .select('facility_id')
+      .select('facility_id, role')
       .eq('id', authenticatedUserId)
       .single()
 
-    if (profileError || !profile || profile.facility_id !== parsedFacilityId) {
+    const isFacilityOwner = profile && profile.facility_id === parsedFacilityId
+    const isAdmin = profile && profile.role === 'Admin'
+
+    if (profileError || !profile || (!isFacilityOwner && !isAdmin)) {
       return Response.json(
         { error: 'Not authorized to view this facility inventory' },
         { status: 403 }

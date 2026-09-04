@@ -83,13 +83,15 @@ const findBloodState = {
   coords: null,
 };
 
-const quickCities = ["Islamabad", "Lahore", "Karachi", "Peshawar"];
 const chipsContainer = document.getElementById("quick-search-chips");
 const citySelect = document.getElementById("city-select");
 
 // Approximate city centers — used to turn a picked city into coordinates so
 // filtering/sorting can run on lat/long (matching facilities.latitude/longitude)
 // the same way a GPS-based search would, instead of a separate string match.
+// This stays as a static reference table for the reverse-geocode feature
+// (nearestCityFromCoords); cities from the API that aren't listed here
+// simply won't have coordinate lookup, but the text-based search still works.
 const CITY_COORDS = {
   Islamabad: { lat: 33.6844, lng: 73.0479 },
   Lahore: { lat: 31.5497, lng: 74.3436 },
@@ -145,17 +147,6 @@ function setCity(cityName) {
   }
 }
 
-if (chipsContainer) {
-  quickCities.forEach((city) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "chip";
-    btn.textContent = city;
-    btn.addEventListener("click", () => setCity(city));
-    chipsContainer.appendChild(btn);
-  });
-}
-
 if (citySelect) {
   citySelect.addEventListener("change", () => {
     const cityName = citySelect.selectedOptions[0]?.textContent.trim() || null;
@@ -171,6 +162,49 @@ if (citySelect) {
     }
   });
 }
+
+// Populate city dropdown and quick-search chips dynamically from the
+// facilities API. Runs once on page load. The dropdown gets every unique
+// city; the chips are rebuilt from the same list so both stay in sync.
+// Cities that aren't in CITY_COORDS still work for text-based search —
+// they just won't have GPS coordinate lookup.
+(async function loadCityOptions() {
+  try {
+    const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`);
+    if (!res.ok) return;
+    const facilities = await res.json();
+    const cities = [...new Set(facilities.map((f) => f.city).filter(Boolean))].sort();
+
+    // Populate dropdown
+    if (citySelect) {
+      const currentVal = citySelect.value;
+      cities.forEach((city) => {
+        const opt = document.createElement("option");
+        opt.value = city;
+        opt.textContent = city;
+        citySelect.appendChild(opt);
+      });
+      // Restore selection if it still exists in the new list
+      if (currentVal) citySelect.value = currentVal;
+    }
+
+    // Rebuild chips from the full city list
+    if (chipsContainer) {
+      chipsContainer.innerHTML = "";
+      cities.forEach((city) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chip";
+        btn.textContent = city;
+        btn.addEventListener("click", () => setCity(city));
+        chipsContainer.appendChild(btn);
+      });
+    }
+  } catch {
+    // If the fetch fails, the dropdown stays empty and the user can still
+    // type a city manually or use live-location — no hard crash.
+  }
+})();
 
 // Blood group — single select, click again to deselect
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -690,7 +724,62 @@ if (loginForm) {
       return;
     }
 
-    loginSubmitBtnText.textContent = "Logged In ✓";
-    window.location.href = "dashboard.html";
+    const selectedRole = document.getElementById("login-role").value;
+
+    if (selectedRole === "admin") {
+      // Verify the authenticated user actually holds the Admin role
+      // server-side via /api/profile — never trust a client-supplied role.
+      try {
+        const profileRes = await fetch(`${BACKEND_BASE_URL}/api/profile`, {
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+        });
+
+        if (!profileRes.ok) {
+          throw new Error(`Profile fetch failed (${profileRes.status})`);
+        }
+
+        const profile = await profileRes.json();
+
+        if (!profile || profile.role !== "Admin") {
+          throw new Error("Not an admin");
+        }
+
+        loginSubmitBtnText.textContent = "Logged In ✓";
+        window.location.href = "admin-dashboard.html";
+      } catch (err) {
+        loginError.textContent = "This account does not have admin privileges.";
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtnText.textContent = "Log In as Admin";
+        await supabaseClient.auth.signOut();
+        return;
+      }
+    } else {
+      // Staff login — verify the authenticated user is NOT an admin.
+      // Admin accounts must not reach the Staff Dashboard.
+      try {
+        const profileRes = await fetch(`${BACKEND_BASE_URL}/api/profile`, {
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+        });
+
+        if (!profileRes.ok) {
+          throw new Error(`Profile fetch failed (${profileRes.status})`);
+        }
+
+        const profile = await profileRes.json();
+
+        if (profile && profile.role === "Admin") {
+          throw new Error("Admin account on staff login");
+        }
+
+        loginSubmitBtnText.textContent = "Logged In ✓";
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        loginError.textContent = "This account is not authorized for staff access.";
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtnText.textContent = "Log In";
+        await supabaseClient.auth.signOut();
+        return;
+      }
+    }
   });
 }
