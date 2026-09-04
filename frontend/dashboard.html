@@ -4422,7 +4422,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (res.status === 429) {
           userMsg = 'AI Ledger is temporarily busy. Please try again shortly.';
         } else if (res.status === 502 || res.status === 503) {
-          userMsg = 'AI Ledger is temporarily unavailable. Please try again in a moment.';
+          userMsg = 'AI Ledger is temporarily unavailable. Please enter the data manually.';
         } else {
           userMsg = 'We couldn\u2019t process the ledger image. Please try again.';
         }
@@ -4455,7 +4455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'Your session has expired. Please log in again.',
         'Please select a valid ledger image and try again.',
         'AI Ledger is temporarily busy. Please try again shortly.',
-        'AI Ledger is temporarily unavailable. Please try again in a moment.',
+        'AI Ledger is temporarily unavailable. Please enter the data manually.',
         'We couldn\u2019t process the ledger image. Please try again.',
         'No entries were extracted from this image.',
       ];
