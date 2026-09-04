@@ -873,141 +873,89 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     <span id="toast-message"></span>
   </div>
 
+  <!-- Supabase client — auth guard + session check at the top of the inline JS below -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
   <script>
 /* =========================================================================
-   MOCK DATA. Shape mirrors exactly what GET /facilities returns per
-   route.js (id, name, location, latitude, longitude, has_emr), plus two
-   fields that do NOT exist in the real Facility table yet: `status` and
-   `units`. Those are placeholders until the team decides how deactivation
-   and unit totals are actually computed/stored (units will likely be a
-   client-side sum of Inventory rows per facility, not a stored column).
-   Nothing outside facilityStore (below) should ever touch this array
-   directly — that's the whole point of the adapter.
+   BACKEND + AUTH
+   Same convention as dashboard.html — standalone static page, separate
+   Next.js backend, Supabase JS client for session/token management.
    ========================================================================= */
-const MOCK_FACILITIES = [
-  {
-    id: '1',
-    name: "Shifa International Hospital",
-    location: "Sector H-8/4, Islamabad",
-    latitude: 33.6938,
-    longitude: 73.0652,
-    has_emr: true,
-    status: 'active',
-    units: 142,
-    inventory: [
-      { blood_group: 'O+', unit_count: 56 },
-      { blood_group: 'A+', unit_count: 41 },
-      { blood_group: 'B+', unit_count: 28 },
-      { blood_group: 'AB+', unit_count: 17 },
-    ],
-  },
-  {
-    id: '2',
-    name: "PIMS Hospital",
-    location: "G-8/3, Islamabad",
-    latitude: 33.6939,
-    longitude: 73.0451,
-    has_emr: false,
-    status: 'active',
-    units: 89,
-    inventory: [
-      { blood_group: 'O+', unit_count: 30 },
-      { blood_group: 'O-', unit_count: 12 },
-      { blood_group: 'A+', unit_count: 47 },
-    ],
-  },
-  {
-    id: '3',
-    name: "Services Hospital",
-    location: "Jail Road, Rawalpindi",
-    latitude: 33.5988,
-    longitude: 73.0455,
-    has_emr: true,
-    status: 'active',
-    units: 203,
-    inventory: [
-      { blood_group: 'O+', unit_count: 56 },
-      { blood_group: 'A+', unit_count: 41 },
-      { blood_group: 'B+', unit_count: 28 },
-      { blood_group: 'AB+', unit_count: 12 },
-      { blood_group: 'O-', unit_count: 66 },
-    ],
-  },
-  {
-    id: '4',
-    name: "Al-Shifa Trust Eye Hospital",
-    location: "Canal Bank, Lahore",
-    latitude: 31.5204,
-    longitude: 74.3587,
-    has_emr: false,
-    status: 'inactive',
-    units: 0,
-    inventory: [],
-  },
-];
+const BACKEND_BASE_URL = 'http://localhost:3000';
+
+// Access token populated by auth guard — used by all authenticated API calls.
+let accessToken = null;
+
+// Auth guard — redirects to login if no active session (same as dashboard.html).
+const authReady = (async function authGuard() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+  accessToken = session.access_token;
+})();
 
 /* =========================================================================
    DATA ADAPTER — facilityStore.
-   Every read/write in this file goes through here, never through
-   MOCK_FACILITIES directly. Each method already matches the shape its
-   real backend call will have (same params, same async/await call site,
-   same return value) so that converting this file to Next.js later is a
-   drop-in swap: replace the body of each method with a fetch() to the
-   matching route in route.js and nothing else in the file has to change.
+   Every read/write in this file goes through here. Phase 1 wires
+   getFacilities() and createFacility() to the real backend; the remaining
+   two methods throw until their backend endpoints exist (Phase 2+).
 
-     getFacilities()            -> GET    /facilities
-     createFacility(data)       -> POST   /facilities
-     updateFacility(id, data)   -> PATCH  /facilities/:id
-     setFacilityStatus(id, bool)-> PATCH  /facilities/:id/status  (not built yet — see wireframe notes)
-
-   Methods are async and return Promises even though the mock work is
-   synchronous, purely so call sites already use `await` and don't need
-   to change when real network calls replace the mock logic.
+     getFacilities()            -> GET    /api/facilities
+     createFacility(data)       -> POST   /api/facilities
+     updateFacility(id, data)   -> PATCH  /api/facilities/:id   (Phase 2)
+     setFacilityStatus(id, bool)-> PATCH  /api/facilities/:id   (Phase 2)
    ========================================================================= */
 const facilityStore = {
   async getFacilities() {
-    // Artificial delay so the loading skeleton (see renderSkeleton()) is
-    // visible during development — this line is exactly what gets deleted
-    // when this becomes a real fetch(), since the real network round-trip
-    // already provides that delay.
-    await new Promise((resolve) => setTimeout(resolve, 350));
-    return MOCK_FACILITIES;
+    const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`);
+    if (!res.ok) {
+      throw new Error(`Failed to load facilities (${res.status})`);
+    }
+    const facilities = await res.json();
+    // Phase 1: status, units, and inventory are not yet served by the
+    // backend — apply safe defaults so the existing render/filter code
+    // continues to work until those are wired in later phases.
+    return facilities.map(f => ({
+      ...f,
+      status: 'active',
+      units: 0,
+      inventory: [],
+    }));
   },
 
   async createFacility(data) {
-    const newFacility = {
-      id: String(Date.now()),           // real backend returns a uuid — placeholder id here
-      name: data.name.trim(),
-      location: data.location.trim(),
-      latitude: data.latitude,
-      longitude: data.longitude,
-      has_emr: data.has_emr,
-      status: 'active',                 // not a real column yet — see MOCK_FACILITIES note above
+    await authReady;
+    const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken,
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      throw new Error(result.error || 'Failed to create facility');
+    }
+    return {
+      ...result,
+      status: 'active',
       units: 0,
       inventory: [],
     };
-    MOCK_FACILITIES.push(newFacility);
-    return newFacility;
   },
 
   async updateFacility(id, data) {
-    const facility = MOCK_FACILITIES.find(f => f.id === id);
-    if (!facility) throw new Error('Facility not found');
-    Object.assign(facility, {
-      name: data.name.trim(),
-      location: data.location.trim(),
-      latitude: data.latitude,
-      longitude: data.longitude,
-      has_emr: data.has_emr,
-    });
-    return facility;
+    // Phase 2 — PATCH /api/facilities/:id endpoint not yet built.
+    throw new Error('Edit not available yet — backend endpoint pending.');
   },
 
   async setFacilityStatus(id, isActive) {
-    const facility = MOCK_FACILITIES.find(f => f.id === id);
-    if (!facility) throw new Error('Facility not found');
-    facility.status = isActive ? 'active' : 'inactive';
-    return facility;
+    // Phase 2 — is_active column and endpoint not yet built.
+    throw new Error('Deactivate not available yet — backend endpoint pending.');
   },
 };
 

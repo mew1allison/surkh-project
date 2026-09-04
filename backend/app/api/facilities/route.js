@@ -1,11 +1,12 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { extractBearerToken } from '@/app/api/inventory/route'
 
 export async function GET() {
   const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from("Facility")
-    .select('id, name, location, latitude, longitude, has_emr')
+    .select('id, name, city, location, latitude, longitude, has_emr')
 
   if (error) {
     return Response.json(
@@ -18,16 +19,17 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const supabase = await createSupabaseServerClient()
+  // Authenticate — Bearer token pattern (same as inventory/exchange-requests/profile)
+  const accessToken = extractBearerToken(request)
+  if (!accessToken) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-  // Authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const supabase = await createSupabaseServerClient(accessToken)
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
   if (authError || !user) {
-    return Response.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    )
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   // Parse body
