@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In — SURKH</title>
+  <link rel="icon" type=""image/x-icon" href="assets/icon-drop-of-blood.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Supabase client — supabaseClient.js creates window.supabaseClient used by script.js login handler -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
+
+  <!-- Minor addition: scoped styles for the Staff/Admin login tab slider.
+       Kept local to this page rather than added to style.css, since it's
+       only used here. -->
+  <style>
+    .login-tabs {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--color-border, #E8E1D6);
+      margin-top: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .login-tabs__slider {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 50%;
+      height: 2px;
+      background: var(--color-primary, #D8323A);
+      transition: transform 0.25s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .login-tabs[data-active="admin"] .login-tabs__slider {
+      transform: translateX(100%);
+    }
+    .login-tabs__btn {
+      position: relative;
+      background: none;
+      border: none;
+      padding: 0 0 0.85rem;
+      text-align: center;
+      font-family: var(--font-heading, 'Montserrat', sans-serif);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      color: var(--color-muted, #8A7F78);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .login-tabs__btn:hover {
+      color: var(--color-text, #1C0204);
+    }
+    .login-tabs[data-active="staff"] .login-tabs__btn[data-tab="staff"],
+    .login-tabs[data-active="admin"] .login-tabs__btn[data-tab="admin"] {
+      color: var(--color-primary, #D8323A);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top announcement bar -->
+  <div class="top-bar">
+    <a href="#" class="top-bar__link">Download Our App <span aria-hidden="true">→</span></a>
+  </div>
+
+  <!-- Header — no "Get Connected" CTA here, this page is for returning facilities, not new sign-ups -->
+  <header class="site-header">
+    <a href="index.html" class="brand">
+      <img src="assets/logo.jpg" alt="SURKH logo" class="brand__logo">
+      <span class="brand__text">
+        <span class="brand__name">SURKH</span>
+        <span class="brand__tagline">CENTRALISED BLOOD INVENTORY</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <a href="index.html#hero" class="main-nav__link">Home</a>
+      <a href="index.html#why" class="main-nav__link">About</a>
+    </nav>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <!-- ---- Short intro — no full pitch/chips here, just a welcome line ---- -->
+  <section class="partner-hero">
+    <div class="partner-hero__inner">
+      <p class="partner-hero__label">Facility Login</p>
+      <h1 class="partner-hero__heading js-float-in">Welcome Back to the Grid</h1>
+      <p class="partner-hero__desc js-float-in">
+        Log in to update your inventory, view incoming requests, and keep
+        your facility visible across the network.
+      </p>
+    </div>
+  </section>
+
+  <!-- ---- Login: photo panel + form ---- -->
+  <section class="partner-signup" id="facility-login">
+    <div class="partner-signup__inner">
+
+      <!-- Photo panel — same image as the sign-up page for visual continuity -->
+      <div class="partner-photo">
+        <img src="assets/hospital-login.jpg" class="partner-photo__img">
+        <div class="partner-photo__content">
+        </div>
+      </div>
+
+      <!-- Form card — just the two fields a returning user actually needs -->
+      <form class="partner-form" id="login-form" novalidate>
+        <h2 class="partner-form__heading js-float-in">Log In</h2>
+        <p class="partner-form__subtext js-float-in" id="login-subtext">Enter the details you signed up with.</p>
+
+        <!-- Minor addition: Staff/Admin slider tab. Sets #login-role
+             (read by script.js's login handler to route to the right
+             dashboard) and swaps the subtext/button copy below. Both
+             tabs share the same email + password fields — login is by
+             account credentials only, no facility code required. -->
+        <div class="login-tabs" id="login-tabs" data-active="staff" role="tablist" aria-label="Login as">
+          <div class="login-tabs__slider" aria-hidden="true"></div>
+          <button type="button" class="login-tabs__btn" data-tab="staff" role="tab" aria-selected="true">Staff Login</button>
+          <button type="button" class="login-tabs__btn" data-tab="admin" role="tab" aria-selected="false">Admin Login</button>
+        </div>
+        <input type="hidden" id="login-role" name="login-role" value="staff">
+
+        <!-- profile.email -->
+        <div class="partner-form__field">
+          <label class="partner-form__label" for="login-email">Work Email</label>
+          <input type="email" id="login-email" name="login-email" class="partner-form__input" placeholder="you@hospital.org" required>
+        </div>
+
+        <!-- Auth-only — Supabase Auth verifies this, not a Profile column -->
+        <div class="partner-form__field">
+          <label class="partner-form__label" for="login-password">Password</label>
+          <input type="password" id="login-password" name="login-password" class="partner-form__input" placeholder="Your password" required minlength="8">
+        </div>
+
+        <p class="partner-form__error" id="login-form-error"></p>
+
+        <button type="submit" class="btn btn--primary partner-form__submit" id="login-submit-btn">
+          <span id="login-submit-btn-text">Log In</span>
+        </button>
+
+        <p class="partner-form__login">
+          <a href="#">Forgot password?</a>
+        </p>
+        <p class="partner-form__login">Don't have an account? <a href="signup.html">Sign up</a></p>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- Minor addition: tab-switch behavior. Only toggles the slider
+       position, hidden role value, and copy — form submission logic in
+       script.js is untouched by this edit and should read #login-role
+       to decide whether to route to dashboard.html or
+       admin-dashboard.html after a successful login. -->
+  <script>
+    (function () {
+      const tabs = document.getElementById('login-tabs');
+      const roleInput = document.getElementById('login-role');
+      const subtext = document.getElementById('login-subtext');
+      const submitText = document.getElementById('login-submit-btn-text');
+
+      const copy = {
+        staff: {
+          subtext: 'Enter the details you signed up with.',
+          submit: 'Log In',
+        },
+        admin: {
+          subtext: 'Enter your admin credentials to access the network dashboard.',
+          submit: 'Log In as Admin',
+        },
+      };
+
+      tabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.login-tabs__btn');
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+
+        tabs.dataset.active = tab;
+        roleInput.value = tab;
+        subtext.textContent = copy[tab].subtext;
+        submitText.textContent = copy[tab].submit;
+
+        tabs.querySelectorAll('.login-tabs__btn').forEach((b) => {
+          b.setAttribute('aria-selected', String(b === btn));
+        });
+      });
+    })();
+  </script>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__brand">Surkh</p>
+      <nav class="site-footer__links">
+        <a href="index.html#why">Impact</a>
+        <a href="index.html#join-grid">Technology</a>
+        <a href="signup.html">Partner Hospitals</a>
+        <a href="#">Privacy Policy</a>
+      </nav>
+      <p class="site-footer__copy">&copy; <span id="footer-year"></span> Surkh Blood Management Grid. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

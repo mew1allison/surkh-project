@@ -1,0 +1,1788 @@
+/* ---- Design tokens ---- */
+:root {
+  --color-primary: #D8323A;   /* red */
+  --color-secondary: #F0B856; /* gold */
+  --color-accent: #111415;    /* near-black */
+  --color-text: #1C0204;
+  --color-bg: #FFFCF7;
+  --color-hero-navy: #242B34; /* derived hero overlay */
+
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+}
+
+/* ---- Top announcement bar ---- */
+.top-bar {
+  background: var(--color-primary);
+  padding: 0.75rem 1.5rem;
+}
+
+.top-bar__link {
+  color: var(--color-bg);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* ---- Header ---- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.brand:hover {
+  opacity: 0.8;
+}
+
+.brand__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand__name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-primary);
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+}
+
+.brand__tagline {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-accent);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+/* Nav — hidden on mobile until the hamburger opens it as a dropdown */
+.main-nav {
+  display: none;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  padding: 1.5rem;
+  box-shadow: 0 8px 16px rgba(28, 2, 4, 0.1);
+  z-index: 20;
+}
+
+.main-nav.is-open {
+  display: flex;
+}
+
+.main-nav__link {
+  position: relative;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.main-nav__link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width 0.25s ease;
+}
+
+.main-nav__link:hover {
+  color: var(--color-primary);
+}
+
+.main-nav__link:hover::after {
+  width: 100%;
+}
+
+.main-nav__cta {
+  width: auto;
+  align-self: flex-start;
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.nav-toggle {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 26px;
+  height: 3px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Hamburger animates into an X when the nav is open */
+.nav-toggle.is-active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.nav-toggle.is-active span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle.is-active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ---- Hero ---- */
+.hero {
+  position: relative;
+  background: var(--color-hero-navy) url('assets/hero-map-bg.png') center / cover no-repeat;
+  padding: 3rem 1.5rem 3.5rem;
+  text-align: center;
+}
+
+/* Dark overlay so hero text stays legible over the map image */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(36, 43, 52, 0.90);
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hero__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.05;
+  font-size: clamp(2.2rem, 9vw, 3.2rem);
+}
+
+.hero__heading-line {
+  display: block;
+}
+
+.hero__heading-line--red {
+  color: var(--color-primary);
+}
+
+.hero__heading-line--white {
+  color: var(--color-bg);
+}
+
+.hero__drop-icon {
+  font-size: 0.75em;
+}
+
+.hero__swoosh {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 1rem auto 1.5rem;
+  display: block;
+}
+
+.hero__desc {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--color-bg);
+  font-size: clamp(1.05rem, 4vw, 1.3rem);
+  line-height: 1.5;
+  max-width: 560px;
+  margin: 0 auto 2rem;
+}
+
+.hero__desc-accent {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Small icon sitting inline with button/heading text (replaces emoji placeholders) */
+.icon-inline {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* Shake feedback for a blocked form submit, so it never reads as unresponsive */
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+.shake {
+  animation: shake 0.5s ease;
+}
+
+/* ---- Buttons ---- */
+/* Kept exactly as shown in design: sharp corners, block-level, not pill-shaped or centered */
+.btn {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  border: none;
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(28, 2, 4, 0.18);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.btn--secondary {
+  background: var(--color-secondary);
+  color: var(--color-accent);
+}
+
+/* ---- Why SURKH ---- */
+.why {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg);
+  padding: 3rem 1.5rem 3.5rem;
+  text-align: center;
+}
+
+.why__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.why__icon-top {
+  width: 32px;
+  margin-bottom: 1rem;
+}
+
+.why__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  margin-bottom: 1.5rem;
+}
+
+.why__stats {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin-bottom: 2.5rem;
+}
+
+.why__stats strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.why__stats-accent {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Scroll-in animation target: starts hidden/offset, .is-visible triggers the transition */
+.js-float-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.js-float-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.why__icon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 420px;
+  margin: 0 auto 3rem;
+}
+
+.why__icon-side {
+  width: 64px;
+  height: 64px;
+}
+
+.why__subheading {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.why__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Card border color is set per-card via inline style / --card-accent (see script.js) */
+.why-card {
+  --card-accent: var(--color-accent);
+  background: var(--color-bg);
+  border-left: 6px solid var(--card-accent);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.why-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(28, 2, 4, 0.14);
+}
+
+.why-card__icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.75rem;
+}
+
+.why-card__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.why-card__title span {
+  color: var(--color-primary);
+}
+
+.why-card__desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  opacity: 0.85;
+}
+
+.why__resolves {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.why__learn-more {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  margin-bottom: 2.5rem;
+}
+
+.why__photo {
+  width: calc(100% + 3rem);
+  margin: 0 -1.5rem -3.5rem;
+  display: block;
+  max-width: none;
+}
+
+/* ---- Find Blood Now ---- */
+.find-blood {
+  background: #FBE3E4; /* light pink derived from primary, matches mockup */
+  padding: 3rem 1.5rem 3.5rem;
+}
+
+.find-blood__intro {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.find-blood__icon-top {
+  width: 32px;
+  margin-bottom: 1rem;
+}
+
+.find-blood__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  margin-bottom: 1rem;
+}
+
+.find-blood__subtext {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.find-blood__subtext-accent {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.find-blood__location-btn {
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.find-blood__location-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.find-blood__location-status {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  min-height: 1.2em;
+  margin-bottom: 1.25rem;
+}
+
+.find-blood__location-status--success {
+  color: #1a7a3c;
+}
+
+.find-blood__location-status--error {
+  color: var(--color-primary);
+}
+
+.find-blood__location-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.find-blood__quick-label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.find-blood__quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.chip {
+  font-family: var(--font-body);
+  font-weight: 500;
+  background: var(--color-secondary);
+  color: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(28, 2, 4, 0.12);
+}
+
+.chip.is-active {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+/* Search form card */
+.find-blood__form {
+  background: var(--color-bg);
+  border-left: 6px solid var(--color-primary);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  max-width: 640px;
+  margin: 0 auto 3rem;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.find-blood__field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.find-blood__field-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.find-blood__field-icon--pin {
+  width: auto;
+  height: auto;
+  font-size: 1.3rem;
+}
+
+.find-blood__group-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.group-btn {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  transition: transform 0.15s ease;
+}
+
+.group-btn:hover {
+  transform: scale(1.1);
+}
+
+.group-btn.is-active {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border-radius: 4px;
+}
+
+.find-blood__qty-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.qty-btn {
+  font-family: var(--font-body);
+  font-weight: 500;
+  background: var(--color-secondary);
+  opacity: 0.55;
+  border: none;
+  border-radius: 4px;
+  min-width: 56px;
+  padding: 0.7rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.qty-btn:hover {
+  transform: translateY(-2px);
+}
+
+.qty-btn.is-active {
+  opacity: 1;
+}
+
+.find-blood__qty-custom {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 160px;
+  background: var(--color-secondary);
+  opacity: 0.55;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.find-blood__qty-custom.is-active {
+  opacity: 1;
+}
+
+.find-blood__qty-custom-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-accent);
+  padding: 0.7rem 0.9rem;
+  min-width: 0;
+}
+
+.find-blood__qty-custom-input::placeholder {
+  color: var(--color-accent);
+  opacity: 0.7;
+}
+
+.find-blood__qty-step {
+  border: none;
+  background: rgba(17, 20, 21, 0.08);
+  font-family: var(--font-body);
+  font-weight: 600;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+}
+
+.find-blood__city-select {
+  width: 100%;
+  background: var(--color-secondary);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-accent);
+  padding: 0.9rem 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111415'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.find-blood__submit {
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.find-blood__submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.find-blood__form-error {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  text-align: center;
+  min-height: 1.2em;
+}
+
+/* Results */
+.find-blood__results {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.find-blood__results-heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.find-blood__results-subtext {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  opacity: 0.75;
+  margin-bottom: 2rem;
+}
+
+.find-blood__results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.result-card {
+  background: var(--color-bg);
+  border-left: 6px solid var(--color-secondary);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  overflow: hidden;
+  text-align: left;
+  display: flex;              /* ADD */
+  flex-direction: column;     /* ADD */
+  height: 100%;
+}
+
+.result-card__photo-wrap {
+  position: relative;
+}
+
+.result-card__photo {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Root-cause fix: if a facility photo or logo fails to load, hide the
+   fallback alt text instead of letting it spill across the card. The box's
+   own width/height/overflow still clip the broken-image icon. This applies
+   no matter what layout wraps these images later, so it keeps protecting
+   the card once real photos are wired in — no need to revisit this. */
+.result-card__photo,
+.result-card__logo {
+  color: transparent;
+  font-size: 0;
+  overflow: hidden;
+}
+
+.result-card__badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-secondary);
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+}
+/* ADD THIS — Low Stock variant, primary color */
+.result-card__badge--low {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+/* Unavailable/out-of-stock variant — neutral so it reads as "no stock",
+   not an error, keeping it visually distinct from Available (gold) and
+   Low Stock (red). Every card now always shows one of these three states. */
+.result-card__badge--out {
+  background: rgba(28, 2, 4, 0.35);
+  color: var(--color-bg);
+}
+
+/* ADD THIS — notification line shown only on Low Stock cards */
+.result-card__notice {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(216, 50, 58, 0.08);
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.6rem 0.9rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.result-card__body {
+  padding: 1.25rem 1.5rem 1.5rem;
+  display: flex;              /* ADD */
+  flex-direction: column;     /* ADD */
+  flex: 1;
+}
+
+.result-card__top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-card__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.result-card__name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text);
+  margin-bottom: 0.2rem;
+}
+
+.result-card__address {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.75;
+}
+
+.result-card__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.result-card__eta {
+  font-family: var(--font-body);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.result-card__reserve {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.result-card__reserve:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(28, 2, 4, 0.2);
+}
+
+.find-blood__see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  text-decoration: none;
+  padding: 0.9rem 1.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.find-blood__empty {
+  display: none;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  opacity: 0.75;
+  margin-bottom: 1.5rem;
+}
+
+.find-blood__empty.is-visible {
+  display: block;
+}
+
+.result-card__reserve:disabled {
+  background: var(--color-accent);
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---- Reserve Blood dialog ---- */
+.reserve-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.reserve-modal[hidden] {
+  display: none;
+}
+
+.reserve-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 20, 21, 0.55);
+}
+
+.reserve-modal__box {
+  position: relative;
+  background: var(--color-bg);
+  border-radius: 8px;
+  max-width: 380px;
+  width: 100%;
+  padding: 2rem 1.75rem;
+  text-align: center;
+}
+
+.reserve-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.reserve-modal__title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.reserve-modal__group {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.reserve-modal__facility {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+.reserve-modal__contact {
+  background: rgba(17, 20, 21, 0.05);
+  border-radius: 4px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reserve-modal__contact-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+
+.reserve-modal__cta {
+  width: 100%;
+  justify-content: center;
+  background: #25D366; /* WhatsApp brand green */
+}
+
+/* ---- Desktop ---- */
+/* Design was provided mobile-first; on wider screens we simply give the
+   same stacked layout more breathing room rather than re-composing it. */
+@media (min-width: 768px) {
+  .top-bar,
+  .site-header,
+  .hero__inner {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  .site-header {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  /* Desktop nav sits inline in the header; hamburger is mobile-only */
+  .nav-toggle {
+    display: none;
+  }
+
+  .main-nav {
+    display: flex;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .main-nav__cta {
+    align-self: center;
+  }
+
+  .hero {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .hero__actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .btn {
+    flex: 0 0 auto;
+    min-width: 220px;
+  }
+
+  .why__cards {
+    flex-direction: row;
+    gap: 2.5rem;
+  }
+
+  .why-card {
+    flex: 1;
+    padding: 2.25rem 2rem;
+  }
+
+  .why__resolves {
+    max-width: 1100px;
+  }
+
+  .why__photo {
+    width: calc(100% + 8rem);
+    margin: 0 -4rem -3.5rem;
+  }
+
+  /* Find Blood: becomes a full-width filter toolbar, results grid below it */
+  .find-blood {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  .find-blood__location-btn {
+    width: auto;
+    display: inline-flex;
+  }
+
+  .find-blood__form {
+    max-width: none;
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    border-left: none;
+    border-top: 6px solid var(--color-primary);
+    padding: 1.75rem 2rem;
+    gap: 2rem;
+  }
+
+  .find-blood__field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .find-blood__field--group {
+    flex: 1.6;
+  }
+
+  .find-blood__field-label {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .find-blood__submit {
+    width: auto;
+    align-self: flex-end;
+    padding: 0.9rem 2rem;
+  }
+
+  .find-blood__results {
+    max-width: none;
+  }
+
+  /* Wider tracks so desktop cards read as generously as the mobile
+     full-width card, while staying uniform and centered as a pair. */
+  .find-blood__results-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 460px));
+    justify-content: center;
+    gap: 1.75rem;
+  }
+
+  .result-card {
+    width: 100%;
+    min-width: 0;
+    height: 400px;
+  }
+
+  .result-card__photo {
+    height: 200px;
+  }
+}
+
+/* ---- Join the Grid: how it works, AI ledger brief, CTA cards ---- */
+.join-grid {
+  background: var(--color-bg);
+  padding: 3rem 1.5rem 3.5rem;
+}
+
+.how-works {
+  background: var(--color-bg);
+  border: 1px solid rgba(28, 2, 4, 0.08);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(28, 2, 4, 0.08);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  max-width: 1100px;
+  margin: 0 auto 2.5rem;
+}
+
+.how-works__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text);
+  font-size: clamp(1.6rem, 6vw, 2rem);
+  margin-bottom: 2rem;
+}
+
+.how-works__steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem 1rem;
+}
+
+.how-works__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin: 0 auto 0.85rem;
+}
+
+.how-works__icon img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Tints derived from existing brand tokens (no new hex values introduced) */
+.how-works__icon--tint1 { background: rgba(216, 50, 58, 0.14); }
+.how-works__icon--tint2 { background: rgba(36, 43, 52, 0.12); }
+.how-works__icon--tint3 { background: rgba(240, 184, 86, 0.3); }
+.how-works__icon--tint4 { background: rgba(216, 50, 58, 0.14); }
+
+.how-works__step-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.how-works__step-desc {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+/* ---- AI Ledger Reader brief ---- */
+/* No screenshot supplied yet for this block — placeholder copy, kept in the
+   same visual language as the rest of the page until the real one arrives. */
+.ledger-brief {
+  max-width: 640px;
+  margin: 0 auto 3.5rem;
+  padding: 1rem 0 1.5rem;
+  text-align: center;
+}
+
+.ledger-brief__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--color-primary);
+  border-radius: 4px;
+}
+
+.ledger-brief__icon img {
+  width: 28px;
+  height: 28px;
+}
+
+.ledger-brief__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: clamp(1.5rem, 5vw, 1.9rem);
+  margin-bottom: 0.75rem;
+}
+
+.ledger-brief__desc {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  opacity: 0.85;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.ledger-brief__features {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+  margin: 0 auto;
+}
+
+.ledger-brief__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.ledger-brief__feature-check {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+/* ---- For Donors / For Hospitals CTA cards ---- */
+.cta-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cta-card {
+  border-radius: 4px;
+  padding: 2rem 1.75rem;
+  color: var(--color-bg);
+}
+
+.cta-card--donor {
+  /* Derived from --color-primary rather than a hand-picked new hex */
+  background: color-mix(in srgb, var(--color-primary) 65%, black);
+}
+
+.cta-card--hospital {
+  background: var(--color-hero-navy);
+}
+
+.cta-card__title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cta-card__desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+  max-width: 420px;
+}
+
+/* Buttons size to their own text instead of stretching full-width, so labels
+   like "Partner with Surkh" never wrap under the card edge */
+.cta-card__btn {
+  display: inline-flex;
+  width: auto;
+  white-space: nowrap;
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--color-bg);
+  border: 2px solid var(--color-bg);
+}
+
+/* ---- Footer ---- */
+.site-footer {
+  background: var(--color-hero-navy);
+  color: var(--color-bg);
+  padding: 2rem 1.5rem;
+}
+
+.site-footer__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.site-footer__brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.site-footer__links a {
+  color: var(--color-bg);
+  opacity: 0.8;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.site-footer__links a:hover {
+  opacity: 1;
+}
+
+.site-footer__copy {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+@media (min-width: 768px) {
+  .how-works {
+    padding: 3rem;
+  }
+
+  .how-works__steps {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .how-works__icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .cta-cards {
+    flex-direction: row;
+  }
+
+  .cta-card {
+    flex: 1;
+    padding: 2.5rem;
+  }
+
+  .site-footer__inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .site-footer__links {
+    justify-content: flex-start;
+  }
+}
+
+
+/* ================================================================
+   Partner with Surkh — hospital sign-up page (partner.html)
+   ================================================================ */
+
+/* ---- Section 1: why hospitals ---- */
+.partner-hero {
+  background: var(--color-bg);
+  padding: 3.5rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.partner-hero__inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.partner-hero__label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.partner-hero__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text);
+  font-size: clamp(1.9rem, 7vw, 2.6rem);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.partner-hero__desc {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--color-text);
+  opacity: 0.85;
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+.partner-hero__chips {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.partner-chip {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--color-bg);
+  border: 1px solid rgba(28, 2, 4, 0.08);
+  border-radius: 4px;
+  padding: 1.25rem;
+}
+
+.partner-chip__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partner-chip__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.partner-chip__desc {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.5;
+}
+
+/* ---- Section 2: photo + form ---- */
+.partner-signup {
+  background: var(--color-bg);
+  padding: 1rem 1.5rem 4rem;
+}
+
+.partner-signup__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(28, 2, 4, 0.1);
+}
+
+/* Photo panel — placeholder hospital image with a primary-to-accent gradient,
+   same overlay technique as the hero section's dark map overlay */
+.partner-photo {
+  position: relative;
+  min-height: 220px;
+  background: var(--color-hero-navy);
+}
+
+.partner-photo__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+.partner-photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(216, 50, 58, 0.85), rgba(17, 20, 21, 0.85));
+}
+
+.partner-photo__content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: var(--color-bg);
+}
+
+.partner-photo__quote {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.partner-photo__count {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Form card */
+.partner-form {
+  background: var(--color-bg);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.partner-form__heading {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text);
+  font-size: 1.5rem;
+}
+
+.partner-form__subtext {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  opacity: 0.7;
+  margin-top: -1rem;
+}
+
+.partner-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.partner-form__label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.partner-form__input {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1.5px solid rgba(17, 20, 21, 0.15);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  padding: 0.85rem 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.partner-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.partner-form__select {
+  width: 100%;
+  background: var(--color-secondary);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-accent);
+  padding: 0.9rem 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111415'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.partner-form__location-btn {
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.partner-form__location-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.partner-form__location-status {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.partner-form__location-status--success {
+  color: #1a7a3c;
+}
+
+.partner-form__location-status--error {
+  color: var(--color-primary);
+}
+
+.partner-form__toggle {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.toggle-btn {
+  flex: 1;
+  font-family: var(--font-body);
+  font-weight: 600;
+  background: var(--color-secondary);
+  opacity: 0.55;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-btn.is-active {
+  opacity: 1;
+}
+
+.partner-form__divider {
+  border: none;
+  border-top: 1px solid rgba(28, 2, 4, 0.1);
+  margin: 0.5rem 0;
+}
+
+.partner-form__section-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: -1rem;
+}
+
+.partner-form__error {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  min-height: 1.2em;
+}
+
+.partner-form__submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.partner-form__login {
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.partner-form__login a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .partner-hero__chips {
+    flex-direction: row;
+  }
+
+  .partner-chip {
+    flex: 1;
+  }
+
+  .partner-signup__inner {
+    flex-direction: row;
+  }
+
+  .partner-photo,
+  .partner-form {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .partner-photo {
+    min-height: 100%;
+  }
+
+  .partner-form {
+    padding: 3rem 3rem;
+  }
+}

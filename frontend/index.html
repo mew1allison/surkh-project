@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SURKH — Centralised Blood Inventory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type=""image/x-icon" href="assets/icon-drop-of-blood.svg">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Top announcement bar -->
+    <div class="top-bar">
+      <a href="#" class="top-bar__link"
+        >Download Our App <span aria-hidden="true">→</span></a
+      >
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+      <a href="#hero" class="brand">
+        <img src="assets/logo.jpg" alt="SURKH logo" class="brand__logo" />
+        <span class="brand__text">
+          <span class="brand__name">SURKH</span>
+          <span class="brand__tagline">CENTRALISED BLOOD INVENTORY</span>
+        </span>
+      </a>
+
+      <nav class="main-nav" id="main-nav" aria-label="Main">
+        <a href="#hero" class="main-nav__link">Home</a>
+        <a href="#why" class="main-nav__link">About</a>
+        <a href="signup.html" class="btn main-nav__cta"
+          >Get Connected <span aria-hidden="true">→</span></a
+        >
+      </nav>
+
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero__inner">
+        <h1 class="hero__heading js-float-in">
+          <span class="hero__heading-line hero__heading-line--red"
+            >Pakistan's Blood,</span
+          >
+          <span class="hero__heading-line hero__heading-line--white"
+            >Found Fast
+            <img
+              src="assets/icon-drop-of-blood.svg"
+              alt=""
+              class="icon-inline hero__drop-icon"
+          /></span>
+        </h1>
+
+        <svg class="hero__swoosh" viewBox="0 0 600 100" aria-hidden="true">
+          <path
+            d="M10,80 C 200,10 400,10 590,60"
+            stroke="#F0B856"
+            stroke-width="6"
+            fill="none"
+            stroke-linecap="round"
+          />
+        </svg>
+
+        <p class="hero__desc js-float-in">
+          <span class="hero__desc-accent">SURKH</span> achieves a
+          <span class="hero__desc-accent">centralised</span> blood distribution
+          system by connecting hospitals, patients and donors in
+          <span class="hero__desc-accent">real-time.</span>
+        </p>
+
+        <div class="hero__actions">
+          <a href="#find-blood" class="btn btn--primary">
+            Find Blood
+            <img src="assets/icon-droplet.svg" alt="" class="icon-inline" />
+          </a>
+          <a href="signup.html" class="btn btn--secondary">
+            Get Connected <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why SURKH -->
+    <section class="why" id="why">
+      <div class="why__inner">
+        <img src="assets/icon-drop-of-blood.svg" alt="" class="why__icon-top" />
+
+        <h2 class="why__heading js-float-in">Why SURKH?</h2>
+
+        <p class="why__stats js-float-in">
+          In Pakistan, roughly <strong>5000</strong> blood bags are collected
+          everyday against a deficit of <strong>8000</strong>. <br /><br />
+          Out of these, <strong>4&nbsp;-&nbsp;13.5%</strong> blood is lost due
+          to product expiration and
+          <span class="why__stats-accent">fragmented tracking systems.</span>
+        </p>
+
+        <div class="why__icon-row">
+          <img
+            src="assets/icon-blood-bag.svg"
+            alt="Blood bag icon"
+            class="why__icon-side"
+          />
+          <img
+            src="assets/icon-ambulance.svg"
+            alt="Ambulance icon"
+            class="why__icon-side"
+          />
+        </div>
+      </div>
+
+      <div class="why__resolves">
+        <h3 class="why__subheading">SURKH Resolves This By</h3>
+
+        <div class="why__cards" id="why-cards">
+          <!-- cards injected by script.js from the whyCards data array -->
+        </div>
+
+        <a href="#join-grid" class="why__learn-more">Learn More &gt;&gt;</a>
+      </div>
+
+      <img
+        src="assets/donation-camp.jpg"
+        alt="Volunteers donating blood at a Pakistan Red Crescent camp"
+        class="why__photo"
+      />
+    </section>
+
+    <!-- Find Blood Now -->
+    <section class="find-blood" id="find-blood">
+      <div class="find-blood__intro">
+        <img
+          src="assets/icon-drop-of-blood.svg"
+          alt=""
+          class="find-blood__icon-top"
+        />
+        <h2 class="find-blood__heading js-float-in">Find Blood Now</h2>
+        <p class="find-blood__subtext js-float-in">
+          Search for blood availability in nearby facilities by selecting your
+          <span class="find-blood__subtext-accent">blood group</span> and
+          <span class="find-blood__subtext-accent">location</span>.
+        </p>
+
+        <button
+          class="btn btn--primary find-blood__location-btn"
+          id="use-location-btn"
+        >
+          <img
+            src="assets/icon-location.svg"
+            alt=""
+            class="find-blood__location-icon"
+          />
+          <span id="location-btn-text">Use Live Location</span>
+        </button>
+        <p class="find-blood__location-status" id="location-status"></p>
+
+        <div class="find-blood__quick">
+          <p class="find-blood__quick-label">Quick Search</p>
+          <div class="find-blood__quick-chips" id="quick-search-chips">
+            <!-- city chips injected by script.js -->
+          </div>
+        </div>
+      </div>
+
+      <form class="find-blood__form" id="find-blood-form">
+        <div class="find-blood__field find-blood__field--group">
+          <h3 class="find-blood__field-label">
+            <img
+              src="assets/icon-blood-bag.svg"
+              alt=""
+              class="find-blood__field-icon"
+            />
+            Blood Group
+          </h3>
+          <div class="find-blood__group-grid" id="blood-group-grid">
+            <!-- blood group buttons injected by script.js -->
+          </div>
+        </div>
+
+        <div class="find-blood__field find-blood__field--city">
+          <h3 class="find-blood__field-label">
+            <img
+              src="assets/icon-pin.svg"
+              alt=""
+              class="find-blood__field-icon"
+            />
+            Location (City)
+          </h3>
+          <select class="find-blood__city-select" id="city-select">
+            <option value="" selected disabled>Select City</option>
+            <!-- City options populated dynamically from GET /api/facilities by script.js -->
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn--primary find-blood__submit"
+          id="search-blood-btn"
+        >
+          <img src="assets/icon-search.svg" alt="" class="icon-inline" />
+          <span id="search-btn-text">Search Blood</span>
+        </button>
+        <p class="find-blood__form-error" id="form-error"></p>
+      </form>
+
+      <div class="find-blood__results">
+        <h2 class="find-blood__results-heading">Search Results</h2>
+        <p class="find-blood__results-subtext" id="results-subtext">
+          Showing Common Searches
+        </p>
+
+        <div class="find-blood__results-list" id="results-list">
+          <!-- result cards injected by script.js -->
+        </div>
+
+        <p class="find-blood__empty" id="results-empty">
+          No matching facilities found. Try a different city or blood group.
+        </p>
+
+        <button type="button" class="find-blood__see-all" id="see-all-btn">
+          See All <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ---- Join the Grid: how it works, AI ledger brief, donor/hospital CTAs ---- -->
+    <section class="join-grid" id="join-grid">
+      <div class="how-works">
+        <h2 class="how-works__heading js-float-in">How Surkh Works</h2>
+        <div class="how-works__steps">
+          <div class="how-works__step">
+            <span class="how-works__icon how-works__icon--tint1"
+              ><img src="assets/icon-search.svg" alt=""
+            /></span>
+            <h3 class="how-works__step-title">1. Search</h3>
+            <p class="how-works__step-desc">
+              Find specific blood groups in your city.
+            </p>
+          </div>
+          <div class="how-works__step">
+            <span class="how-works__icon how-works__icon--tint2"
+              ><img src="assets/icon-locate.svg" alt=""
+            /></span>
+            <h3 class="how-works__step-title">2. Locate</h3>
+            <p class="how-works__step-desc">
+              Identify nearest hospitals with inventory.
+            </p>
+          </div>
+          <div class="how-works__step">
+            <span class="how-works__icon how-works__icon--tint3"
+              ><img src="assets/icon-connect.svg" alt=""
+            /></span>
+            <h3 class="how-works__step-title">3. Connect</h3>
+            <p class="how-works__step-desc">Contact the blood bank directly.</p>
+          </div>
+          <div class="how-works__step">
+            <span class="how-works__icon how-works__icon--tint4"
+              ><img src="assets/icon-heart.svg" alt=""
+            /></span>
+            <h3 class="how-works__step-title">4. Save Lives</h3>
+            <p class="how-works__step-desc">
+              Receive or donate blood efficiently.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder copy — no screenshot supplied for this block yet -->
+      <div class="ledger-brief">
+        <span class="ledger-brief__icon"
+          ><img src="assets/icon-ledger.svg" alt=""
+        /></span>
+        <h2 class="ledger-brief__heading js-float-in">AI Ledger Reader</h2>
+        <p class="ledger-brief__desc js-float-in">
+          Seamlessly transform hand-written blood logs into a digitised database
+          instantly via AI's OCR technology.
+        </p>
+        <ul class="ledger-brief__features js-float-in">
+          <li class="ledger-brief__feature">
+            <span class="ledger-brief__feature-check">✓</span>Reads a
+            photographed capture slip — no typing required
+          </li>
+          <li class="ledger-brief__feature">
+            <span class="ledger-brief__feature-check">✓</span>Extracts blood
+            group, quantity &amp; date automatically
+          </li>
+          <li class="ledger-brief__feature">
+            <span class="ledger-brief__feature-check">✓</span>Flags a confidence
+            score for staff to double-check
+          </li>
+          <li class="ledger-brief__feature">
+            <span class="ledger-brief__feature-check">✓</span>Built for
+            facilities with no existing digital system
+          </li>
+        </ul>
+      </div>
+
+      <div class="cta-cards">
+        <div class="cta-card cta-card--donor">
+          <h3 class="cta-card__title js-float-in">For Donors</h3>
+          <p class="cta-card__desc js-float-in">
+            Register as a voluntary donor and get notified when someone in your
+            area urgently needs your blood type.
+          </p>
+          <a href="#" class="btn btn--secondary cta-card__btn"
+            >Register to Donate</a
+          >
+        </div>
+        <div class="cta-card cta-card--hospital">
+          <h3 class="cta-card__title js-float-in">For Hospitals</h3>
+          <p class="cta-card__desc js-float-in">
+            Join the central grid to manage your inventory, broadcast urgent
+            needs, and connect with other banks.
+          </p>
+          <a href="signup.html" class="btn btn--outline cta-card__btn"
+            >Partner with Surkh</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="site-footer__brand">Surkh</p>
+        <nav class="site-footer__links">
+          <a href="#">Impact</a>
+          <a href="#">Technology</a>
+          <a href="#">Partner Hospitals</a>
+          <a href="#">Privacy Policy</a>
+        </nav>
+        <p class="site-footer__copy">
+          &copy; <span id="footer-year"></span> Surkh Blood Management Grid. All
+          rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Reserve Blood dialog -->
+    <div class="reserve-modal" id="reserve-modal" hidden>
+      <div class="reserve-modal__backdrop" id="reserve-modal-backdrop"></div>
+      <div
+        class="reserve-modal__box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reserve-modal-title"
+      >
+        <button
+          type="button"
+          class="reserve-modal__close"
+          id="reserve-modal-close"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+        <h3 class="reserve-modal__title" id="reserve-modal-title">
+          Blood Available
+        </h3>
+        <p class="reserve-modal__group" id="reserve-modal-group"></p>
+        <p class="reserve-modal__facility" id="reserve-modal-facility"></p>
+
+        <div class="reserve-modal__contact">
+          <p class="reserve-modal__contact-label">Contact Info</p>
+          <p id="reserve-modal-contact"></p>
+        </div>
+
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener"
+          class="btn btn--primary reserve-modal__cta"
+          id="reserve-modal-cta"
+        >
+          Send Report on WhatsApp
+        </a>
+      </div>
+    </div>
+<!-- Add Supabase JS SDK before script.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
