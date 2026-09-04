@@ -11,6 +11,53 @@
   <!-- Supabase client — supabaseClient.js creates window.supabaseClient used by script.js login handler -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabaseClient.js"></script>
+
+  <!-- Minor addition: scoped styles for the Staff/Admin login tab slider.
+       Kept local to this page rather than added to style.css, since it's
+       only used here. -->
+  <style>
+    .login-tabs {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--color-border, #E8E1D6);
+      margin-top: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .login-tabs__slider {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 50%;
+      height: 2px;
+      background: var(--color-primary, #D8323A);
+      transition: transform 0.25s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .login-tabs[data-active="admin"] .login-tabs__slider {
+      transform: translateX(100%);
+    }
+    .login-tabs__btn {
+      position: relative;
+      background: none;
+      border: none;
+      padding: 0 0 0.85rem;
+      text-align: center;
+      font-family: var(--font-heading, 'Montserrat', sans-serif);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      color: var(--color-muted, #8A7F78);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .login-tabs__btn:hover {
+      color: var(--color-text, #1C0204);
+    }
+    .login-tabs[data-active="staff"] .login-tabs__btn[data-tab="staff"],
+    .login-tabs[data-active="admin"] .login-tabs__btn[data-tab="admin"] {
+      color: var(--color-primary, #D8323A);
+    }
+  </style>
 </head>
 <body>
 
@@ -67,7 +114,19 @@
       <!-- Form card — just the two fields a returning user actually needs -->
       <form class="partner-form" id="login-form" novalidate>
         <h2 class="partner-form__heading js-float-in">Log In</h2>
-        <p class="partner-form__subtext js-float-in">Enter the details you signed up with.</p>
+        <p class="partner-form__subtext js-float-in" id="login-subtext">Enter the details you signed up with.</p>
+
+        <!-- Minor addition: Staff/Admin slider tab. Sets #login-role
+             (read by script.js's login handler to route to the right
+             dashboard) and swaps the subtext/button copy below. Both
+             tabs share the same email + password fields — login is by
+             account credentials only, no facility code required. -->
+        <div class="login-tabs" id="login-tabs" data-active="staff" role="tablist" aria-label="Login as">
+          <div class="login-tabs__slider" aria-hidden="true"></div>
+          <button type="button" class="login-tabs__btn" data-tab="staff" role="tab" aria-selected="true">Staff Login</button>
+          <button type="button" class="login-tabs__btn" data-tab="admin" role="tab" aria-selected="false">Admin Login</button>
+        </div>
+        <input type="hidden" id="login-role" name="login-role" value="staff">
 
         <!-- profile.email -->
         <div class="partner-form__field">
@@ -95,6 +154,46 @@
 
     </div>
   </section>
+
+  <!-- Minor addition: tab-switch behavior. Only toggles the slider
+       position, hidden role value, and copy — form submission logic in
+       script.js is untouched by this edit and should read #login-role
+       to decide whether to route to dashboard.html or
+       admin-dashboard.html after a successful login. -->
+  <script>
+    (function () {
+      const tabs = document.getElementById('login-tabs');
+      const roleInput = document.getElementById('login-role');
+      const subtext = document.getElementById('login-subtext');
+      const submitText = document.getElementById('login-submit-btn-text');
+
+      const copy = {
+        staff: {
+          subtext: 'Enter the details you signed up with.',
+          submit: 'Log In',
+        },
+        admin: {
+          subtext: 'Enter your admin credentials to access the network dashboard.',
+          submit: 'Log In as Admin',
+        },
+      };
+
+      tabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.login-tabs__btn');
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+
+        tabs.dataset.active = tab;
+        roleInput.value = tab;
+        subtext.textContent = copy[tab].subtext;
+        submitText.textContent = copy[tab].submit;
+
+        tabs.querySelectorAll('.login-tabs__btn').forEach((b) => {
+          b.setAttribute('aria-selected', String(b === btn));
+        });
+      });
+    })();
+  </script>
 
   <footer class="site-footer">
     <div class="site-footer__inner">
