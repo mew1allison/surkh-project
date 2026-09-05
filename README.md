@@ -68,7 +68,11 @@ cd backend
 npm install                                        # also installs the Supabase CLI (npx supabase)
 Copy-Item ../.env.example .env.local     # then fill in the 4 real values
 npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # Supabase login + DB password (interactive)
+<<<<<<< HEAD
 npm run db:reset -- --linked             # migrations + RLS + grants + mock data from seed.sql
+=======
+npm run db:reset                          
+>>>>>>> b7fa8d918957a2d89cf5cb3658858af780baaa7e
 npm run dev                              # http://localhost:3000
 
 # 2. Frontend (new terminal) — any port works
