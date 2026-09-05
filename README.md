@@ -59,7 +59,7 @@ cd backend
 npm install
 Copy-Item ../.env.example .env.local     # then fill in the 4 real values
 npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # Supabase login + DB password (interactive)
-npm run db:push                          # schema + RLS + grants + demo data
+npm run db:reset                          
 npm run dev                              # http://localhost:3000
 
 # 2. Frontend (new terminal) — any port works
