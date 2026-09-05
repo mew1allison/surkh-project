@@ -1,6 +1,6 @@
 -- SQL Data Seeding for table: facility
 
-INSERT INTO facility (id, created_at, name, location, latitude, longitude, has_emr, facility_code, city) VALUES
+INSERT INTO Facility (id, created_at, name, location, latitude, longitude, has_emr, facility_code, city) VALUES
 (1, '2026-08-21 12:00:00+00', 'Pakistan Institute of Medical Sciences (PIMS)', 'G-8/3, Islamabad', 33.6844, 73.047, true, 'FAC-001', 'Islamabad'),
 (2, '2026-08-20 12:00:00+00', 'Shifa International Hospital', 'H-8/4, Islamabad', 33.6851, 73.0573, true, 'FAC-002', 'Islamabad'),
 (3, '2026-08-19 12:00:00+00', 'Quaid-e-Azam International Hospital', 'H-13, Islamabad', 33.6489, 73.0167, true, 'FAC-003', 'Islamabad'),
@@ -34,7 +34,7 @@ INSERT INTO facility (id, created_at, name, location, latitude, longitude, has_e
 
 -- SQL Data Seeding for table: inventory
 
-INSERT INTO inventory (id, created_at, blood_group, quantity, expiry_date, status, updated_at, facility_id) VALUES
+INSERT INTO Inventory (id, created_at, blood_group, quantity, expiry_date, status, updated_at, facility_id) VALUES
 (33, '2026-07-17 12:00:00+00', 'O-', 1, '2027-08-26', 'low', '2026-07-22 12:00:00', 9),
 (10, '2026-07-12 12:00:00+00', 'B+', 34, '2027-01-27', 'available', '2026-07-12 12:00:00', 3),
 (18, '2026-07-27 12:00:00+00', 'AB+', 33, '2027-01-04', 'available', '2026-07-31 12:00:00', 5),
@@ -138,7 +138,7 @@ INSERT INTO inventory (id, created_at, blood_group, quantity, expiry_date, statu
 
 -- SQL Data Seeding for table: profile
 
-INSERT INTO profile (id, created_at, full_name, email, role, facility_id) VALUES
+INSERT INTO Profile (id, created_at, full_name, email, role, facility_id) VALUES
 ('1aaabe41-3dbc-4336-b04c-b21f29f66d07', '2026-08-22 15:23:24+00', 'Komal Zahra', 'komalzahra890@gmail.com', 'Hospital Staff', 3),
 ('39878f44-dbcf-4e77-8d77-4c2b0ae3e6b0', '2026-08-22 15:20:37+00', 'Aleena Mubashar', 'aleenamubashar123@gmail.com', 'Hospital Staff', 1),
 ('5f959d4a-5f9e-4dba-a3ab-432f4122bb1f', '2026-08-22 15:22:12+00', 'Fizza Imran', 'fizzaimran760@email.com', 'Hospital Staff', 2),

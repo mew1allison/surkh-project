@@ -8,6 +8,11 @@ key or port is hardcoded anywhere else.
 
 ## Setup (one file, one command)
 
+Requirements: **Node.js 20.9+** (Next.js 16 `engines.node`), **Docker Desktop running**
+for the `npx supabase` database commands, and a **scratch Supabase project** — `db reset`
+drops the user tables in whichever database it targets. The Supabase CLI itself comes from
+`npm install` (devDependency), so every command below can also be run as `npx supabase …`.
+
 ```bash
 cd backend
 npm install
@@ -27,22 +32,28 @@ Copy-Item ../.env.example .env.local     # Windows PowerShell (macOS/Linux: cp .
 
 ## Provision the database
 
+Start Docker Desktop, then:
+
 ```bash
 npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # interactive: Supabase login + DB password
-npm run db:push                                        # schema + RLS + grants + demo data
+npm run db:reset -- --linked                          # npx supabase db reset --linked
 ```
 
-`db:push` runs every file in `supabase/migrations/` in version-prefix order. The
-authoritative schema, RLS, grants and demo data all live in
+`db:reset --linked` is the one that hands a fresh clone working demo data in **its own**
+project: it drops the user entities in the linked database, re-applies every file in
+`supabase/migrations/` in version-prefix order, and then executes `supabase/seed.sql` (the
+facilities, inventory and profile rows). It is destructive and repeatable — run it again
+whenever you want the mock data back.
+
+`npm run db:push` is the incremental alternative: it applies only the migrations the remote
+is still missing and **does not run `seed.sql`**, so a project provisioned that way gets just
+the three demo facilities inserted by the init migration. To re-add the seed rows without
+wiping anything, run `npx supabase db push --include-seed`.
+
+The authoritative schema, RLS, grants and their inline demo data all live in
 `supabase/migrations/20260901000000_init_schema.sql`; `20260905000000_reassert_single_source_of_truth.sql`
 sorts last and is the final word on every push (it re-pins `is_admin()` and drops the
 duplicate permissive policies the three legacy migrations re-add).
-
-To wipe a scratch project and re-provision from scratch:
-
-```bash
-npm run db:reset
-```
 
 ## Run
 
@@ -74,4 +85,4 @@ for all API routes. It echoes the caller's `Origin` when it is allowlisted and r
 
 See `../docs/api-contract.md`. Runtime public config is published by `GET /api/config`
 which also returns a `databaseReady` boolean — the diagnostic for a missed or failed
-`db push` (`databaseReady: false` means the migrations were not applied).
+provisioning step (`databaseReady: false` means the migrations were not applied).

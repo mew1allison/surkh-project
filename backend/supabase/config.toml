@@ -1,4 +1,4 @@
-project_id = ""            # `supabase link --project-ref <ref>` fills this
+project_id = "hospital_management_local"            # `supabase link --project-ref <ref>` fills this
 [db]
 major_version = 17
 [api]
