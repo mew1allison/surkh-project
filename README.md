@@ -18,8 +18,8 @@ Everything else in the original product vision (inter-hospital exchange, forecas
 
 ## Tech stack
 
-- Frontend: React (PWA — installable, offline-aware)
-- Backend: Node/Express + Supabase (Postgres)
+- Frontend: HTML, CSS & JavaScript
+- Backend: Next.js + Supabase (Postgres)
 - AI: Gemini API (vision extraction for the Ledger Reader)
 
 ## Repo structure
@@ -31,6 +31,7 @@ surkh/
 │   └── api-contract.md    → endpoint definitions
 ├── frontend/
 ├── backend/
+├── ai/
 ├── .gitignore
 ├── .env.example
 └── README.md
@@ -40,24 +41,22 @@ surkh/
 
 ```
 main       → stable, demo-ready
-dev        → integration branch
+integration        → integration branch
 frontend   → frontend developer's working branch
 backend    → backend developer's working branch
 ai         → AI integrator's working branch
 ```
-
-Work happens on individual branches, merges into `dev` once tested, `dev` merges into `main` only when stable.
 
 ## Local setup
 
 1. Clone the repo
 2. Copy `.env.example` to `.env` in both `frontend/` and `backend/`, fill in real values (ask a teammate for keys — never commit `.env`)
 3. Backend: `cd backend && npm install && npm run dev`
-4. Frontend: `cd frontend && npm install && npm run dev`
+4. Frontend: `cd frontend && python -m http.server 5500`
 
 ## Data model
 
-See `docs/schema.md` for full field definitions. Core tables: `facilities`, `inventory`. One row per blood group per facility — not arrays.
+See `docs/schema.md` for full field definitions. Core tables: `facilities`, `inventory`. One row per blood group per facility.
 
 ## Team
 
