@@ -1,6 +1,20 @@
--- SQL Data Seeding for table: facility
+-- Seed data, applied by `supabase db reset` (npm run db:reset -- --linked) AFTER every file
+-- in supabase/migrations/, and never by plain `db push`.
+--
+-- Identifiers are double-quoted on purpose: the schema is created as "Facility",
+-- "Inventory" and "Profile" (quoted mixed case, see 20260901000000_init_schema.sql). An
+-- unquoted name is folded to lowercase by Postgres and fails as a missing relation.
 
-INSERT INTO Facility (id, created_at, name, location, latitude, longitude, has_emr, facility_code, city) VALUES
+-- 20260901000000_init_schema.sql inserts three demo facilities of its own, which take ids
+-- 1-3 in a freshly migrated database -- the same ids this file uses for other hospitals.
+-- Clear them and their stock first so the inserts below cannot clash on the primary key.
+DELETE FROM "Inventory" WHERE facility_id IN (
+  SELECT id FROM "Facility" WHERE facility_code IN ('KHI-001', 'LHR-001', 'PES-001'));
+DELETE FROM "Facility" WHERE facility_code IN ('KHI-001', 'LHR-001', 'PES-001');
+
+-- SQL Data Seeding for table: Facility
+-- OVERRIDING SYSTEM VALUE is required because id is `generated always as identity`.
+INSERT INTO "Facility" (id, created_at, name, location, latitude, longitude, has_emr, facility_code, city) OVERRIDING SYSTEM VALUE VALUES
 (1, '2026-08-21 12:00:00+00', 'Pakistan Institute of Medical Sciences (PIMS)', 'G-8/3, Islamabad', 33.6844, 73.047, true, 'FAC-001', 'Islamabad'),
 (2, '2026-08-20 12:00:00+00', 'Shifa International Hospital', 'H-8/4, Islamabad', 33.6851, 73.0573, true, 'FAC-002', 'Islamabad'),
 (3, '2026-08-19 12:00:00+00', 'Quaid-e-Azam International Hospital', 'H-13, Islamabad', 33.6489, 73.0167, true, 'FAC-003', 'Islamabad'),
@@ -30,11 +44,11 @@ INSERT INTO Facility (id, created_at, name, location, latitude, longitude, has_e
 (27, '2026-07-26 12:00:00+00', 'Rehman Medical Institute', 'Phase 5, Hayatabad, Peshawar', 33.995, 71.434, false, 'FAC-027', 'Peshawar'),
 (28, '2026-07-25 12:00:00+00', 'Bolan Medical Complex Hospital', 'Brewery Road, Quetta', 30.1874, 67.0014, false, 'FAC-028', 'Quetta'),
 (29, '2026-07-24 12:00:00+00', 'Bahawal Victoria Hospital', 'Circular Road, Bahawalpur', 29.3956, 71.6836, false, 'FAC-029', 'Bahawalpur'),
-(30, '2026-07-23 12:00:00+00', 'Chandka Medical College Hospital', 'Shah Nawaz Bhutto Road, Larkana', 27.558, 68.212, false, 'FAC-030', 'Larkana');
+(30, '2026-07-23 12:00:00+00', 'Chandka Medical College Hospital', 'Shah Nawaz Bhutto Road, Larkana', 27.558, 68.212, false, 'FAC-030', 'Larkana')
+ON CONFLICT DO NOTHING;
 
--- SQL Data Seeding for table: inventory
-
-INSERT INTO Inventory (id, created_at, blood_group, quantity, expiry_date, status, updated_at, facility_id) VALUES
+-- SQL Data Seeding for table: Inventory
+INSERT INTO "Inventory" (id, created_at, blood_group, quantity, expiry_date, status, updated_at, facility_id) OVERRIDING SYSTEM VALUE VALUES
 (33, '2026-07-17 12:00:00+00', 'O-', 1, '2027-08-26', 'low', '2026-07-22 12:00:00', 9),
 (10, '2026-07-12 12:00:00+00', 'B+', 34, '2027-01-27', 'available', '2026-07-12 12:00:00', 3),
 (18, '2026-07-27 12:00:00+00', 'AB+', 33, '2027-01-04', 'available', '2026-07-31 12:00:00', 5),
@@ -134,13 +148,17 @@ INSERT INTO Inventory (id, created_at, blood_group, quantity, expiry_date, statu
 (36, '2026-07-24 12:00:00+00', 'B+', 18, '2027-03-24', 'available', '2026-07-25 12:00:00', 9),
 (40, '2026-08-21 12:00:00+00', 'B-', 7, '2027-07-12', 'available', '2026-08-24 12:00:00', 10),
 (44, '2026-08-21 12:00:00+00', 'AB+', 11, '2027-07-12', 'available', '2026-08-23 12:00:00', 11),
-(48, '2026-06-23 12:00:00+00', 'AB-', 12, '2027-05-15', 'available', '2026-06-24 12:00:00', 12);
+(48, '2026-06-23 12:00:00+00', 'AB-', 12, '2027-05-15', 'available', '2026-06-24 12:00:00', 12)
+ON CONFLICT DO NOTHING;
 
--- SQL Data Seeding for table: profile
+-- The ids above were supplied explicitly, so both identity sequences are still sitting at 1.
+-- Restart them past the seeded rows, or the next facility/inventory row the API creates
+-- collides on the primary key.
+SELECT setval(pg_get_serial_sequence('public."Facility"',  'id'), COALESCE(MAX(id), 1)) FROM "Facility";
+SELECT setval(pg_get_serial_sequence('public."Inventory"', 'id'), COALESCE(MAX(id), 1)) FROM "Inventory";
 
-INSERT INTO Profile (id, created_at, full_name, email, role, facility_id) VALUES
-('1aaabe41-3dbc-4336-b04c-b21f29f66d07', '2026-08-22 15:23:24+00', 'Komal Zahra', 'komalzahra890@gmail.com', 'Hospital Staff', 3),
-('39878f44-dbcf-4e77-8d77-4c2b0ae3e6b0', '2026-08-22 15:20:37+00', 'Aleena Mubashar', 'aleenamubashar123@gmail.com', 'Hospital Staff', 1),
-('5f959d4a-5f9e-4dba-a3ab-432f4122bb1f', '2026-08-22 15:22:12+00', 'Fizza Imran', 'fizzaimran760@email.com', 'Hospital Staff', 2),
-('4c8bdd8f-6abc-481a-b3ce-0cf965519c80', '2026-08-31 20:11:58.848075+00', 'System Admin', 'admin123@gmail.com', 'Admin', null),
-('0d8d853b-fa85-41bd-afc6-8760fa65a62c', '2026-09-04 18:09:32.321166+00', 'Mumtaz Azeem', 'you1@hospitals.com', 'Hospital Staff', 1);
+-- No "Profile" rows are seeded. "Profile".id is a foreign key to auth.users(id) (see
+-- 20260901000000_init_schema.sql) and the auth schema is not part of what a reset restores,
+-- so the five accounts exported from the old shared project can never resolve in a fresh
+-- one. Profiles are created by POST /api/auth/signup, which makes the Auth user and then
+-- the row -- sign up against any seeded facility_code (FAC-001 .. FAC-030) for a login.

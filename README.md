@@ -51,44 +51,56 @@ ai         → AI integrator's working branch
 
 ### Requirements
 
-| Requirement          | Why                                                                                                            |
-| -------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Node.js **20.9+**    | Next.js 16 declares `engines.node >= 20.9.0`; older Node refuses to start `next dev`                            |
-| **Docker Desktop**   | needed by the `npx supabase` database commands — the CLI starts a local Postgres 17 container to replay `supabase/migrations/` and `supabase/seed.sql`, then restores the result into your project. On Windows, use the WSL 2 backend. |
-| Supabase project     | a **scratch** one — `db reset` drops the user tables in whatever database it targets                            |
-| Python 3             | only for serving the static frontend (`python -m http.server`)                                                  |
+| Requirement               | Why                                                                                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Node.js 20.9+**         | Next.js 16 declares `engines.node >= 20.9.0` — install a current LTS before anything else                                                  |
+| **Docker Desktop**        | running while you provision the database: the Supabase CLI replays `supabase/migrations/` and `supabase/seed.sql` in a local Postgres 17 container and restores the result into your project (WSL 2 backend on Windows) |
+| **A Supabase project**    | create one from the dashboard (free tier is enough) — its URL and keys go in `backend/.env.local`, its ref in `db:link`                    |
+| **Python 3**              | only to serve the static frontend on any port                                                                                             |
 
 Only **one** file carries credentials (`backend/.env.local`) and **one** command provisions
-the database. The frontend needs no config file and runs on any port — it reads public
-config from the backend's `GET /api/config` at runtime.
+the database.
+
+### 1. Backend + database
 
 ```bash
-# 1. Backend + database  (Docker Desktop must be running)
+# Docker Desktop running, from the repo root
 cd backend
-npm install                                        # also installs the Supabase CLI (npx supabase)
-Copy-Item ../.env.example .env.local     # then fill in the 4 real values
-npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # Supabase login + DB password (interactive)
-<<<<<<< HEAD
-npm run db:reset -- --linked             # migrations + RLS + grants + mock data from seed.sql
-=======
-npm run db:reset                          
->>>>>>> b7fa8d918957a2d89cf5cb3658858af780baaa7e
-npm run dev                              # http://localhost:3000
-
-# 2. Frontend (new terminal) — any port works
-cd frontend
-python -m http.server 4321               # http://localhost:4321
+npm install                                         # app dependencies + the Supabase CLI
+Copy-Item ../.env.example .env.local    # macOS/Linux: cp ../.env.example .env.local
+# open backend/.env.local and fill in the 4 values from your Supabase project
+npm run db:link -- --project-ref <YOUR-PROJECT-REF> # interactive: Supabase login + DB password
+npm run db:reset -- --linked                        # schema + RLS + grants + mock data
+npm run dev                                         # http://localhost:3000
 ```
 
-`npm run db:reset -- --linked` (i.e. `npx supabase db reset --linked`) is what populates
-**your own** project with the mock data: it wipes the linked database, re-applies every
-migration, and then runs `supabase/seed.sql`. `npm run db:push` only applies missing
-migrations and never runs `seed.sql`, so on a fresh clone it leaves you with the schema and
-the three demo facilities baked into the init migration — not the full dataset.
+`npm run db:reset -- --linked` (i.e. `npx supabase db reset --linked`) builds the database
+end to end: it applies every migration in `supabase/migrations/`, then loads
+`supabase/seed.sql` — 30 hospitals, their stock rows, and the `FAC-001 … FAC-030` codes. Run
+it again whenever you want a clean, fully populated database.
 
-Provision a fresh Supabase project from the dashboard first, or reuse one. If
-`curl http://localhost:3000/api/config` returns `databaseReady: false`, the reset was
-missed or failed. See `backend/README.md` for the full walkthrough.
+### 2. Frontend (new terminal)
+
+No config file and no fixed port — it reads public config from the backend's
+`GET /api/config` at runtime.
+
+```bash
+cd frontend
+python -m http.server 4321                           # http://localhost:4321
+```
+
+### 3. Check it worked
+
+```bash
+curl http://localhost:3000/api/config                # "databaseReady": true
+```
+
+Open http://localhost:4321 and search a blood group: the seeded facilities answer. For the
+dashboards, sign up on `signup.html` with a seeded facility code (`FAC-001` … `FAC-030`) to
+reach the staff dashboard, or use the reserved code `SURKH-ADMIN` and then **Admin Login** on
+`login.html` to reach the network dashboard.
+
+See `backend/README.md` for the full walkthrough.
 
 ## Data model
 

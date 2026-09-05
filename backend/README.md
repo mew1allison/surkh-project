@@ -6,12 +6,16 @@ The backend is the single place that holds credentials. The static frontend and 
 other consumer read public config from `GET /api/config` at runtime, so no Supabase URL,
 key or port is hardcoded anywhere else.
 
-## Setup (one file, one command)
+## Requirements
 
-Requirements: **Node.js 20.9+** (Next.js 16 `engines.node`), **Docker Desktop running**
-for the `npx supabase` database commands, and a **scratch Supabase project** — `db reset`
-drops the user tables in whichever database it targets. The Supabase CLI itself comes from
-`npm install` (devDependency), so every command below can also be run as `npx supabase …`.
+| Requirement               | Why                                                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Node.js 20.9+**         | Next.js 16 declares `engines.node >= 20.9.0`                                                                                     |
+| **Docker Desktop**        | running while you provision the database — `supabase db reset` replays the migrations and `supabase/seed.sql` in a local Postgres 17 container and restores the result into your project |
+| **A Supabase project**    | created from the dashboard; its URL and keys go in `.env.local`, its ref goes in `db:link`                                       |
+| **Supabase CLI**          | already installed by `npm install` as a devDependency, so every command below is also available as `npx supabase …`              |
+
+## Setup — 1. credentials
 
 ```bash
 cd backend
@@ -30,30 +34,26 @@ Copy-Item ../.env.example .env.local     # Windows PowerShell (macOS/Linux: cp .
 | `GEMINI_API_KEY`                       | https://aistudio.google.com/apikey (AI Ledger Reader)   |
 | `FRONTEND_ORIGINS`                     | optional CORS allowlist — see below                     |
 
-## Provision the database
+## Setup — 2. provision the database
 
-Start Docker Desktop, then:
+With Docker Desktop running:
 
 ```bash
 npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # interactive: Supabase login + DB password
 npm run db:reset -- --linked                          # npx supabase db reset --linked
 ```
 
-`db:reset --linked` is the one that hands a fresh clone working demo data in **its own**
-project: it drops the user entities in the linked database, re-applies every file in
-`supabase/migrations/` in version-prefix order, and then executes `supabase/seed.sql` (the
-facilities, inventory and profile rows). It is destructive and repeatable — run it again
-whenever you want the mock data back.
+That one command takes a project from empty to demo-ready. It applies every file in
+`supabase/migrations/` in version-prefix order — schema, RLS policies, grants — and then runs
+`supabase/seed.sql`, which loads the 30 hospitals, their inventory rows, and the
+`FAC-001 … FAC-030` codes staff sign up against. Re-run it whenever you want the same clean,
+fully populated state again.
 
-`npm run db:push` is the incremental alternative: it applies only the migrations the remote
-is still missing and **does not run `seed.sql`**, so a project provisioned that way gets just
-the three demo facilities inserted by the init migration. To re-add the seed rows without
-wiping anything, run `npx supabase db push --include-seed`.
-
-The authoritative schema, RLS, grants and their inline demo data all live in
+The authoritative schema, RLS and grants live in
 `supabase/migrations/20260901000000_init_schema.sql`; `20260905000000_reassert_single_source_of_truth.sql`
 sorts last and is the final word on every push (it re-pins `is_admin()` and drops the
-duplicate permissive policies the three legacy migrations re-add).
+duplicate permissive policies the three legacy migrations re-add). `npm run db:push` is the
+lighter variant: migrations only, no seed data.
 
 ## Run
 
@@ -69,7 +69,9 @@ python -m http.server 4321      # http://localhost:4321
 ```
 
 The frontend derives the backend base from `location.hostname` (override with
-`window.SURKH_BACKEND_URL` or `?backend=`), so it runs on any port with zero config.
+`window.SURKH_BACKEND_URL` or `?backend=`), so it runs on any port with zero config. Search a
+blood group to see the seeded stock; then sign up with `FAC-001` for the staff dashboard, or
+with the reserved `SURKH-ADMIN` code and **Admin Login** for the network dashboard.
 
 ## CORS (`proxy.js`)
 
@@ -84,5 +86,5 @@ for all API routes. It echoes the caller's `Origin` when it is allowlisted and r
 ## API surface
 
 See `../docs/api-contract.md`. Runtime public config is published by `GET /api/config`
-which also returns a `databaseReady` boolean — the diagnostic for a missed or failed
-provisioning step (`databaseReady: false` means the migrations were not applied).
+which also returns a `databaseReady` boolean — the diagnostic for whether the provisioning
+step above reached the database.

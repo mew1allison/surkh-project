@@ -74,22 +74,37 @@ export async function POST(request) {
     );
   }
 
+  // Demo bootstrap for a fresh clone: the reserved code below mints the network
+  // Admin instead of joining a facility. No other path leads to an Admin row —
+  // the insert in step 7 always writes 'Hospital Staff', and supabase/seed.sql
+  // cannot create one because "Profile".id is a foreign key to auth.users.
+  // Local-only by design: NODE_ENV is "production" in a deployed build, so the
+  // code stops granting anything once this ships.
+  const isAdminSignup =
+    process.env.NODE_ENV !== "production" &&
+    facility_code.trim().toUpperCase() === "SURKH-ADMIN";
+
   // Step 5: look up the facility by facility_code (the server decides facility_id)
-  const { data: facility, error: facilityError } = await supabase
-    .from("Facility")
-    .select("id, name")
-    .eq("facility_code", facility_code.trim())
-    .maybeSingle();
+  let facility = null;
+  if (!isAdminSignup) {
+    const { data, error: facilityError } = await supabase
+      .from("Facility")
+      .select("id, name")
+      .eq("facility_code", facility_code.trim())
+      .maybeSingle();
 
-  if (facilityError) {
-    return json({ error: facilityError.message }, { status: 500 });
-  }
+    if (facilityError) {
+      return json({ error: facilityError.message }, { status: 500 });
+    }
 
-  if (!facility) {
-    return json(
-      { error: "No facility found with that facility_code" },
-      { status: 400 },
-    );
+    if (!data) {
+      return json(
+        { error: "No facility found with that facility_code" },
+        { status: 400 },
+      );
+    }
+
+    facility = data;
   }
 
   // Step 6: create the Auth user — role/facility are not part of the Auth record
@@ -112,8 +127,9 @@ export async function POST(request) {
       id: createdUser.user.id,
       full_name: full_name.trim(),
       email: email.trim(),
-      role: "Hospital Staff",
-      facility_id: facility.id,
+      role: isAdminSignup ? "Admin" : "Hospital Staff",
+      // Admins own no facility; is_admin() + the Facility policies do the gating.
+      facility_id: facility ? facility.id : null,
     })
     .select()
     .single();

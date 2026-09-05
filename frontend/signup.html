@@ -98,7 +98,11 @@
              that's already been registered, they don't create one from this form -->
         <div class="partner-form__field">
           <label class="partner-form__label" for="facility-code">Facility Code</label>
-          <input type="text" id="facility-code" name="facility-code" class="partner-form__input" placeholder="Provided by your facility admin" required>
+          <input type="text" id="facility-code" name="facility-code" class="partner-form__input" placeholder="Provided by your facility admin" value="FAC-001" required>
+          <!-- Demo convenience: supabase/seed.sql registers FAC-001 … FAC-030, so a fresh
+               local database always has a code to join. SURKH-ADMIN is the one reserved
+               code that creates the network admin instead of a staff account. -->
+          <p class="partner-form__location-status">Demo database: FAC-001 … FAC-030 are seeded (FAC-001 = PIMS, Islamabad). Enter <strong>SURKH-ADMIN</strong> to create the admin account instead.</p>
         </div>
 
         <hr class="partner-form__divider">

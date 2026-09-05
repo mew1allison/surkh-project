@@ -143,6 +143,19 @@
 
         <p class="partner-form__error" id="login-form-error"></p>
 
+        <!-- Minor addition (demo convenience): a fresh database has no Admin row to
+             log in with — "Profile".id is a key into auth.users, so seed.sql cannot
+             create one. This button posts the reserved SURKH-ADMIN code to
+             /api/auth/signup (backend/app/api/auth/signup/route.js), which mints the
+             Admin profile locally. Hidden on the Staff tab. -->
+        <div class="partner-form__field" id="login-admin-demo" hidden>
+          <p class="partner-form__section-label">No admin account in this database yet?</p>
+          <button type="button" class="btn btn--secondary partner-form__submit" id="create-demo-admin-btn">
+            Create demo admin account
+          </button>
+          <p class="partner-form__location-status" id="login-admin-demo-msg"></p>
+        </div>
+
         <button type="submit" class="btn btn--primary partner-form__submit" id="login-submit-btn">
           <span id="login-submit-btn-text">Log In</span>
         </button>
@@ -160,13 +173,28 @@
        position, hidden role value, and copy — form submission logic in
        script.js is untouched by this edit and should read #login-role
        to decide whether to route to dashboard.html or
-       admin-dashboard.html after a successful login. -->
+       admin-dashboard.html after a successful login. On the Admin tab it also
+       prefills the demo credentials and offers the one-click admin bootstrap. -->
   <script>
     (function () {
       const tabs = document.getElementById('login-tabs');
       const roleInput = document.getElementById('login-role');
       const subtext = document.getElementById('login-subtext');
       const submitText = document.getElementById('login-submit-btn-text');
+      const emailInput = document.getElementById('login-email');
+      const passwordInput = document.getElementById('login-password');
+      const demoBox = document.getElementById('login-admin-demo');
+      const demoBtn = document.getElementById('create-demo-admin-btn');
+      const demoMsg = document.getElementById('login-admin-demo-msg');
+
+      // The local-only demo admin: what the Create button signs up with and what
+      // the Admin tab prefills, so the two can never drift apart.
+      const DEMO_ADMIN = {
+        fullName: 'Surkh Network Admin',
+        email: 'admin@surkh.demo',
+        password: 'SurkhAdmin2026',
+        code: 'SURKH-ADMIN',
+      };
 
       const copy = {
         staff: {
@@ -179,19 +207,73 @@
         },
       };
 
-      tabs.addEventListener('click', (e) => {
-        const btn = e.target.closest('.login-tabs__btn');
-        if (!btn) return;
-        const tab = btn.dataset.tab;
+      function showDemoMessage(text, kind) {
+        demoMsg.className = `partner-form__location-status partner-form__location-status--${kind}`;
+        demoMsg.textContent = text;
+      }
 
+      function applyTab(tab) {
         tabs.dataset.active = tab;
         roleInput.value = tab;
         subtext.textContent = copy[tab].subtext;
         submitText.textContent = copy[tab].submit;
+        demoBox.hidden = tab !== 'admin';
+
+        const hasDemoCreds =
+          emailInput.value === DEMO_ADMIN.email &&
+          passwordInput.value === DEMO_ADMIN.password;
+
+        if (tab === 'admin') {
+          // Fill the demo credentials only into fields nobody has typed in.
+          if (!emailInput.value) emailInput.value = DEMO_ADMIN.email;
+          if (!passwordInput.value) passwordInput.value = DEMO_ADMIN.password;
+        } else if (hasDemoCreds) {
+          // Leaving the Admin tab again: drop the demo pair so it is not sent
+          // by accident against a staff account.
+          emailInput.value = '';
+          passwordInput.value = '';
+        }
 
         tabs.querySelectorAll('.login-tabs__btn').forEach((b) => {
-          b.setAttribute('aria-selected', String(b === btn));
+          b.setAttribute('aria-selected', String(b.dataset.tab === tab));
         });
+      }
+
+      tabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.login-tabs__btn');
+        if (btn) applyTab(btn.dataset.tab);
+      });
+
+      demoBtn.addEventListener('click', async () => {
+        demoBtn.disabled = true;
+        showDemoMessage('Creating the admin account…', 'success');
+
+        try {
+          const { BACKEND_BASE_URL } = await window.SURKH_READY;
+          const res = await fetch(`${BACKEND_BASE_URL}/api/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              full_name: DEMO_ADMIN.fullName,
+              email: DEMO_ADMIN.email,
+              password: DEMO_ADMIN.password,
+              facility_code: DEMO_ADMIN.code,
+            }),
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            showDemoMessage('Admin account created — press "Log In as Admin".', 'success');
+          } else if (/already|exists|registered/i.test(data.error || '')) {
+            showDemoMessage('That admin account already exists — press "Log In as Admin".', 'success');
+          } else {
+            showDemoMessage(data.error || 'Could not create the admin account.', 'error');
+          }
+        } catch {
+          showDemoMessage('Network error — is the backend running on port 3000?', 'error');
+        } finally {
+          demoBtn.disabled = false;
+        }
       });
     })();
   </script>
