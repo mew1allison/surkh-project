@@ -1,16 +1,8 @@
-// ---- Supabase client ----
-// The anon/publishable key is safe to expose in frontend code by design —
-// access control is enforced by Row Level Security policies in the database,
-// not by keeping this key secret. See lib/supabase.js on the backend for the
-// same URL + key pair used server-side.
-// TODO: fill in your project's real values (Supabase dashboard > Project Settings > API).
-
-
-// Backend base URL — the backend is a separate Next.js app (its API routes
-// live under app/api/), not served from the same origin as this static
-// frontend, so calls to it need an absolute base.
-// TODO: point this at your backend's real deployed/dev URL.
-const BACKEND_BASE_URL = "http://localhost:3000";
+// ---- Supabase client + backend URL ----
+// Nothing is hardcoded here. supabaseClient.js fetches the public config from
+// GET /api/config on the backend, which reads it from backend/.env.local. Every
+// consumer awaits `window.SURKH_READY` and destructures what it needs from it —
+// the client simply does not exist until that fetch resolves.
 
 // ---- Why SURKH: cards rendered from data, not hand-written ----
 const whyCards = [
@@ -100,7 +92,7 @@ const CITY_COORDS = {
   Quetta: { lat: 30.1798, lng: 66.975 },
   Multan: { lat: 30.1575, lng: 71.5249 },
   Rawalpindi: { lat: 33.5651, lng: 73.0169 },
-  Faisalabad: { lat: 31.4504, lng: 73.1350 },
+  Faisalabad: { lat: 31.4504, lng: 73.135 },
   Bahawalpur: { lat: 29.3544, lng: 71.6911 },
   Larkana: { lat: 27.5551, lng: 68.2147 },
 };
@@ -170,10 +162,13 @@ if (citySelect) {
 // they just won't have GPS coordinate lookup.
 (async function loadCityOptions() {
   try {
+    const { BACKEND_BASE_URL } = await window.SURKH_READY;
     const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`);
     if (!res.ok) return;
     const facilities = await res.json();
-    const cities = [...new Set(facilities.map((f) => f.city).filter(Boolean))].sort();
+    const cities = [
+      ...new Set(facilities.map((f) => f.city).filter(Boolean)),
+    ].sort();
 
     // Populate dropdown
     if (citySelect) {
@@ -386,12 +381,13 @@ function distanceKm(lat1, lng1, lat2, lng2) {
 //   { blood_group, quantity, expiry_date, Facility: { name, city, location } }
 // Always filtered to status='available' and quantity>0 server-side.
 async function fetchInventoryFromApi(bloodGroup, city) {
+  const { BACKEND_BASE_URL } = await window.SURKH_READY;
   const params = new URLSearchParams();
-  if (bloodGroup) params.set('blood_group', bloodGroup);
-  if (city) params.set('city', city);
+  if (bloodGroup) params.set("blood_group", bloodGroup);
+  if (city) params.set("city", city);
 
   const res = await fetch(
-    `${BACKEND_BASE_URL}/api/inventory${params.toString() ? '?' + params.toString() : ''}`
+    `${BACKEND_BASE_URL}/api/inventory${params.toString() ? "?" + params.toString() : ""}`,
   );
   if (!res.ok) {
     throw new Error(`Search failed (${res.status})`);
@@ -404,12 +400,12 @@ async function fetchInventoryFromApi(bloodGroup, city) {
 function groupByFacility(rows) {
   const map = {};
   rows.forEach((row) => {
-    const name = row.Facility?.name || 'Unknown Facility';
+    const name = row.Facility?.name || "Unknown Facility";
     if (!map[name]) {
       map[name] = {
         name,
-        city: row.Facility?.city || '',
-        location: row.Facility?.location || '',
+        city: row.Facility?.city || "",
+        location: row.Facility?.location || "",
         inventory: [],
       };
     }
@@ -446,7 +442,8 @@ function buildResultCard(facility) {
   const card = document.createElement("div");
   card.className = "result-card";
 
-  const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const esc = (s) =>
+    s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
   card.innerHTML = `
     <div class="result-card__photo-wrap">
@@ -501,8 +498,6 @@ function renderResultsList() {
         ? "inline-flex"
         : "none";
 }
-
-
 
 if (seeAllBtn) {
   seeAllBtn.addEventListener("click", () => {
@@ -559,8 +554,8 @@ if (resultsList) {
     const btn = e.target.closest(".result-card__reserve");
     if (!btn) return;
     const facility = {
-      name: btn.dataset.facilityName || '',
-      location: btn.dataset.facilityLocation || '',
+      name: btn.dataset.facilityName || "",
+      location: btn.dataset.facilityLocation || "",
       phone: null,
     };
     openReserveModal(facility, btn.dataset.contactOnly === "true");
@@ -578,7 +573,7 @@ if (reserveModalBackdrop)
     const rows = await fetchInventoryFromApi();
     currentFilteredResults = groupByFacility(rows);
   } catch (err) {
-    console.error('Failed to load initial inventory:', err);
+    console.error("Failed to load initial inventory:", err);
   }
   renderResultsList();
 })();
@@ -631,7 +626,12 @@ if (partnerForm) {
     const staffEmail = document.getElementById("staff-email").value.trim();
     const staffPassword = document.getElementById("staff-password").value;
 
-    if (!facilityCode || !staffName || !staffEmail || staffPassword.length < 8) {
+    if (
+      !facilityCode ||
+      !staffName ||
+      !staffEmail ||
+      staffPassword.length < 8
+    ) {
       partnerFormError.textContent =
         "Please complete all fields, including an 8+ character password.";
       // Reuses the same shake animation as the Find Blood form
@@ -654,6 +654,7 @@ if (partnerForm) {
     partnerSubmitBtnText.textContent = "Creating Account…";
 
     try {
+      const { BACKEND_BASE_URL } = await window.SURKH_READY;
       const res = await fetch(`${BACKEND_BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -663,7 +664,8 @@ if (partnerForm) {
 
       if (!res.ok) {
         // e.g. "No facility found with that facility_code", weak password, etc.
-        partnerFormError.textContent = data.error || "Could not create your account.";
+        partnerFormError.textContent =
+          data.error || "Could not create your account.";
         partnerSubmitBtn.disabled = false;
         partnerSubmitBtnText.textContent = "Create Hospital Account";
         return;
@@ -707,9 +709,22 @@ if (loginForm) {
     }
 
     loginSubmitBtn.disabled = true;
+    const loginBtnLabel = loginSubmitBtnText.textContent;
     loginSubmitBtnText.textContent = "Logging In…";
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
+    // The client and the backend base only exist once /api/config has resolved.
+    let sb, BACKEND_BASE_URL;
+    try {
+      ({ client: sb, BACKEND_BASE_URL } = await window.SURKH_READY);
+    } catch {
+      loginError.textContent =
+        "Cannot reach the SURKH backend — is `npm run dev` running in backend/?";
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtnText.textContent = loginBtnLabel;
+      return;
+    }
+
+    const { data, error } = await sb.auth.signInWithPassword({
       email,
       password,
     });
@@ -750,7 +765,7 @@ if (loginForm) {
         loginError.textContent = "This account does not have admin privileges.";
         loginSubmitBtn.disabled = false;
         loginSubmitBtnText.textContent = "Log In as Admin";
-        await supabaseClient.auth.signOut();
+        await sb.auth.signOut();
         return;
       }
     } else {
@@ -774,10 +789,11 @@ if (loginForm) {
         loginSubmitBtnText.textContent = "Logged In ✓";
         window.location.href = "dashboard.html";
       } catch (err) {
-        loginError.textContent = "This account is not authorized for staff access.";
+        loginError.textContent =
+          "This account is not authorized for staff access.";
         loginSubmitBtn.disabled = false;
         loginSubmitBtnText.textContent = "Log In";
-        await supabaseClient.auth.signOut();
+        await sb.auth.signOut();
         return;
       }
     }

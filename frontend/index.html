@@ -390,8 +390,10 @@
         </a>
       </div>
     </div>
-<!-- Add Supabase JS SDK before script.js -->
+    <!-- Supabase SDK, then the async config bootstrap (window.SURKH_READY) that
+         script.js awaits — without supabaseClient.js this page has no client. -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

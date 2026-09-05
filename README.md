@@ -49,10 +49,27 @@ ai         → AI integrator's working branch
 
 ## Local setup
 
-1. Clone the repo
-2. Copy `.env.example` to `.env` in both `frontend/` and `backend/`, fill in real values (ask a teammate for keys — never commit `.env`)
-3. Backend: `cd backend && npm install && npm run dev`
-4. Frontend: `cd frontend && python -m http.server 5500`
+Only **one** file carries credentials (`backend/.env.local`) and **one** command provisions
+the database. The frontend needs no config file and runs on any port — it reads public
+config from the backend's `GET /api/config` at runtime.
+
+```bash
+# 1. Backend + database
+cd backend
+npm install
+Copy-Item ../.env.example .env.local     # then fill in the 4 real values
+npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # Supabase login + DB password (interactive)
+npm run db:push                          # schema + RLS + grants + demo data
+npm run dev                              # http://localhost:3000
+
+# 2. Frontend (new terminal) — any port works
+cd frontend
+python -m http.server 4321               # http://localhost:4321
+```
+
+Provision a fresh Supabase project from the dashboard first, or reuse one. If
+`curl http://localhost:3000/api/config` returns `databaseReady: false`, the `db push` was
+missed or failed. See `backend/README.md` for the full walkthrough.
 
 ## Data model
 

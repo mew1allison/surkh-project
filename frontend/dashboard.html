@@ -3647,12 +3647,10 @@ body {
 
   <script>
 // ---- Supabase client + config ----
-// Same pair as script.js / lib/supabase.js — the anon key is safe to expose,
-// access control comes from RLS, not key secrecy.
-// No need to initialize again!
-
-// Backend base URL — separate Next.js app, not same-origin as this static page.
-const BACKEND_BASE_URL = "http://localhost:3000";
+// supabaseClient.js exposes window.SURKH_READY — a promise resolving to
+// { client, supabaseUrl, BACKEND_BASE_URL } after GET /api/config on the backend.
+// Nothing is hardcoded here, and nothing may be read synchronously: every
+// function below that needs those values awaits SURKH_READY first.
 
 // Access token populated by auth guard — used by all authenticated API calls.
 let accessToken = null;
@@ -3664,7 +3662,16 @@ let accessToken = null;
 // The dashboard-shell DOMContentLoaded block awaits this before calling
 // authenticated endpoints (loadInventory, profile, PATCH).
 const authReady = (async function authGuard() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+  let sb, BACKEND_BASE_URL;
+  try {
+    ({ client: sb, BACKEND_BASE_URL } = await window.SURKH_READY);
+  } catch {
+    // No backend means no session to verify and no data to render — sending the
+    // staffer to the login page (which reports the failure) beats a blank shell.
+    window.location.href = "login.html";
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
   if (!session) {
     window.location.href = "login.html";
     return;
@@ -3678,7 +3685,7 @@ const authReady = (async function authGuard() {
     if (profileRes.ok) {
       const profile = await profileRes.json();
       if (profile && profile.role === "Admin") {
-        await supabaseClient.auth.signOut();
+        await sb.auth.signOut();
         window.location.href = "login.html";
         return;
       }
@@ -3889,6 +3896,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // facility_id param at all.
   async function loadInventory() {
     try {
+      const { BACKEND_BASE_URL } = await window.SURKH_READY;
       const profileRes = await fetch(`${BACKEND_BASE_URL}/api/profile`, {
         headers: { 'Authorization': 'Bearer ' + accessToken },
       });
@@ -3969,6 +3977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function updateExchangeRequest(req, status) {
     try {
+      const { BACKEND_BASE_URL } = await window.SURKH_READY;
       const res = await fetch(`${BACKEND_BASE_URL}/api/exchange-requests?id=${req.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
@@ -4004,6 +4013,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!livePanel || !historyPanel) return;
 
     try {
+      const { BACKEND_BASE_URL } = await window.SURKH_READY;
       const res = await fetch(`${BACKEND_BASE_URL}/api/exchange-requests`, {
         headers: { 'Authorization': 'Bearer ' + accessToken },
       });
@@ -4179,6 +4189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { apiStatus } = computeStockTier(quantity);
 
       try {
+        const { BACKEND_BASE_URL } = await window.SURKH_READY;
         const res = await fetch(`${BACKEND_BASE_URL}/api/inventory`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
@@ -4215,6 +4226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { tier, label: tierLabel, apiStatus } = computeStockTier(newVal);
 
       try {
+        const { BACKEND_BASE_URL } = await window.SURKH_READY;
         const res = await fetch(`${BACKEND_BASE_URL}/api/inventory`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
@@ -4390,6 +4402,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ledgerUploadStatus.className = 'ledger-upload__status ledger-upload__status--loading';
 
     try {
+      const { BACKEND_BASE_URL } = await window.SURKH_READY;
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -4505,6 +4518,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ledgerConfirmBtn.textContent = 'Logging…';
 
     try {
+      const { BACKEND_BASE_URL } = await window.SURKH_READY;
       const res = await fetch(`${BACKEND_BASE_URL}/api/inventory`, {
         method: 'POST',
         headers: {

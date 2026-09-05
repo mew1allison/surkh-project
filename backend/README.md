@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Surkh backend
 
-## Getting Started
+Next.js 16 App Router API + Supabase (Postgres). Serves on **http://localhost:3000**.
 
-First, run the development server:
+The backend is the single place that holds credentials. The static frontend and every
+other consumer read public config from `GET /api/config` at runtime, so no Supabase URL,
+key or port is hardcoded anywhere else.
+
+## Setup (one file, one command)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+npm install
+Copy-Item ../.env.example .env.local     # Windows PowerShell (macOS/Linux: cp ../.env.example .env.local)
+# fill in the 4 real values in backend/.env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`backend/.env.local` keys (server-only unless prefixed `NEXT_PUBLIC_`):
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+| Key                                    | Where it comes from                                     |
+| -------------------------------------- | ------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase → Project Settings → Data API → URL            |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Data API → Publishable key (safe for browsers)          |
+| `SUPABASE_SECRET_KEY`                  | Data API → Secret key (NEVER expose to the browser)     |
+| `GEMINI_API_KEY`                       | https://aistudio.google.com/apikey (AI Ledger Reader)   |
+| `FRONTEND_ORIGINS`                     | optional CORS allowlist — see below                     |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Provision the database
 
-## Learn More
+```bash
+npm run db:link -- --project-ref <YOUR-PROJECT-REF>   # interactive: Supabase login + DB password
+npm run db:push                                        # schema + RLS + grants + demo data
+```
 
-To learn more about Next.js, take a look at the following resources:
+`db:push` runs every file in `supabase/migrations/` in version-prefix order. The
+authoritative schema, RLS, grants and demo data all live in
+`supabase/migrations/20260901000000_init_schema.sql`; `20260905000000_reassert_single_source_of_truth.sql`
+sorts last and is the final word on every push (it re-pins `is_admin()` and drops the
+duplicate permissive policies the three legacy migrations re-add).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To wipe a scratch project and re-provision from scratch:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run db:reset
+```
 
-## Deploy on Vercel
+## Run
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev        # http://localhost:3000
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then, from the repo root, serve the static frontend on any port and open it:
+
+```bash
+cd ../frontend
+python -m http.server 4321      # http://localhost:4321
+```
+
+The frontend derives the backend base from `location.hostname` (override with
+`window.SURKH_BACKEND_URL` or `?backend=`), so it runs on any port with zero config.
+
+## CORS (`proxy.js`)
+
+`backend/proxy.js` (Next 16 renamed the old `middleware.js` convention) centralises CORS
+for all API routes. It echoes the caller's `Origin` when it is allowlisted and returns
+`403` otherwise. By default it accepts loopback `5500`, `5501` and `4321`. Setting
+`FRONTEND_ORIGINS` **replaces** that default list (it does not extend it).
+
+> There must not be a `backend/middleware.js` alongside `proxy.js` — having both is a hard
+> boot error (E900).
+
+## API surface
+
+See `../docs/api-contract.md`. Runtime public config is published by `GET /api/config`
+which also returns a `databaseReady` boolean — the diagnostic for a missed or failed
+`db push` (`databaseReady: false` means the migrations were not applied).

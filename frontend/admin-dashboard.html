@@ -1,905 +1,1068 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard — SURKH</title>
-  <link rel="icon" type="image/x-icon" href="assets/icon-drop-of-blood.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-/* =====================================================================
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard — SURKH</title>
+    <link rel="icon" type="image/x-icon" href="assets/icon-drop-of-blood.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =====================================================================
    Design tokens — identical to dashboard.html / index.html, unchanged
    on purpose so the admin screen doesn't read as a different product.
    ===================================================================== */
-:root {
-  --color-primary: #D8323A;
-  --color-secondary: #F0B856;
-  --color-accent: #111415;
-  --color-text: #1C0204;
-  --color-bg: #FFFCF7;
-  --color-muted: #8A7F78;
-  --color-border: #E8E1D6;
-  --color-success-bg: #F3F7EC;
-  --color-success-text: #5B7A3A;
-  --color-inactive-bg: #F1EFEC;
-  --color-inactive-text: #8A7F78;
+      :root {
+        --color-primary: #d8323a;
+        --color-secondary: #f0b856;
+        --color-accent: #111415;
+        --color-text: #1c0204;
+        --color-bg: #fffcf7;
+        --color-muted: #8a7f78;
+        --color-border: #e8e1d6;
+        --color-success-bg: #f3f7ec;
+        --color-success-text: #5b7a3a;
+        --color-inactive-bg: #f1efec;
+        --color-inactive-text: #8a7f78;
 
-  --font-heading: 'Montserrat', sans-serif;
-  --font-body: 'Outfit', sans-serif;
-}
+        --font-heading: "Montserrat", sans-serif;
+        --font-body: "Outfit", sans-serif;
+      }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
-}
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
 
-body {
-  font-family: var(--font-body);
-  color: var(--color-text);
-  background: var(--color-bg);
-}
+      body {
+        font-family: var(--font-body);
+        color: var(--color-text);
+        background: var(--color-bg);
+      }
 
-button, input, select { font-family: inherit; }
+      button,
+      input,
+      select {
+        font-family: inherit;
+      }
 
-button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible,
-[role="button"]:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      a:focus-visible,
+      [role="button"]:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
 
-/* ---- Header (matches dashboard.html's .dash-header) ---- */
-.dash-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg);
-}
+      /* ---- Header (matches dashboard.html's .dash-header) ---- */
+      .dash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--color-border);
+        background: var(--color-bg);
+      }
 
-.dash-header__brand {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  text-decoration: none;
-  color: inherit;
-}
+      .dash-header__brand {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        text-decoration: none;
+        color: inherit;
+      }
 
-.dash-header__logo {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
+      .dash-header__logo {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+      }
 
-.dash-header__brand-name {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1.2rem;
-  color: var(--color-primary);
-  letter-spacing: 0.02em;
-}
+      .dash-header__brand-name {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--color-primary);
+        letter-spacing: 0.02em;
+      }
 
-.dash-header__nav {
-  display: flex;
-  align-items: center;
-  gap: 1.75rem;
-}
+      .dash-header__nav {
+        display: flex;
+        align-items: center;
+        gap: 1.75rem;
+      }
 
-.dash-header__nav-link {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--color-text);
-  text-decoration: none;
-}
+      .dash-header__nav-link {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--color-text);
+        text-decoration: none;
+      }
 
-.dash-header__nav-link--active {
-  color: var(--color-primary);
-}
+      .dash-header__nav-link--active {
+        color: var(--color-primary);
+      }
 
-.dash-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+      .dash-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
 
-.dash-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.85rem;
-}
+      .dash-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
 
-.dash-profile__avatar {
-  width: 32px;
-  height: 32px;
-  background: var(--color-accent);
-  color: var(--color-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
+      .dash-profile__avatar {
+        width: 32px;
+        height: 32px;
+        background: var(--color-accent);
+        color: var(--color-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
 
-.dash-profile__role {
-  color: var(--color-muted);
-  font-weight: 400;
-  font-size: 0.75rem;
-  display: block;
-}
+      .dash-profile__role {
+        color: var(--color-muted);
+        font-weight: 400;
+        font-size: 0.75rem;
+        display: block;
+      }
 
-.dash-logout {
-  background: none;
-  border: 1px solid var(--color-border);
-  padding: 0.5rem 0.9rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--color-text);
-  cursor: pointer;
-}
+      .dash-logout {
+        background: none;
+        border: 1px solid var(--color-border);
+        padding: 0.5rem 0.9rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--color-text);
+        cursor: pointer;
+      }
 
-.dash-logout:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
+      .dash-logout:hover {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
 
-/* ---- Page body ---- */
-.admin-main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
-}
+      /* ---- Page body ---- */
+      .admin-main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 4rem;
+      }
 
-.admin-page-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.75rem;
-  flex-wrap: wrap;
-}
+      .admin-page-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        flex-wrap: wrap;
+      }
 
-.admin-page-head__title {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1.6rem;
-  color: var(--color-accent);
-}
+      .admin-page-head__title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.6rem;
+        color: var(--color-accent);
+      }
 
-.admin-page-head__subtitle {
-  font-size: 0.9rem;
-  color: var(--color-muted);
-  margin-top: 0.3rem;
-}
+      .admin-page-head__subtitle {
+        font-size: 0.9rem;
+        color: var(--color-muted);
+        margin-top: 0.3rem;
+      }
 
-.btn-primary {
-  background: var(--color-primary);
-  color: var(--color-bg);
-  border: none;
-  padding: 0.75rem 1.4rem;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
+      .btn-primary {
+        background: var(--color-primary);
+        color: var(--color-bg);
+        border: none;
+        padding: 0.75rem 1.4rem;
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+      }
 
-.btn-primary:hover { background: #C22B32; }
+      .btn-primary:hover {
+        background: #c22b32;
+      }
 
-/* ---- Filter bar ---- */
-.admin-filters {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
+      /* ---- Filter bar ---- */
+      .admin-filters {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
 
-.admin-filters__search {
-  position: relative;
-  flex: 1 1 260px;
-}
+      .admin-filters__search {
+        position: relative;
+        flex: 1 1 260px;
+      }
 
-.admin-filters__search img {
-  position: absolute;
-  left: 0.85rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  opacity: 0.5;
-}
+      .admin-filters__search img {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.5;
+      }
 
-.admin-filters__search input {
-  width: 100%;
-  padding: 0.65rem 0.9rem 0.65rem 2.5rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  font-size: 0.9rem;
-  color: var(--color-text);
-}
+      .admin-filters__search input {
+        width: 100%;
+        padding: 0.65rem 0.9rem 0.65rem 2.5rem;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg);
+        font-size: 0.9rem;
+        color: var(--color-text);
+      }
 
-.admin-filters__search input:focus,
-.admin-filters select:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
-}
+      .admin-filters__search input:focus,
+      .admin-filters select:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 1px;
+      }
 
-.admin-filters select {
-  padding: 0.65rem 0.9rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  font-size: 0.9rem;
-  color: var(--color-text);
-  min-width: 140px;
-}
+      .admin-filters select {
+        padding: 0.65rem 0.9rem;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg);
+        font-size: 0.9rem;
+        color: var(--color-text);
+        min-width: 140px;
+      }
 
-/* ---- Facility table ---- */
-.facility-table {
-  border: 1px solid var(--color-border);
-}
+      /* ---- Facility table ---- */
+      .facility-table {
+        border: 1px solid var(--color-border);
+      }
 
-.facility-table__head {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 0.8fr 0.9fr 0.7fr 4rem;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--color-inactive-bg);
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.03em;
-  color: var(--color-muted);
-}
+      .facility-table__head {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr 0.8fr 0.9fr 0.7fr 4rem;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: var(--color-inactive-bg);
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 0.03em;
+        color: var(--color-muted);
+      }
 
-.facility-row {
-  border-top: 1px solid var(--color-border);
-}
+      .facility-row {
+        border-top: 1px solid var(--color-border);
+      }
 
-.facility-row__main {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 0.8fr 0.9fr 0.7fr 4rem;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.9rem 1rem;
-  cursor: pointer;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: var(--color-text);
-}
+      .facility-row__main {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr 0.8fr 0.9fr 0.7fr 4rem;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.9rem 1rem;
+        cursor: pointer;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        font-family: inherit;
+        font-size: 0.9rem;
+        color: var(--color-text);
+      }
 
-.facility-row__main:hover { background: #FBF8F2; }
+      .facility-row__main:hover {
+        background: #fbf8f2;
+      }
 
-.facility-row.is-inactive .facility-row__main { opacity: 0.55; }
+      .facility-row.is-inactive .facility-row__main {
+        opacity: 0.55;
+      }
 
-.facility-row__name {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-weight: 600;
-}
+      .facility-row__name {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 600;
+      }
 
-.facility-row__caret {
-  font-size: 0.7rem;
-  color: var(--color-muted);
-  transition: transform 0.15s ease;
-  flex: none;
-}
+      .facility-row__caret {
+        font-size: 0.7rem;
+        color: var(--color-muted);
+        transition: transform 0.15s ease;
+        flex: none;
+      }
 
-.facility-row.is-open .facility-row__caret { transform: rotate(90deg); }
+      .facility-row.is-open .facility-row__caret {
+        transform: rotate(90deg);
+      }
 
-.facility-row__emr {
-  font-size: 0.85rem;
-}
+      .facility-row__emr {
+        font-size: 0.85rem;
+      }
 
-.facility-row__emr--yes { color: var(--color-success-text); }
-.facility-row__emr--no { color: var(--color-muted); }
+      .facility-row__emr--yes {
+        color: var(--color-success-text);
+      }
+      .facility-row__emr--no {
+        color: var(--color-muted);
+      }
 
-.status-pill {
-  display: inline-block;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-family: var(--font-heading);
-  width: fit-content;
-}
+      .status-pill {
+        display: inline-block;
+        padding: 0.25rem 0.65rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: var(--font-heading);
+        width: fit-content;
+      }
 
-.status-pill--active {
-  background: var(--color-success-bg);
-  color: var(--color-success-text);
-}
+      .status-pill--active {
+        background: var(--color-success-bg);
+        color: var(--color-success-text);
+      }
 
-.status-pill--inactive {
-  background: var(--color-inactive-bg);
-  color: var(--color-inactive-text);
-}
+      .status-pill--inactive {
+        background: var(--color-inactive-bg);
+        color: var(--color-inactive-text);
+      }
 
-.facility-row__units { font-weight: 600; }
+      .facility-row__units {
+        font-weight: 600;
+      }
 
-.facility-row__edit {
-  background: none;
-  border: 1px solid var(--color-border);
-  padding: 0.4rem 0.7rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.75rem;
-  cursor: pointer;
-  color: var(--color-text);
-  justify-self: end;
-}
+      .facility-row__edit {
+        background: none;
+        border: 1px solid var(--color-border);
+        padding: 0.4rem 0.7rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.75rem;
+        cursor: pointer;
+        color: var(--color-text);
+        justify-self: end;
+      }
 
-.facility-row__edit:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
+      .facility-row__edit:hover {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
 
-/* ---- Expanded row detail ---- */
-.facility-row__detail {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.2s ease;
-  padding: 0 1rem;
-}
+      /* ---- Expanded row detail ---- */
+      .facility-row__detail {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.2s ease;
+        padding: 0 1rem;
+      }
 
-.facility-row__detail > div { overflow: hidden; }
+      .facility-row__detail > div {
+        overflow: hidden;
+      }
 
-.facility-row.is-open .facility-row__detail {
-  grid-template-rows: 1fr;
-  padding: 0 1rem 1.25rem 1rem;
-}
+      .facility-row.is-open .facility-row__detail {
+        grid-template-rows: 1fr;
+        padding: 0 1rem 1.25rem 1rem;
+      }
 
-.facility-detail-card {
-  background: #FBF8F2;
-  border: 1px solid var(--color-border);
-  padding: 1rem 1.25rem;
-  min-height: 0;
-}
+      .facility-detail-card {
+        background: #fbf8f2;
+        border: 1px solid var(--color-border);
+        padding: 1rem 1.25rem;
+        min-height: 0;
+      }
 
-/* Momentary highlight on the row a create/edit/deactivate action just
+      /* Momentary highlight on the row a create/edit/deactivate action just
    touched — the one deliberate motion moment on this page, answering the
    user's own action rather than decorating on load. */
-@keyframes row-confirm-flash {
-  0% { background: var(--color-success-bg); }
-  100% { background: transparent; }
-}
+      @keyframes row-confirm-flash {
+        0% {
+          background: var(--color-success-bg);
+        }
+        100% {
+          background: transparent;
+        }
+      }
 
-.facility-row.is-flashing .facility-row__main {
-  animation: row-confirm-flash 1.4s ease-out;
-}
+      .facility-row.is-flashing .facility-row__main {
+        animation: row-confirm-flash 1.4s ease-out;
+      }
 
-/* ---- Loading skeleton ---- */
-.skeleton-row {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 0.8fr 0.9fr 0.7fr auto;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.95rem 1rem;
-  border-top: 1px solid var(--color-border);
-}
+      /* ---- Loading skeleton ---- */
+      .skeleton-row {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr 0.8fr 0.9fr 0.7fr auto;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.95rem 1rem;
+        border-top: 1px solid var(--color-border);
+      }
 
-.skeleton-bar {
-  height: 0.85rem;
-  background: var(--color-inactive-bg);
-  position: relative;
-  overflow: hidden;
-}
+      .skeleton-bar {
+        height: 0.85rem;
+        background: var(--color-inactive-bg);
+        position: relative;
+        overflow: hidden;
+      }
 
-.skeleton-bar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-  animation: skeleton-shimmer 1.3s infinite;
-}
+      .skeleton-bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.6),
+          transparent
+        );
+        animation: skeleton-shimmer 1.3s infinite;
+      }
 
-@keyframes skeleton-shimmer {
-  100% { transform: translateX(100%); }
-}
+      @keyframes skeleton-shimmer {
+        100% {
+          transform: translateX(100%);
+        }
+      }
 
-/* ---- Toast ---- */
-.toast {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  background: var(--color-accent);
-  color: var(--color-bg);
-  padding: 0.85rem 1.25rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  transform: translateY(12px);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  z-index: 40;
-}
+      /* ---- Toast ---- */
+      .toast {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: var(--color-accent);
+        color: var(--color-bg);
+        padding: 0.85rem 1.25rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        transform: translateY(12px);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
+        z-index: 40;
+      }
 
-.toast.is-visible {
-  transform: translateY(0);
-  opacity: 1;
-}
+      .toast.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+      }
 
-.toast__dot {
-  width: 7px;
-  height: 7px;
-  background: var(--color-secondary);
-  flex: none;
-}
+      .toast__dot {
+        width: 7px;
+        height: 7px;
+        background: var(--color-secondary);
+        flex: none;
+      }
 
-.facility-detail-card__label {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.03em;
-  color: var(--color-muted);
-  margin-bottom: 0.75rem;
-}
+      .facility-detail-card__label {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 0.03em;
+        color: var(--color-muted);
+        margin-bottom: 0.75rem;
+      }
 
-.facility-detail-card__groups {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-bottom: 0.9rem;
-}
+      .facility-detail-card__groups {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        margin-bottom: 0.9rem;
+      }
 
-.blood-group-chip {
-  font-size: 0.85rem;
-}
+      .blood-group-chip {
+        font-size: 0.85rem;
+      }
 
-.blood-group-chip__label {
-  font-weight: 700;
-  color: var(--color-primary);
-  margin-right: 0.35rem;
-}
+      .blood-group-chip__label {
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-right: 0.35rem;
+      }
 
-.facility-detail-card__link {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--color-primary);
-  text-decoration: none;
-}
+      .facility-detail-card__link {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--color-primary);
+        text-decoration: none;
+      }
 
-.facility-detail-card__link:hover { text-decoration: underline; }
+      .facility-detail-card__link:hover {
+        text-decoration: underline;
+      }
 
-/* ---- Empty / no-match state ---- */
-.admin-empty {
-  display: none;
-  text-align: center;
-  padding: 3.5rem 1.5rem;
-  border: 1px dashed var(--color-border);
-}
+      /* ---- Empty / no-match state ---- */
+      .admin-empty {
+        display: none;
+        text-align: center;
+        padding: 3.5rem 1.5rem;
+        border: 1px dashed var(--color-border);
+      }
 
-.admin-empty.is-visible { display: block; }
+      .admin-empty.is-visible {
+        display: block;
+      }
 
-.admin-empty__title {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin-bottom: 0.4rem;
-}
+      .admin-empty__title {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 0.4rem;
+      }
 
-.admin-empty__desc {
-  color: var(--color-muted);
-  font-size: 0.9rem;
-  margin-bottom: 1.25rem;
-}
+      .admin-empty__desc {
+        color: var(--color-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+      }
 
-/* ---- Slide-over (Add / Edit Facility) ---- */
-.slideover-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(28, 2, 4, 0.35);
-  z-index: 30;
-}
+      /* ---- Slide-over (Add / Edit Facility) ---- */
+      .slideover-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(28, 2, 4, 0.35);
+        z-index: 30;
+      }
 
-.slideover-overlay.is-open { display: block; }
+      .slideover-overlay.is-open {
+        display: block;
+      }
 
-.slideover {
-  position: fixed;
-  top: 0;
-  right: -420px;
-  width: 100%;
-  max-width: 420px;
-  height: 100%;
-  background: var(--color-bg);
-  z-index: 31;
-  transition: right 0.25s ease;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
+      .slideover {
+        position: fixed;
+        top: 0;
+        right: -420px;
+        width: 100%;
+        max-width: 420px;
+        height: 100%;
+        background: var(--color-bg);
+        z-index: 31;
+        transition: right 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
 
-.slideover.is-open { right: 0; }
+      .slideover.is-open {
+        right: 0;
+      }
 
-.slideover__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-}
+      .slideover__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--color-border);
+      }
 
-.slideover__title {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.1rem;
-}
+      .slideover__title {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
 
-.slideover__close {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--color-muted);
-}
+      .slideover__close {
+        background: none;
+        border: none;
+        font-size: 1.3rem;
+        line-height: 1;
+        cursor: pointer;
+        color: var(--color-muted);
+      }
 
-.slideover__close:hover { color: var(--color-primary); }
+      .slideover__close:hover {
+        color: var(--color-primary);
+      }
 
-.slideover__body {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-  flex: 1;
-}
+      .slideover__body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+        flex: 1;
+      }
 
-.form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
 
-.form-field label {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.82rem;
-}
+      .form-field label {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.82rem;
+      }
 
-.form-field__hint {
-  font-size: 0.75rem;
-  color: var(--color-muted);
-  font-weight: 400;
-}
+      .form-field__hint {
+        font-size: 0.75rem;
+        color: var(--color-muted);
+        font-weight: 400;
+      }
 
-.form-field input[type="text"],
-.form-field input[type="number"],
-.form-field input[type="email"],
-.form-field input[type="password"] {
-  padding: 0.65rem 0.8rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  font-size: 0.9rem;
-  color: var(--color-text);
-}
+      .form-field input[type="text"],
+      .form-field input[type="number"],
+      .form-field input[type="email"],
+      .form-field input[type="password"] {
+        padding: 0.65rem 0.8rem;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg);
+        font-size: 0.9rem;
+        color: var(--color-text);
+      }
 
-.form-field input:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+      .form-field input:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 1px;
+      }
 
-.form-row { display: flex; gap: 0.8rem; }
-.form-row .form-field { flex: 1; }
+      .form-row {
+        display: flex;
+        gap: 0.8rem;
+      }
+      .form-row .form-field {
+        flex: 1;
+      }
 
-.form-radio-group {
-  display: flex;
-  gap: 1.25rem;
-}
+      .form-radio-group {
+        display: flex;
+        gap: 1.25rem;
+      }
 
-.form-radio-group label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-weight: 500;
-  font-size: 0.88rem;
-  cursor: pointer;
-}
+      .form-radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 500;
+        font-size: 0.88rem;
+        cursor: pointer;
+      }
 
-.form-error {
-  font-size: 0.82rem;
-  color: var(--color-primary);
-  min-height: 1em;
-}
+      .form-error {
+        font-size: 0.82rem;
+        color: var(--color-primary);
+        min-height: 1em;
+      }
 
-.slideover__footer {
-  padding: 1.25rem 1.5rem;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-}
+      .slideover__footer {
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid var(--color-border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+      }
 
-.btn-secondary {
-  background: none;
-  border: 1px solid var(--color-border);
-  padding: 0.7rem 1.2rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.88rem;
-  cursor: pointer;
-  color: var(--color-text);
-}
+      .btn-secondary {
+        background: none;
+        border: 1px solid var(--color-border);
+        padding: 0.7rem 1.2rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+        color: var(--color-text);
+      }
 
-.btn-secondary:hover { border-color: var(--color-accent); }
+      .btn-secondary:hover {
+        border-color: var(--color-accent);
+      }
 
-.slideover__danger-zone {
-  margin: 0 1.5rem 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--color-border);
-}
+      .slideover__danger-zone {
+        margin: 0 1.5rem 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--color-border);
+      }
 
-.btn-danger-outline {
-  background: none;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  padding: 0.65rem 1.1rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  width: 100%;
-}
+      .btn-danger-outline {
+        background: none;
+        border: 1px solid var(--color-primary);
+        color: var(--color-primary);
+        padding: 0.65rem 1.1rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        width: 100%;
+      }
 
-.btn-danger-outline:hover { background: var(--color-primary); color: var(--color-bg); }
+      .btn-danger-outline:hover {
+        background: var(--color-primary);
+        color: var(--color-bg);
+      }
 
-.slideover__danger-desc {
-  font-size: 0.78rem;
-  color: var(--color-muted);
-  margin-top: 0.5rem;
-}
+      .slideover__danger-desc {
+        font-size: 0.78rem;
+        color: var(--color-muted);
+        margin-top: 0.5rem;
+      }
 
-.danger-confirm {
-  display: none;
-  align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.7rem;
-  font-size: 0.85rem;
-}
+      .danger-confirm {
+        display: none;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 0.7rem;
+        font-size: 0.85rem;
+      }
 
-.danger-confirm.is-visible { display: flex; }
+      .danger-confirm.is-visible {
+        display: flex;
+      }
 
-.danger-confirm button {
-  padding: 0.4rem 0.8rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.78rem;
-  cursor: pointer;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-}
+      .danger-confirm button {
+        padding: 0.4rem 0.8rem;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.78rem;
+        cursor: pointer;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg);
+      }
 
-.danger-confirm button.is-confirm {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-bg);
-}
+      .danger-confirm button.is-confirm {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: var(--color-bg);
+      }
 
-/* ---- Mobile ---- */
-@media (max-width: 800px) {
-  .facility-table__head { display: none; }
-  .facility-row__main {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "name edit"
-      "meta meta";
-    row-gap: 0.4rem;
-  }
-  .facility-row__name { grid-area: name; }
-  .facility-row__edit { grid-area: edit; }
-  .facility-row__location,
-  .facility-row__emr,
-  .facility-row__status,
-  .facility-row__units {
-    grid-area: meta;
-    display: inline;
-    font-size: 0.8rem;
-    color: var(--color-muted);
-  }
-  .facility-row__location::after { content: ' · '; }
-  .dash-header__nav { display: none; }
-}
-  </style>
-</head>
-<body>
-
-  <!-- =====================================================================
+      /* ---- Mobile ---- */
+      @media (max-width: 800px) {
+        .facility-table__head {
+          display: none;
+        }
+        .facility-row__main {
+          grid-template-columns: 1fr auto;
+          grid-template-areas:
+            "name edit"
+            "meta meta";
+          row-gap: 0.4rem;
+        }
+        .facility-row__name {
+          grid-area: name;
+        }
+        .facility-row__edit {
+          grid-area: edit;
+        }
+        .facility-row__location,
+        .facility-row__emr,
+        .facility-row__status,
+        .facility-row__units {
+          grid-area: meta;
+          display: inline;
+          font-size: 0.8rem;
+          color: var(--color-muted);
+        }
+        .facility-row__location::after {
+          content: " · ";
+        }
+        .dash-header__nav {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- =====================================================================
        HEADER
        ===================================================================== -->
-  <header class="dash-header">
-    <a href="admin-dashboard.html" class="dash-header__brand">
-      <img src="assets/logo.jpg" alt="SURKH logo" class="dash-header__logo">
-      <span class="dash-header__brand-name">SURKH</span>
-    </a>
+    <header class="dash-header">
+      <a href="admin-dashboard.html" class="dash-header__brand">
+        <img src="assets/logo.jpg" alt="SURKH logo" class="dash-header__logo" />
+        <span class="dash-header__brand-name">SURKH</span>
+      </a>
 
-    <nav class="dash-header__nav">
-      <a href="admin-dashboard.html" class="dash-header__nav-link dash-header__nav-link--active">Facilities</a>
-    </nav>
+      <nav class="dash-header__nav">
+        <a
+          href="admin-dashboard.html"
+          class="dash-header__nav-link dash-header__nav-link--active"
+          >Facilities</a
+        >
+      </nav>
 
-    <div class="dash-header__actions">
-      <div class="dash-profile">
-        <span class="dash-profile__avatar">A</span>
-        <span>
-          Admin
-          <span class="dash-profile__role">System Administrator</span>
-        </span>
+      <div class="dash-header__actions">
+        <div class="dash-profile">
+          <span class="dash-profile__avatar">A</span>
+          <span>
+            Admin
+            <span class="dash-profile__role">System Administrator</span>
+          </span>
+        </div>
+        <button class="dash-logout" id="logout-btn" type="button">
+          Log out
+        </button>
       </div>
-      <button class="dash-logout" id="logout-btn" type="button">Log out</button>
-    </div>
-  </header>
+    </header>
 
-  <!-- =====================================================================
+    <!-- =====================================================================
        MAIN
        ===================================================================== -->
-  <main class="admin-main">
-
-    <div class="admin-page-head">
-      <div>
-        <h1 class="admin-page-head__title">Manage Facilities</h1>
-        <p class="admin-page-head__subtitle">Add new facilities and update existing ones across the network.</p>
+    <main class="admin-main">
+      <div class="admin-page-head">
+        <div>
+          <h1 class="admin-page-head__title">Manage Facilities</h1>
+          <p class="admin-page-head__subtitle">
+            Add new facilities and update existing ones across the network.
+          </p>
+        </div>
+        <button class="btn-primary" id="add-facility-btn" type="button">
+          + Add Facility
+        </button>
       </div>
-      <button class="btn-primary" id="add-facility-btn" type="button">+ Add Facility</button>
-    </div>
 
-    <div class="admin-filters">
-      <div class="admin-filters__search">
-        <img src="assets/icon-search.svg" alt="">
-        <input type="text" id="search-input" placeholder="Search facility name...">
+      <div class="admin-filters">
+        <div class="admin-filters__search">
+          <img src="assets/icon-search.svg" alt="" />
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search facility name..."
+          />
+        </div>
+        <select id="city-filter">
+          <option value="">City: All</option>
+        </select>
+        <select id="status-filter">
+          <option value="">Status: All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
-      <select id="city-filter">
-        <option value="">City: All</option>
-      </select>
-      <select id="status-filter">
-        <option value="">Status: All</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-      </select>
-    </div>
 
-    <!-- Table head is a static grid row; the body is rendered by JS from
+      <!-- Table head is a static grid row; the body is rendered by JS from
          facilityStore + current filter state (see applyFiltersAndRender()
          and renderFacilities() below). -->
-    <div class="facility-table">
-      <div class="facility-table__head">
-        <span>Name</span>
-        <span>Location</span>
-        <span>EMR</span>
-        <span>Status</span>
-        <span>Units</span>
-        <span></span>
+      <div class="facility-table">
+        <div class="facility-table__head">
+          <span>Name</span>
+          <span>Location</span>
+          <span>EMR</span>
+          <span>Status</span>
+          <span>Units</span>
+          <span></span>
+        </div>
+        <div id="facility-table-body"><!-- rows injected here --></div>
       </div>
-      <div id="facility-table-body"><!-- rows injected here --></div>
-    </div>
 
-    <div class="admin-empty" id="empty-state">
-      <p class="admin-empty__title">No facilities match your search</p>
-      <p class="admin-empty__desc">Try a different name, or clear your filters.</p>
-      <button class="btn-secondary" id="clear-filters-btn" type="button">Clear filters</button>
-    </div>
+      <div class="admin-empty" id="empty-state">
+        <p class="admin-empty__title">No facilities match your search</p>
+        <p class="admin-empty__desc">
+          Try a different name, or clear your filters.
+        </p>
+        <button class="btn-secondary" id="clear-filters-btn" type="button">
+          Clear filters
+        </button>
+      </div>
+    </main>
 
-  </main>
-
-  <!-- =====================================================================
+    <!-- =====================================================================
        ADD / EDIT FACILITY SLIDE-OVER
        Both flows share this one panel; JS swaps the title, pre-fills
        fields, and shows/hides the parts that differ (initial staff login
        only on Add; danger zone only on Edit).
        ===================================================================== -->
-  <div class="slideover-overlay" id="slideover-overlay"></div>
-  <div class="slideover" id="facility-slideover" role="dialog" aria-modal="true" aria-labelledby="slideover-title">
-    <div class="slideover__header">
-      <span class="slideover__title" id="slideover-title">Add Facility</span>
-      <button class="slideover__close" id="slideover-close" type="button" aria-label="Close">&times;</button>
-    </div>
-
-    <div class="slideover__body">
-      <div class="form-field">
-        <label for="f-name">Facility name *</label>
-        <input type="text" id="f-name" placeholder="e.g. Shifa International Hospital">
+    <div class="slideover-overlay" id="slideover-overlay"></div>
+    <div
+      class="slideover"
+      id="facility-slideover"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="slideover-title"
+    >
+      <div class="slideover__header">
+        <span class="slideover__title" id="slideover-title">Add Facility</span>
+        <button
+          class="slideover__close"
+          id="slideover-close"
+          type="button"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
-      <div class="form-field">
-        <label for="f-location">Location (address) *</label>
-        <input type="text" id="f-location" placeholder="e.g. Sector H-8/4, Islamabad">
-      </div>
-
-      <div class="form-field">
-        <label for="f-city">City *</label>
-        <input type="text" id="f-city" placeholder="e.g. Islamabad">
-      </div>
-
-      <div class="form-row">
+      <div class="slideover__body">
         <div class="form-field">
-          <label for="f-lat">Latitude</label>
-          <input type="number" id="f-lat" step="any" placeholder="33.6844">
+          <label for="f-name">Facility name *</label>
+          <input
+            type="text"
+            id="f-name"
+            placeholder="e.g. Shifa International Hospital"
+          />
         </div>
+
         <div class="form-field">
-          <label for="f-lng">Longitude</label>
-          <input type="number" id="f-lng" step="any" placeholder="73.0479">
+          <label for="f-location">Location (address) *</label>
+          <input
+            type="text"
+            id="f-location"
+            placeholder="e.g. Sector H-8/4, Islamabad"
+          />
         </div>
-      </div>
-      <p class="form-field__hint">Optional for now — used later for distance-based search.</p>
 
-      <div class="form-field">
-        <label>Has EMR?</label>
-        <div class="form-radio-group">
-          <label><input type="radio" name="f-emr" value="yes"> Yes</label>
-          <label><input type="radio" name="f-emr" value="no" checked> No</label>
+        <div class="form-field">
+          <label for="f-city">City *</label>
+          <input type="text" id="f-city" placeholder="e.g. Islamabad" />
         </div>
-        <p class="form-field__hint">Label only — no live EMR integration in this version.</p>
-      </div>
 
-      <div class="form-field" id="staff-login-field">
-        <label for="f-staff-email">Initial staff login (optional)</label>
         <div class="form-row">
-          <input type="email" id="f-staff-email" placeholder="staff@hospital.pk">
-          <input type="password" id="f-staff-password" placeholder="Temporary password">
+          <div class="form-field">
+            <label for="f-lat">Latitude</label>
+            <input type="number" id="f-lat" step="any" placeholder="33.6844" />
+          </div>
+          <div class="form-field">
+            <label for="f-lng">Longitude</label>
+            <input type="number" id="f-lng" step="any" placeholder="73.0479" />
+          </div>
         </div>
-        <p class="form-field__hint">If left blank, the facility is created but no one can log into its dashboard yet.</p>
+        <p class="form-field__hint">
+          Optional for now — used later for distance-based search.
+        </p>
+
+        <div class="form-field">
+          <label>Has EMR?</label>
+          <div class="form-radio-group">
+            <label><input type="radio" name="f-emr" value="yes" /> Yes</label>
+            <label
+              ><input type="radio" name="f-emr" value="no" checked /> No</label
+            >
+          </div>
+          <p class="form-field__hint">
+            Label only — no live EMR integration in this version.
+          </p>
+        </div>
+
+        <div class="form-field" id="staff-login-field">
+          <label for="f-staff-email">Initial staff login (optional)</label>
+          <div class="form-row">
+            <input
+              type="email"
+              id="f-staff-email"
+              placeholder="staff@hospital.pk"
+            />
+            <input
+              type="password"
+              id="f-staff-password"
+              placeholder="Temporary password"
+            />
+          </div>
+          <p class="form-field__hint">
+            If left blank, the facility is created but no one can log into its
+            dashboard yet.
+          </p>
+        </div>
+
+        <p class="form-error" id="form-error"></p>
       </div>
 
-      <p class="form-error" id="form-error"></p>
-    </div>
+      <div
+        class="slideover__danger-zone"
+        id="danger-zone"
+        style="display: none"
+      >
+        <button class="btn-danger-outline" id="deactivate-btn" type="button">
+          Deactivate Facility
+        </button>
+        <p class="slideover__danger-desc">
+          Hides this facility from public search and hospital exchange.
+          Historical data is kept.
+        </p>
+        <div class="danger-confirm" id="danger-confirm">
+          <span>Are you sure?</span>
+          <button type="button" id="danger-cancel">Cancel</button>
+          <button type="button" class="is-confirm" id="danger-yes">
+            Yes, deactivate
+          </button>
+        </div>
+      </div>
 
-    <div class="slideover__danger-zone" id="danger-zone" style="display:none;">
-      <button class="btn-danger-outline" id="deactivate-btn" type="button">Deactivate Facility</button>
-      <p class="slideover__danger-desc">Hides this facility from public search and hospital exchange. Historical data is kept.</p>
-      <div class="danger-confirm" id="danger-confirm">
-        <span>Are you sure?</span>
-        <button type="button" id="danger-cancel">Cancel</button>
-        <button type="button" class="is-confirm" id="danger-yes">Yes, deactivate</button>
+      <div class="slideover__footer">
+        <button class="btn-secondary" id="slideover-cancel" type="button">
+          Cancel
+        </button>
+        <button class="btn-primary" id="slideover-save" type="button">
+          Create
+        </button>
       </div>
     </div>
 
-    <div class="slideover__footer">
-      <button class="btn-secondary" id="slideover-cancel" type="button">Cancel</button>
-      <button class="btn-primary" id="slideover-save" type="button">Create</button>
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <span class="toast__dot"></span>
+      <span id="toast-message"></span>
     </div>
-  </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite">
-    <span class="toast__dot"></span>
-    <span id="toast-message"></span>
-  </div>
-
-  <!-- Supabase client — auth guard + session check at the top of the inline JS below -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabaseClient.js"></script>
-  <script>
-/* =========================================================================
+    <!-- Supabase client — auth guard + session check at the top of the inline JS below -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script>
+      /* =========================================================================
    BACKEND + AUTH
    Same convention as dashboard.html — standalone static page, separate
    Next.js backend, Supabase JS client for session/token management.
    ========================================================================= */
-const BACKEND_BASE_URL = 'http://localhost:3000';
+      // Backend base URL comes from window.SURKH_READY (see supabaseClient.js) — each
+      // async consumer below awaits it and destructures BACKEND_BASE_URL locally.
 
-// Access token populated by auth guard — used by all authenticated API calls.
-let accessToken = null;
+      // Access token populated by auth guard — used by all authenticated API calls.
+      let accessToken = null;
 
-// Auth guard — redirects to login if no active session (same as dashboard.html).
-const authReady = (async function authGuard() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session) {
-    window.location.href = 'login.html';
-    return;
-  }
-  accessToken = session.access_token;
-})();
+      // Auth guard — redirects to login if no active session (same as dashboard.html).
+      const authReady = (async function authGuard() {
+        let sb;
+        try {
+          ({ client: sb } = await window.SURKH_READY);
+        } catch {
+          // Without the backend there is no session to verify — the login page reports it.
+          window.location.href = "login.html";
+          return;
+        }
+        const {
+          data: { session },
+        } = await sb.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+        accessToken = session.access_token;
+      })();
 
-/* =========================================================================
+      /* =========================================================================
    DATA ADAPTER — facilityStore.
    Every read/write in this file goes through here. Phase 1 wires
    getFacilities() and createFacility() to the real backend; the remaining
@@ -910,140 +1073,166 @@ const authReady = (async function authGuard() {
      updateFacility(id, data)   -> PATCH  /api/facilities/:id   (Phase 2)
      setFacilityStatus(id, bool)-> PATCH  /api/facilities/:id   (Phase 2)
    ========================================================================= */
-const facilityStore = {
-  async getFacilities() {
-    const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`);
-    if (!res.ok) {
-      throw new Error(`Failed to load facilities (${res.status})`);
-    }
-    const facilities = await res.json();
+      const facilityStore = {
+        async getFacilities() {
+          const { BACKEND_BASE_URL } = await window.SURKH_READY;
+          const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`);
+          if (!res.ok) {
+            throw new Error(`Failed to load facilities (${res.status})`);
+          }
+          const facilities = await res.json();
 
-    // Fetch real inventory per facility so the Units column shows the
-    // actual total. Uses the existing GET /api/inventory?facility_id=N
-    // endpoint which the admin is authorized to call (admin role check
-    // was added to the inventory route earlier). Failures are caught
-    // per-facility so one broken fetch doesn't block the entire list.
-    await authReady;
-    const withInventory = await Promise.all(facilities.map(async (f) => {
-      try {
-        const invRes = await fetch(
-          `${BACKEND_BASE_URL}/api/inventory?facility_id=${f.id}`,
-          { headers: { 'Authorization': 'Bearer ' + accessToken } }
-        );
-        if (!invRes.ok) return { ...f, status: 'active', units: 0, inventory: [] };
-        const inventory = await invRes.json();
-        const units = inventory.reduce((sum, r) => sum + (r.quantity || 0), 0);
-        return {
-          ...f,
-          status: 'active',
-          units,
-          inventory: inventory.map(r => ({ blood_group: r.blood_group, unit_count: r.quantity })),
-        };
-      } catch {
-        return { ...f, status: 'active', units: 0, inventory: [] };
-      }
-    }));
+          // Fetch real inventory per facility so the Units column shows the
+          // actual total. Uses the existing GET /api/inventory?facility_id=N
+          // endpoint which the admin is authorized to call (admin role check
+          // was added to the inventory route earlier). Failures are caught
+          // per-facility so one broken fetch doesn't block the entire list.
+          await authReady;
+          const withInventory = await Promise.all(
+            facilities.map(async (f) => {
+              try {
+                const invRes = await fetch(
+                  `${BACKEND_BASE_URL}/api/inventory?facility_id=${f.id}`,
+                  { headers: { Authorization: "Bearer " + accessToken } },
+                );
+                if (!invRes.ok)
+                  return { ...f, status: "active", units: 0, inventory: [] };
+                const inventory = await invRes.json();
+                const units = inventory.reduce(
+                  (sum, r) => sum + (r.quantity || 0),
+                  0,
+                );
+                return {
+                  ...f,
+                  status: "active",
+                  units,
+                  inventory: inventory.map((r) => ({
+                    blood_group: r.blood_group,
+                    unit_count: r.quantity,
+                  })),
+                };
+              } catch {
+                return { ...f, status: "active", units: 0, inventory: [] };
+              }
+            }),
+          );
 
-    return withInventory;
-  },
+          return withInventory;
+        },
 
-  async createFacility(data) {
-    await authReady;
-    const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + accessToken,
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await res.json();
-    if (!res.ok) {
-      throw new Error(result.error || 'Failed to create facility');
-    }
-    return {
-      ...result,
-      status: 'active',
-      units: 0,
-      inventory: [],
-    };
-  },
+        async createFacility(data) {
+          await authReady;
+          const { BACKEND_BASE_URL } = await window.SURKH_READY;
+          const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + accessToken,
+            },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+          if (!res.ok) {
+            throw new Error(result.error || "Failed to create facility");
+          }
+          return {
+            ...result,
+            status: "active",
+            units: 0,
+            inventory: [],
+          };
+        },
 
-  async updateFacility(id, data) {
-    await authReady;
-    const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + accessToken,
-      },
-      body: JSON.stringify({ ...data, id }),
-    });
-    const result = await res.json();
-    if (!res.ok) {
-      throw new Error(result.error || 'Failed to update facility');
-    }
-    return {
-      ...result,
-      status: 'active',
-      units: 0,
-      inventory: [],
-    };
-  },
+        async updateFacility(id, data) {
+          await authReady;
+          const { BACKEND_BASE_URL } = await window.SURKH_READY;
+          const res = await fetch(`${BACKEND_BASE_URL}/api/facilities`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + accessToken,
+            },
+            body: JSON.stringify({ ...data, id }),
+          });
+          const result = await res.json();
+          if (!res.ok) {
+            throw new Error(result.error || "Failed to update facility");
+          }
+          return {
+            ...result,
+            status: "active",
+            units: 0,
+            inventory: [],
+          };
+        },
 
-  async getInventory(facilityId) {
-    await authReady;
-    const res = await fetch(
-      `${BACKEND_BASE_URL}/api/inventory?facility_id=${facilityId}`,
-      { headers: { 'Authorization': 'Bearer ' + accessToken } }
-    );
-    if (!res.ok) {
-      throw new Error(`Failed to load inventory (${res.status})`);
-    }
-    return res.json();
-  },
+        async getInventory(facilityId) {
+          await authReady;
+          const { BACKEND_BASE_URL } = await window.SURKH_READY;
+          const res = await fetch(
+            `${BACKEND_BASE_URL}/api/inventory?facility_id=${facilityId}`,
+            { headers: { Authorization: "Bearer " + accessToken } },
+          );
+          if (!res.ok) {
+            throw new Error(`Failed to load inventory (${res.status})`);
+          }
+          return res.json();
+        },
 
-  async setFacilityStatus(id, isActive) {
-    // Phase 2 — is_active column and endpoint not yet built.
-    throw new Error('Deactivate not available yet — backend endpoint pending.');
-  },
-};
+        async setFacilityStatus(id, isActive) {
+          // Phase 2 — is_active column and endpoint not yet built.
+          throw new Error(
+            "Deactivate not available yet — backend endpoint pending.",
+          );
+        },
+      };
 
-/* =========================================================================
+      /* =========================================================================
    FILTER STATE — search text, city, status. applyFiltersAndRender() is the
    single function that reads current filter state, asks facilityStore for
    the full list, filters it in memory, and re-renders. Every filter input
    just updates state and calls this again.
    ========================================================================= */
-const filterState = { search: '', city: '', status: '' };
+      const filterState = { search: "", city: "", status: "" };
 
-async function applyFiltersAndRender(flashId) {
-  renderSkeleton();
-  const all = await facilityStore.getFacilities();
+      async function applyFiltersAndRender(flashId) {
+        renderSkeleton();
+        const all = await facilityStore.getFacilities();
 
-  // Populate city filter from real facility data — extract unique, non-empty
-  // cities, sort alphabetically, and preserve the current selection.
-  const citySelect = document.getElementById('city-filter');
-  const currentCity = filterState.city;
-  const uniqueCities = [...new Set(all.map(f => f.city).filter(c => c))].sort();
-  citySelect.innerHTML = '<option value="">City: All</option>' +
-    uniqueCities.map(c =>
-      `<option value="${c}"${c === currentCity ? ' selected' : ''}>${c}</option>`
-    ).join('');
+        // Populate city filter from real facility data — extract unique, non-empty
+        // cities, sort alphabetically, and preserve the current selection.
+        const citySelect = document.getElementById("city-filter");
+        const currentCity = filterState.city;
+        const uniqueCities = [
+          ...new Set(all.map((f) => f.city).filter((c) => c)),
+        ].sort();
+        citySelect.innerHTML =
+          '<option value="">City: All</option>' +
+          uniqueCities
+            .map(
+              (c) =>
+                `<option value="${c}"${c === currentCity ? " selected" : ""}>${c}</option>`,
+            )
+            .join("");
 
-  const filtered = all.filter((f) => {
-    const matchesSearch = f.name.toLowerCase().includes(filterState.search.toLowerCase());
-    const matchesCity = !filterState.city || f.city === filterState.city;
-    const matchesStatus = !filterState.status || f.status === filterState.status;
-    return matchesSearch && matchesCity && matchesStatus;
-  });
+        const filtered = all.filter((f) => {
+          const matchesSearch = f.name
+            .toLowerCase()
+            .includes(filterState.search.toLowerCase());
+          const matchesCity = !filterState.city || f.city === filterState.city;
+          const matchesStatus =
+            !filterState.status || f.status === filterState.status;
+          return matchesSearch && matchesCity && matchesStatus;
+        });
 
-  renderFacilities(filtered, flashId);
-}
+        renderFacilities(filtered, flashId);
+      }
 
-function renderSkeleton() {
-  emptyState.classList.remove('is-visible');
-  tableBody.innerHTML = Array.from({ length: 3 }).map(() => `
+      function renderSkeleton() {
+        emptyState.classList.remove("is-visible");
+        tableBody.innerHTML = Array.from({ length: 3 })
+          .map(
+            () => `
     <div class="skeleton-row">
       <div class="skeleton-bar" style="width: 70%"></div>
       <div class="skeleton-bar" style="width: 60%"></div>
@@ -1052,86 +1241,100 @@ function renderSkeleton() {
       <div class="skeleton-bar" style="width: 40%"></div>
       <div class="skeleton-bar" style="width: 50px"></div>
     </div>
-  `).join('');
-}
+  `,
+          )
+          .join("");
+      }
 
-/* ---- Toast — brief confirmation after a create/edit/deactivate action.
+      /* ---- Toast — brief confirmation after a create/edit/deactivate action.
    Doesn't block anything, disappears on its own; the row-flash (below)
    is the primary feedback, this is the secondary one for anyone who's
    scrolled past the row. ---- */
-const toast = document.getElementById('toast');
-const toastMessage = document.getElementById('toast-message');
-let toastTimer = null;
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toast-message");
+      let toastTimer = null;
 
-function showToast(message) {
-  toastMessage.textContent = message;
-  toast.classList.add('is-visible');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2600);
-}
+      function showToast(message) {
+        toastMessage.textContent = message;
+        toast.classList.add("is-visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(
+          () => toast.classList.remove("is-visible"),
+          2600,
+        );
+      }
 
-document.getElementById('search-input').addEventListener('input', (e) => {
-  filterState.search = e.target.value;
-  applyFiltersAndRender();
-});
-document.getElementById('city-filter').addEventListener('change', (e) => {
-  filterState.city = e.target.value;
-  applyFiltersAndRender();
-});
-document.getElementById('status-filter').addEventListener('change', (e) => {
-  filterState.status = e.target.value;
-  applyFiltersAndRender();
-});
-document.getElementById('clear-filters-btn').addEventListener('click', () => {
-  filterState.search = '';
-  filterState.city = '';
-  filterState.status = '';
-  document.getElementById('search-input').value = '';
-  document.getElementById('city-filter').value = '';
-  document.getElementById('status-filter').value = '';
-  applyFiltersAndRender();
-});
+      document.getElementById("search-input").addEventListener("input", (e) => {
+        filterState.search = e.target.value;
+        applyFiltersAndRender();
+      });
+      document.getElementById("city-filter").addEventListener("change", (e) => {
+        filterState.city = e.target.value;
+        applyFiltersAndRender();
+      });
+      document
+        .getElementById("status-filter")
+        .addEventListener("change", (e) => {
+          filterState.status = e.target.value;
+          applyFiltersAndRender();
+        });
+      document
+        .getElementById("clear-filters-btn")
+        .addEventListener("click", () => {
+          filterState.search = "";
+          filterState.city = "";
+          filterState.status = "";
+          document.getElementById("search-input").value = "";
+          document.getElementById("city-filter").value = "";
+          document.getElementById("status-filter").value = "";
+          applyFiltersAndRender();
+        });
 
-/* =========================================================================
+      /* =========================================================================
    RENDER — pure function of whatever list it's given. Never talks to
    facilityStore directly; applyFiltersAndRender() is the only caller that
    decides what list this sees.
    ========================================================================= */
-const tableBody = document.getElementById('facility-table-body');
-const emptyState = document.getElementById('empty-state');
+      const tableBody = document.getElementById("facility-table-body");
+      const emptyState = document.getElementById("empty-state");
 
-function renderFacilities(list, flashId) {
-  tableBody.innerHTML = '';
+      function renderFacilities(list, flashId) {
+        tableBody.innerHTML = "";
 
-  if (list.length === 0) {
-    emptyState.classList.add('is-visible');
-    return;
-  }
-  emptyState.classList.remove('is-visible');
+        if (list.length === 0) {
+          emptyState.classList.add("is-visible");
+          return;
+        }
+        emptyState.classList.remove("is-visible");
 
-  list.forEach((facility) => {
-    const row = document.createElement('div');
-    row.className = 'facility-row' + (facility.status === 'inactive' ? ' is-inactive' : '');
-    if (facility.id === flashId) row.className += ' is-flashing';
-    row.dataset.id = facility.id;
+        list.forEach((facility) => {
+          const row = document.createElement("div");
+          row.className =
+            "facility-row" +
+            (facility.status === "inactive" ? " is-inactive" : "");
+          if (facility.id === flashId) row.className += " is-flashing";
+          row.dataset.id = facility.id;
 
-    const groupsMarkup = facility.inventory.length
-      ? facility.inventory.map(g =>
-          `<span class="blood-group-chip"><span class="blood-group-chip__label">${g.blood_group}</span>${g.unit_count} units</span>`
-        ).join('')
-      : '<span class="blood-group-chip">No inventory logged yet.</span>';
+          const groupsMarkup = facility.inventory.length
+            ? facility.inventory
+                .map(
+                  (g) =>
+                    `<span class="blood-group-chip"><span class="blood-group-chip__label">${g.blood_group}</span>${g.unit_count} units</span>`,
+                )
+                .join("")
+            : '<span class="blood-group-chip">No inventory logged yet.</span>';
 
-    // .facility-row__main is a div, not a <button> — a real <button> can't
-    // legally contain the nested Edit <button>, same reasoning as the
-    // stock-row pattern in dashboard.html. role="button" + tabindex keeps
-    // it keyboard-accessible without the nesting problem.
-    row.innerHTML = `
+          // .facility-row__main is a div, not a <button> — a real <button> can't
+          // legally contain the nested Edit <button>, same reasoning as the
+          // stock-row pattern in dashboard.html. role="button" + tabindex keeps
+          // it keyboard-accessible without the nesting problem.
+          row.innerHTML = `
       <div class="facility-row__main" role="button" tabindex="0" aria-expanded="false">
         <span class="facility-row__name"><span class="facility-row__caret">&#9656;</span>${facility.name}</span>
         <span class="facility-row__location">${facility.location}</span>
-        <span class="facility-row__emr ${facility.has_emr ? 'facility-row__emr--yes' : 'facility-row__emr--no'}">${facility.has_emr ? 'Yes' : 'No'}</span>
+        <span class="facility-row__emr ${facility.has_emr ? "facility-row__emr--yes" : "facility-row__emr--no"}">${facility.has_emr ? "Yes" : "No"}</span>
         <span class="facility-row__status">
-          <span class="status-pill status-pill--${facility.status}">${facility.status === 'active' ? 'Active' : 'Inactive'}</span>
+          <span class="status-pill status-pill--${facility.status}">${facility.status === "active" ? "Active" : "Inactive"}</span>
         </span>
         <span class="facility-row__units">${facility.units}</span>
         <button class="facility-row__edit" type="button" data-id="${facility.id}">Edit</button>
@@ -1145,216 +1348,267 @@ function renderFacilities(list, flashId) {
       </div>
     `;
 
-    const mainEl = row.querySelector('.facility-row__main');
-    const editBtn = row.querySelector('.facility-row__edit');
+          const mainEl = row.querySelector(".facility-row__main");
+          const editBtn = row.querySelector(".facility-row__edit");
 
-    // Row click expands/collapses. Edit button stops propagation so
-    // clicking it doesn't also toggle the row underneath it.
-    function toggleRow() {
-      const isOpen = row.classList.toggle('is-open');
-      mainEl.setAttribute('aria-expanded', String(isOpen));
-    }
-    mainEl.addEventListener('click', toggleRow);
-    mainEl.addEventListener('keydown', (e) => {
-      if (e.target !== mainEl) return; // don't hijack Enter/Space meant for the Edit button
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(); }
-    });
+          // Row click expands/collapses. Edit button stops propagation so
+          // clicking it doesn't also toggle the row underneath it.
+          function toggleRow() {
+            const isOpen = row.classList.toggle("is-open");
+            mainEl.setAttribute("aria-expanded", String(isOpen));
+          }
+          mainEl.addEventListener("click", toggleRow);
+          mainEl.addEventListener("keydown", (e) => {
+            if (e.target !== mainEl) return; // don't hijack Enter/Space meant for the Edit button
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              toggleRow();
+            }
+          });
 
-    editBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openSlideover('edit', facility);
-    });
+          editBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openSlideover("edit", facility);
+          });
 
-    // "View full inventory" — fetches real inventory for this facility
-    // from GET /api/inventory?facility_id=N and renders it into the
-    // detail panel's groups container.
-    const inventoryLink = row.querySelector('.facility-detail-card__link');
-    const groupsContainer = row.querySelector('.facility-detail-card__groups');
+          // "View full inventory" — fetches real inventory for this facility
+          // from GET /api/inventory?facility_id=N and renders it into the
+          // detail panel's groups container.
+          const inventoryLink = row.querySelector(
+            ".facility-detail-card__link",
+          );
+          const groupsContainer = row.querySelector(
+            ".facility-detail-card__groups",
+          );
 
-    inventoryLink.addEventListener('click', async (e) => {
-      e.preventDefault();
-      groupsContainer.innerHTML = '<span class="blood-group-chip">Loading&hellip;</span>';
-      try {
-        const inventory = await facilityStore.getInventory(facility.id);
-        if (!inventory.length) {
-          groupsContainer.innerHTML = '<span class="blood-group-chip">No inventory logged yet.</span>';
-          return;
-        }
-        groupsContainer.innerHTML = inventory.map(r =>
-          `<span class="blood-group-chip"><span class="blood-group-chip__label">${r.blood_group}</span>${r.quantity} units</span>`
-        ).join('');
-      } catch (err) {
-        groupsContainer.innerHTML = '<span class="blood-group-chip">Failed to load inventory.</span>';
-        console.error('Inventory fetch failed:', err);
+          inventoryLink.addEventListener("click", async (e) => {
+            e.preventDefault();
+            groupsContainer.innerHTML =
+              '<span class="blood-group-chip">Loading&hellip;</span>';
+            try {
+              const inventory = await facilityStore.getInventory(facility.id);
+              if (!inventory.length) {
+                groupsContainer.innerHTML =
+                  '<span class="blood-group-chip">No inventory logged yet.</span>';
+                return;
+              }
+              groupsContainer.innerHTML = inventory
+                .map(
+                  (r) =>
+                    `<span class="blood-group-chip"><span class="blood-group-chip__label">${r.blood_group}</span>${r.quantity} units</span>`,
+                )
+                .join("");
+            } catch (err) {
+              groupsContainer.innerHTML =
+                '<span class="blood-group-chip">Failed to load inventory.</span>';
+              console.error("Inventory fetch failed:", err);
+            }
+          });
+
+          tableBody.appendChild(row);
+        });
       }
-    });
 
-    tableBody.appendChild(row);
-  });
-}
+      applyFiltersAndRender();
 
-applyFiltersAndRender();
-
-/* =========================================================================
+      /* =========================================================================
    SLIDE-OVER — shared by Add and Edit. `mode` is 'add' or 'edit';
    `facility` is only passed for 'edit' and is used to pre-fill fields and
    to know which id to PATCH on save.
    ========================================================================= */
-const overlay = document.getElementById('slideover-overlay');
-const slideover = document.getElementById('facility-slideover');
-const slideoverTitle = document.getElementById('slideover-title');
-const saveBtn = document.getElementById('slideover-save');
-const staffLoginField = document.getElementById('staff-login-field');
-const dangerZone = document.getElementById('danger-zone');
-const formError = document.getElementById('form-error');
+      const overlay = document.getElementById("slideover-overlay");
+      const slideover = document.getElementById("facility-slideover");
+      const slideoverTitle = document.getElementById("slideover-title");
+      const saveBtn = document.getElementById("slideover-save");
+      const staffLoginField = document.getElementById("staff-login-field");
+      const dangerZone = document.getElementById("danger-zone");
+      const formError = document.getElementById("form-error");
 
-const fName = document.getElementById('f-name');
-const fLocation = document.getElementById('f-location');
-const fCity = document.getElementById('f-city');
-const fLat = document.getElementById('f-lat');
-const fLng = document.getElementById('f-lng');
-const fStaffEmail = document.getElementById('f-staff-email');
-const fStaffPassword = document.getElementById('f-staff-password');
+      const fName = document.getElementById("f-name");
+      const fLocation = document.getElementById("f-location");
+      const fCity = document.getElementById("f-city");
+      const fLat = document.getElementById("f-lat");
+      const fLng = document.getElementById("f-lng");
+      const fStaffEmail = document.getElementById("f-staff-email");
+      const fStaffPassword = document.getElementById("f-staff-password");
 
-let slideoverMode = 'add';
-let editingFacilityId = null;
+      let slideoverMode = "add";
+      let editingFacilityId = null;
 
-function openSlideover(mode, facility) {
-  slideoverMode = mode;
-  formError.textContent = '';
+      function openSlideover(mode, facility) {
+        slideoverMode = mode;
+        formError.textContent = "";
 
-  if (mode === 'edit') {
-    editingFacilityId = facility.id;
-    slideoverTitle.textContent = 'Edit Facility';
-    saveBtn.textContent = 'Save Changes';
-    staffLoginField.style.display = 'none';
-    dangerZone.style.display = 'block';
+        if (mode === "edit") {
+          editingFacilityId = facility.id;
+          slideoverTitle.textContent = "Edit Facility";
+          saveBtn.textContent = "Save Changes";
+          staffLoginField.style.display = "none";
+          dangerZone.style.display = "block";
 
-    fName.value = facility.name;
-    fLocation.value = facility.location;
-    fCity.value = facility.city || '';
-    fLat.value = facility.latitude;
-    fLng.value = facility.longitude;
-    document.querySelector(`input[name="f-emr"][value="${facility.has_emr ? 'yes' : 'no'}"]`).checked = true;
-  } else {
-    editingFacilityId = null;
-    slideoverTitle.textContent = 'Add Facility';
-    saveBtn.textContent = 'Create';
-    staffLoginField.style.display = 'block';
-    dangerZone.style.display = 'none';
+          fName.value = facility.name;
+          fLocation.value = facility.location;
+          fCity.value = facility.city || "";
+          fLat.value = facility.latitude;
+          fLng.value = facility.longitude;
+          document.querySelector(
+            `input[name="f-emr"][value="${facility.has_emr ? "yes" : "no"}"]`,
+          ).checked = true;
+        } else {
+          editingFacilityId = null;
+          slideoverTitle.textContent = "Add Facility";
+          saveBtn.textContent = "Create";
+          staffLoginField.style.display = "block";
+          dangerZone.style.display = "none";
 
-    fName.value = '';
-    fLocation.value = '';
-    fCity.value = '';
-    fLat.value = '';
-    fLng.value = '';
-    fStaffEmail.value = '';
-    fStaffPassword.value = '';
-    document.querySelector('input[name="f-emr"][value="no"]').checked = true;
-  }
+          fName.value = "";
+          fLocation.value = "";
+          fCity.value = "";
+          fLat.value = "";
+          fLng.value = "";
+          fStaffEmail.value = "";
+          fStaffPassword.value = "";
+          document.querySelector('input[name="f-emr"][value="no"]').checked =
+            true;
+        }
 
-  resetDangerConfirm();
-  overlay.classList.add('is-open');
-  slideover.classList.add('is-open');
-}
+        resetDangerConfirm();
+        overlay.classList.add("is-open");
+        slideover.classList.add("is-open");
+      }
 
-function closeSlideover() {
-  overlay.classList.remove('is-open');
-  slideover.classList.remove('is-open');
-}
+      function closeSlideover() {
+        overlay.classList.remove("is-open");
+        slideover.classList.remove("is-open");
+      }
 
-document.getElementById('add-facility-btn').addEventListener('click', () => openSlideover('add'));
-document.getElementById('slideover-close').addEventListener('click', closeSlideover);
-document.getElementById('slideover-cancel').addEventListener('click', closeSlideover);
-overlay.addEventListener('click', closeSlideover);
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && slideover.classList.contains('is-open')) closeSlideover();
-});
+      document
+        .getElementById("add-facility-btn")
+        .addEventListener("click", () => openSlideover("add"));
+      document
+        .getElementById("slideover-close")
+        .addEventListener("click", closeSlideover);
+      document
+        .getElementById("slideover-cancel")
+        .addEventListener("click", closeSlideover);
+      overlay.addEventListener("click", closeSlideover);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && slideover.classList.contains("is-open"))
+          closeSlideover();
+      });
 
-/* ---- Save (Create or Save Changes) ----
+      /* ---- Save (Create or Save Changes) ----
    Validation mirrors the shape route.js's POST handler already enforces
    (name/location required non-empty strings, lat -90..90, lng -180..180)
    so a submission that passes here should also pass the real backend
    validation later, minimizing surprises when this swaps to a real POST. */
-saveBtn.addEventListener('click', async () => {
-  formError.textContent = '';
+      saveBtn.addEventListener("click", async () => {
+        formError.textContent = "";
 
-  const name = fName.value.trim();
-  const location = fLocation.value.trim();
-  const city = fCity.value.trim();
-  const latRaw = fLat.value.trim();
-  const lngRaw = fLng.value.trim();
-  const hasEmr = document.querySelector('input[name="f-emr"]:checked').value === 'yes';
+        const name = fName.value.trim();
+        const location = fLocation.value.trim();
+        const city = fCity.value.trim();
+        const latRaw = fLat.value.trim();
+        const lngRaw = fLng.value.trim();
+        const hasEmr =
+          document.querySelector('input[name="f-emr"]:checked').value === "yes";
 
-  if (!name) { formError.textContent = 'Facility name is required.'; return; }
-  if (!location) { formError.textContent = 'Location is required.'; return; }
-  if (!city) { formError.textContent = 'City is required.'; return; }
+        if (!name) {
+          formError.textContent = "Facility name is required.";
+          return;
+        }
+        if (!location) {
+          formError.textContent = "Location is required.";
+          return;
+        }
+        if (!city) {
+          formError.textContent = "City is required.";
+          return;
+        }
 
-  // Latitude/longitude are optional at this stage (per the wireframe), but
-  // if entered, validate the same range route.js enforces server-side.
-  const latitude = latRaw === '' ? 0 : Number(latRaw);
-  const longitude = lngRaw === '' ? 0 : Number(lngRaw);
-  if (Number.isNaN(latitude) || latitude < -90 || latitude > 90) {
-    formError.textContent = 'Latitude must be a number between -90 and 90.';
-    return;
-  }
-  if (Number.isNaN(longitude) || longitude < -180 || longitude > 180) {
-    formError.textContent = 'Longitude must be a number between -180 and 180.';
-    return;
-  }
+        // Latitude/longitude are optional at this stage (per the wireframe), but
+        // if entered, validate the same range route.js enforces server-side.
+        const latitude = latRaw === "" ? 0 : Number(latRaw);
+        const longitude = lngRaw === "" ? 0 : Number(lngRaw);
+        if (Number.isNaN(latitude) || latitude < -90 || latitude > 90) {
+          formError.textContent =
+            "Latitude must be a number between -90 and 90.";
+          return;
+        }
+        if (Number.isNaN(longitude) || longitude < -180 || longitude > 180) {
+          formError.textContent =
+            "Longitude must be a number between -180 and 180.";
+          return;
+        }
 
-  const payload = { name, city, location, latitude, longitude, has_emr: hasEmr };
+        const payload = {
+          name,
+          city,
+          location,
+          latitude,
+          longitude,
+          has_emr: hasEmr,
+        };
 
-  saveBtn.disabled = true;
-  saveBtn.textContent = slideoverMode === 'edit' ? 'Saving…' : 'Creating…';
+        saveBtn.disabled = true;
+        saveBtn.textContent =
+          slideoverMode === "edit" ? "Saving…" : "Creating…";
 
-  try {
-    let savedFacility;
-    if (slideoverMode === 'edit') {
-      savedFacility = await facilityStore.updateFacility(editingFacilityId, payload);
-      closeSlideover();
-      await applyFiltersAndRender(savedFacility.id);
-      showToast('Changes saved.');
-    } else {
-      savedFacility = await facilityStore.createFacility(payload);
-      // Staff-login fields (fStaffEmail/fStaffPassword) are read here but not
-      // sent anywhere yet — how staff accounts get created isn't decided
-      // (see wireframe §3 open question). Left as a visible no-op rather
-      // than silently dropped, so it's obvious this still needs wiring.
-      closeSlideover();
-      await applyFiltersAndRender(savedFacility.id);
-      showToast('Facility added.');
-    }
-  } catch (err) {
-    formError.textContent = 'Something went wrong. Please try again.';
-    console.error(err);
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = slideoverMode === 'edit' ? 'Save Changes' : 'Create';
-  }
-});
+        try {
+          let savedFacility;
+          if (slideoverMode === "edit") {
+            savedFacility = await facilityStore.updateFacility(
+              editingFacilityId,
+              payload,
+            );
+            closeSlideover();
+            await applyFiltersAndRender(savedFacility.id);
+            showToast("Changes saved.");
+          } else {
+            savedFacility = await facilityStore.createFacility(payload);
+            // Staff-login fields (fStaffEmail/fStaffPassword) are read here but not
+            // sent anywhere yet — how staff accounts get created isn't decided
+            // (see wireframe §3 open question). Left as a visible no-op rather
+            // than silently dropped, so it's obvious this still needs wiring.
+            closeSlideover();
+            await applyFiltersAndRender(savedFacility.id);
+            showToast("Facility added.");
+          }
+        } catch (err) {
+          formError.textContent = "Something went wrong. Please try again.";
+          console.error(err);
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent =
+            slideoverMode === "edit" ? "Save Changes" : "Create";
+        }
+      });
 
-/* ---- Deactivate (edit mode only) ---- */
-const deactivateBtn = document.getElementById('deactivate-btn');
-const dangerConfirm = document.getElementById('danger-confirm');
+      /* ---- Deactivate (edit mode only) ---- */
+      const deactivateBtn = document.getElementById("deactivate-btn");
+      const dangerConfirm = document.getElementById("danger-confirm");
 
-function resetDangerConfirm() {
-  dangerConfirm.classList.remove('is-visible');
-  deactivateBtn.style.display = 'block';
-}
+      function resetDangerConfirm() {
+        dangerConfirm.classList.remove("is-visible");
+        deactivateBtn.style.display = "block";
+      }
 
-deactivateBtn.addEventListener('click', () => {
-  deactivateBtn.style.display = 'none';
-  dangerConfirm.classList.add('is-visible');
-});
-document.getElementById('danger-cancel').addEventListener('click', resetDangerConfirm);
-document.getElementById('danger-yes').addEventListener('click', async () => {
-  const id = editingFacilityId;
-  await facilityStore.setFacilityStatus(id, false);
-  closeSlideover();
-  await applyFiltersAndRender(id);
-  showToast('Facility deactivated.');
-});
-  </script>
-</body>
+      deactivateBtn.addEventListener("click", () => {
+        deactivateBtn.style.display = "none";
+        dangerConfirm.classList.add("is-visible");
+      });
+      document
+        .getElementById("danger-cancel")
+        .addEventListener("click", resetDangerConfirm);
+      document
+        .getElementById("danger-yes")
+        .addEventListener("click", async () => {
+          const id = editingFacilityId;
+          await facilityStore.setFacilityStatus(id, false);
+          closeSlideover();
+          await applyFiltersAndRender(id);
+          showToast("Facility deactivated.");
+        });
+    </script>
+  </body>
 </html>
